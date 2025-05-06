@@ -4,13 +4,32 @@
 <div class="container mt-5" style="font-family: 'Kumbh Sans';">
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="d-flex align-items-center">
-                <img src="{{ asset('asset/images/profile.png') }}" alt="Foto Profil" class="rounded-circle me-3" width="45" height="45">
-                <div>
-                    <h5 class="mb-0 fw-bold">M. Wildan Alvian Prastya</h5>
-                    <small class="text-muted">Administrator</small>
-                </div>
-            </div>
+            <div class="dropdown">
+                <a class="d-flex align-items-center text-decoration-none dropdown-toggle" style="gap: 1rem;" href="#" role="button" id="dropdownProfile" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{{ asset('asset/images/profile.png') }}" alt="Foto Profil" class="rounded-circle me-2" width="45" height="45">
+                    <div class="text-start">
+                        <h5 class="mb-0 fw-bold text-dark">{{ Auth::user()->nama_lengkap ?? 'M. Wildan Alvian Prastya' }}</h5>
+                        <small class="text-muted">Administrator</small>
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-animated" aria-labelledby="dropdownProfile">
+                    <li>
+                        <a class="dropdown-item" href="{{ route('admin.edit', Auth::user()->id) }}">
+                            <i class="bi bi-pencil-square"></i> Edit Profil
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="{{ route('logout') }}"
+                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    </li>
+                </ul>
+            </div>            
         </div>
         <hr class="my-3"> 
         <div class="d-flex justify-content-between align-items-center mb-3">

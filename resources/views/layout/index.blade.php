@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>{{ config('app.name') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Alfa Slab One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus Jakarta Sans&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Kumbh Sans&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -98,6 +100,50 @@
             transform: scale(1.03);
         }
     </style>     
+
+<style>
+    /* Mengatur animasi smooth pada dropdown */
+        .dropdown-menu {
+            animation: fadeInDown 0.3s ease-in-out;
+            border-radius: 12px;
+            min-width: 180px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mengatur animasi khusus pada dropdown yang menggunakan class .dropdown-animated */
+        .dropdown-menu.dropdown-animated {
+            opacity: 0;
+            transform: translateY(10px);
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dropdown-menu.dropdown-animated.show {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+</style>
+
 </head>
 <body>
     <div class="sidebar">

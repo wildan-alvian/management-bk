@@ -29,7 +29,7 @@ class StudentAchievementController extends Controller
         ]);
     }
 
-    return redirect()->route('student.show', $request->student_id)
+    return redirect()->route('students.show', $request->student_id)
                      ->with('success', 'Prestasi berhasil ditambahkan.');
 }
 
@@ -47,7 +47,7 @@ class StudentAchievementController extends Controller
 
         $achievement->update($request->all());
 
-        return redirect()->route('student.show', $achievement->student_id)
+        return redirect()->route('students.show', $achievement->student_id)
                          ->with('success', 'Prestasi berhasil diperbarui.');
     }
 
@@ -57,7 +57,7 @@ class StudentAchievementController extends Controller
         $studentId = $achievement->student_id;
         $achievement->delete();
 
-        return redirect()->route('student.show', $studentId)
+        return redirect()->route('students.show', $studentId)
                          ->with('success', 'Prestasi berhasil dihapus.');
     }
 }

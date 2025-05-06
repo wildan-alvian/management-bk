@@ -7,7 +7,7 @@
             <h2 class="fw-bold">Form Tambah Guru BK</h2>
         </div>
         <div class="mb-4">
-            <a href="{{ route('guru-bk.index') }}" 
+            <a href="{{ route('counselors.index') }}" 
                class="fw-bold btn btn-sm rounded-pill btn-glow">
                <i class="bi bi-caret-left-fill me-1"></i> Kembali
             </a>         
@@ -15,7 +15,7 @@
 
         <!-- Mulai Card -->
         <div class="card shadow-sm p-4 mb-5 bg-white rounded">
-            <form action="{{ route('guru-bk.store') }}" method="POST">
+            <form action="{{ route('counselors.store') }}" method="POST">
                 @csrf
 
                 <div class="row mb-3">
@@ -70,7 +70,7 @@
                   Apakah anda yakin untuk membatalkan editan?
                 </div>
                 <div class="modal-footer">
-                  <a href="{{ route('guru-bk.index') }}" class="btn btn-danger">Yes</a>
+                  <a href="{{ route('counselors.index') }}" class="btn btn-danger">Yes</a>
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
                 </div>
               </div>

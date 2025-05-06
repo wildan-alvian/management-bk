@@ -7,6 +7,11 @@ use App\Models\Admin;
 
 class AdminController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:Super Admin|Admin');
+    }
+
     public function index(Request $request) 
     {
         $search = $request->input('search'); 

@@ -77,7 +77,7 @@ class StudentController extends Controller
             ]);
         }
 
-        return redirect()->route('student.index')->with('success', 'Data siswa berhasil disimpan.');
+        return redirect()->route('students.index')->with('success', 'Data siswa berhasil disimpan.');
     }
 
     public function show(Student $student)
@@ -89,7 +89,7 @@ class StudentController extends Controller
     {
         $student->delete();
 
-        return redirect()->route('student.index')->with('success', 'Data siswa berhasil dihapus.');
+        return redirect()->route('students.index')->with('success', 'Data siswa berhasil dihapus.');
     }
     public function update(Request $request, $id)
 {
@@ -124,7 +124,7 @@ class StudentController extends Controller
     }
 
     // Redirect jika bukan AJAX
-    return redirect()->route('student.show', $student->id)->with('success', 'Data berhasil diupdate');
+    return redirect()->route('students.show', $student->id)->with('success', 'Data berhasil diupdate');
 
 }
 

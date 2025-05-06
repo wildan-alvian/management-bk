@@ -5,7 +5,7 @@
     <h2 class="fw-bold mb-4">Detail Data Siswa</h2>
 
     <div class="mb-4">
-        <a href="{{ route('student.index') }}" class="fw-bold btn btn-sm rounded-pill btn-glow">
+        <a href="{{ route('students.index') }}" class="fw-bold btn btn-sm rounded-pill btn-glow">
             <i class="bi bi-caret-left-fill me-1"></i> Kembali
         </a>         
     </div>
@@ -143,7 +143,7 @@
                 </div>
                 <div class="modal-body">
                     <!-- Form Edit Siswa -->
-                    <form action="{{ route('student.update', $student->id) }}" method="POST">
+                    <form action="{{ route('students.update', $student->id) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <h6 class="fw-bold mb-3">Data Siswa</h6>
@@ -238,7 +238,7 @@
                     Apakah anda yakin ingin menghapus data siswa ini?
                 </div>
                 <div class="modal-footer">
-                    <form action="{{ route('student.destroy', $student->id) }}" method="POST" class="d-inline">
+                    <form action="{{ route('students.destroy', $student->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Hapus</button>
@@ -297,7 +297,7 @@
                                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                                         </div>
                                         <div class="modal-body">
-                                          <form action="{{ route('achievement.update', $achievement->id) }}" method="POST">
+                                          <form action="{{ route('student-achievements.update', $achievement->id) }}" method="POST">
                                               @csrf
                                               @method('PUT')
                                               
@@ -356,7 +356,7 @@
         Apakah anda yakin ingin menghapus data prestasi ini?
       </div>
       <div class="modal-footer">
-        <form action="{{ route('achievement.destroy', $achievement->id) }}" method="POST">
+        <form action="{{ route('student-achievements.destroy', $achievement->id) }}" method="POST">
           @csrf
           @method('DELETE')
           <button type="submit" class="btn btn-danger">Hapus</button>
@@ -421,7 +421,7 @@
                             <div class="modal fade" id="editMisconductModal{{ $misconduct->id }}" tabindex="-1" aria-labelledby="editModalLabelMisconduct{{ $misconduct->id }}" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                     <div class="modal-content">
-                                        <form action="{{ route('misconduct.update', $misconduct->id) }}" method="POST">
+                                        <form action="{{ route('student-misconducts.update', $misconduct->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <input type="hidden" name="student_id" value="{{ $student->id }}">
@@ -477,7 +477,7 @@
                                     Apakah anda yakin ingin menghapus data pelanggaran ini?
                                   </div>
                                   <div class="modal-footer">
-                                    <form action="{{ route('misconduct.destroy', $misconduct->id) }}" method="POST">
+                                    <form action="{{ route('student-misconducts.destroy', $misconduct->id) }}" method="POST">
                                       @csrf
                                       @method('DELETE')
                                       <button type="submit" class="btn btn-danger">Hapus</button>
@@ -499,7 +499,7 @@
 <div class="modal fade" id="addAchievementModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="{{ route('achievement.store') }}" method="POST">
+            <form action="{{ route('student-achievements.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="student_id" value="{{ $student->id }}">
 
@@ -581,7 +581,7 @@
 <div class="modal fade" id="addMisconductModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="{{ route('misconduct.store', ['studentId' => $student->id]) }}" method="POST">
+            <form action="{{ route('student-misconducts.store', ['studentId' => $student->id]) }}" method="POST">
                 @csrf
                 <input type="hidden" name="student_id" value="{{ $student->id }}">
                 <div class="modal-header">

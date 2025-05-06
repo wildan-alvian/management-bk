@@ -5,7 +5,7 @@
     <h2 class="fw-bold mb-4">Detail Data Guru BK</h2>
 
     <div class="mb-4">
-        <a href="{{ route('guru-bk.index') }}" class="fw-bold btn btn-sm rounded-pill btn-glow">
+        <a href="{{ route('counselors.index') }}" class="fw-bold btn btn-sm rounded-pill btn-glow">
             <i class="bi bi-caret-left-fill me-1"></i> Kembali
         </a>         
     </div>
@@ -80,7 +80,7 @@
                     <h5 class="modal-title fw-bold" id="editModalLabel">Edit Data Guru BK</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
-                <form action="{{ route('guru-bk.update', $guru->id) }}" method="POST">
+                <form action="{{ route('counselors.update', $guru->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
@@ -126,7 +126,7 @@
                     Apakah Anda yakin ingin menghapus data guru BK ini?
                 </div>
                 <div class="modal-footer">
-                    <form action="{{ route('guru-bk.destroy', $guru->id) }}" method="POST" class="d-inline">
+                    <form action="{{ route('counselors.destroy', $guru->id) }}" method="POST" class="d-inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Hapus</button>

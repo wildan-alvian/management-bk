@@ -6,12 +6,12 @@
     <h2 class="fw-bold">Form Tambah Siswa</h2>
 
     <div class="mb-4">
-        <a href="{{ route('student.index') }}" class="fw-bold btn btn-sm rounded-pill btn-glow">
+        <a href="{{ route('students.index') }}" class="fw-bold btn btn-sm rounded-pill btn-glow">
             <i class="bi bi-caret-left-fill me-1"></i> Kembali
         </a>         
     </div>
 
-    <form action="{{ route('student.store') }}" method="POST">
+    <form action="{{ route('students.store') }}" method="POST">
         @csrf
 
         <div class="card shadow-sm p-4 mb-5 bg-white rounded">
@@ -217,7 +217,7 @@
                     Apakah anda yakin untuk membatalkan editan?
                 </div>
                 <div class="modal-footer">
-                    <a href="{{ route('student.index') }}" class="btn btn-danger">Yes</a>
+                    <a href="{{ route('students.index') }}" class="btn btn-danger">Yes</a>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
                 </div>
             </div>

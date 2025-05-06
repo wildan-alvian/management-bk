@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class CounselingController extends Controller
 {
+
+    // public function __construct()
+    // {
+    //     $this->middleware('role:Super Admin|Admin|Guidance Counselor');
+    //     $this->middleware('role:Student|Student Parents')->only(['index', 'store', 'edit', 'update']);
+    // }
+
     public function index(Request $request)
 {
     $search = $request->input('search');

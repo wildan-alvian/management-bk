@@ -102,42 +102,51 @@
 <body>
     <div class="sidebar">
         <div class="d-flex flex-column align-items-start mb-5">
-            <div class="d-flex align-items-center mb-5">
+            <div class="d-flex align-items-center mb-3">
                 <img src="{{ asset('asset/images/dapuda.png') }}" width="55" height="55" class="me-2">
                 <h4 class="fs-2 m-0" style="font-family: 'Alfa Slab One';">
                     <span style="color:#D3F1DF">Counsel</span><span style="color:#F9CB43">Link</span>
                 </h4>
             </div>    
-            <div class="d-flex align-items-center mb-5 ps-3" style="font-family: 'Plus Jakarta Sans';">
+            <div class="d-flex align-items-center mb-3 ps-3" style="font-family: 'Plus Jakarta Sans';">
                 <i class="bi bi-bell-fill fs-5 me-5 text-white opacity-50"></i>
                 <span class="text-white opacity-50">5 Notifikasi Baru</span>
             </div>        
-            <hr class="w-100" style="border: none; border-top: 4px solid white; margin: 0px 0;">
+            <hr class="w-100" style="border: none; border-top: 4px solid white; margin: 0 0 20px 0;">
             
             <nav class="nav flex-column">
-                <a href="#" class="nav-link text-white mb-4" style="font-family: 'Plus Jakarta Sans';">
+                <a href="#" class="nav-link text-white mb-2" style="font-family: 'Plus Jakarta Sans';">
                     <i class="bi bi-grid me-5 text-white opacity-100"></i> <span class="text-white opacity-100">Dashboard</span>
                 </a>
+
+                @if(in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                 <a href="{{ route('admin.index') }}" 
-                class="nav-link mb-4 {{ request()->routeIs('admin.index') ? 'active' : '' }}">
-                <i class="bi bi-person-badge-fill me-5"></i> 
-                <span>Data Admin</span>
+                class="nav-link mb-2 {{ request()->routeIs('admin.index') ? 'active' : '' }}">
+                    <i class="bi bi-person-badge-fill me-5"></i> 
+                    <span>Data Admin</span>
                 </a>
-                <a href="{{ route('guru-bk.index') }}" 
-                class="nav-link mb-4 {{ request()->routeIs('guru-bk.index') ? 'active' : '' }}">
+                @endif
+
+                @if(in_array(Auth::user()->role, ['Super Admin', 'Admin', 'Guidance Counselor']))
+                <a href="{{ route('counselors.index') }}" 
+                class="nav-link mb-2 {{ request()->routeIs('counselors.index') ? 'active' : '' }}">
                     <i class="bi bi-person-vcard-fill me-5"></i> 
                     <span>Data Guru BK</span>
                 </a>
-                <a href="{{ route('student.index') }}" 
-                class="nav-link mb-4 {{ request()->routeIs('student.index') ? 'active' : '' }}">
+                @endif
+
+                @if(in_array(Auth::user()->role, ['Super Admin', 'Admin', 'Guidance Counselor', 'Student', 'Student Parent']))
+                <a href="{{ route('students.index') }}" 
+                class="nav-link mb-2 {{ request()->routeIs('students.index') ? 'active' : '' }}">
                     <i class="bi bi-people-fill me-5"></i>
                     <span>Data Siswa</span>
                 </a>
                 <a href="{{ route('counseling.index') }}" 
-                class="nav-link mb-4 {{ request()->routeIs('counseling.index') ? 'active' : '' }}">
+                class="nav-link mb-2 {{ request()->routeIs('counseling.index') ? 'active' : '' }}">
                     <i class="bi bi-file-earmark-richtext-fill me-5"></i> 
                     <span>Data Konseling</span>
                 </a>
+                @endif
             </nav>
         </div>
     </div> 

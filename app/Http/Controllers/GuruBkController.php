@@ -7,6 +7,12 @@ use App\Models\GuruBk;
 
 class GuruBkController extends Controller
 {
+    // public function __construct()
+    // {
+    //     $this->middleware('role:Super Admin|Admin');
+    //     $this->middleware('role:Guidance Counselor')->only('index');
+    // }
+
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -42,7 +48,7 @@ class GuruBkController extends Controller
                 ->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data.'])
                 ->withInput();
         }
-        return redirect()->route('guru-bk.index')->with('success', 'Data berhasil ditambahkan');
+        return redirect()->route('counselors.index')->with('success', 'Data berhasil ditambahkan');
 
     }
     public function show($id)
@@ -58,7 +64,7 @@ class GuruBkController extends Controller
     $counselor = GuruBk::findOrFail($id);
     $counselor->delete();
 
-    return redirect()->route('guru-bk.index')->with('success', 'Data admin berhasil dihapus.');
+    return redirect()->route('counselors.index')->with('success', 'Data admin berhasil dihapus.');
 }
 
 
@@ -67,7 +73,7 @@ public function update(Request $request, $id)
     $guru = GuruBk::findOrFail($id);
     $guru->update($request->all());
 
-    return redirect()->route('guru-bk.show', $guru->id)->with('success', 'Data berhasil diperbarui.');
+    return redirect()->route('counselors.show', $guru->id)->with('success', 'Data berhasil diperbarui.');
 }
 
 

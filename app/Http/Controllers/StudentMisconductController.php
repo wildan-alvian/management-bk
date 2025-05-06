@@ -30,7 +30,7 @@ class StudentMisconductController extends Controller
             ]);
         }
 
-        return redirect()->route('student.show', $request->student_id)
+        return redirect()->route('students.show', $request->student_id)
                          ->with('success', 'Pelanggaran berhasil ditambahkan.');
     }
 
@@ -62,7 +62,7 @@ class StudentMisconductController extends Controller
         $studentId = $misconduct->student_id;
         $misconduct->delete();
 
-        return redirect()->route('student.show', $studentId)
+        return redirect()->route('students.show', $studentId)
                          ->with('success', 'Pelanggaran berhasil dihapus.');
     }
 }

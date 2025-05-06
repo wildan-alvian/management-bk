@@ -7,26 +7,43 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentAchievementController;
 use App\Http\Controllers\StudentMisconductController;
 use App\Http\Controllers\CounselingController;
-
-
-
+use App\Http\Controllers\RoleController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('layout.index');
 });
-Route::get('/user', function () {
-    return view('welcome');
-});
+
+// Authentication Routes
+Auth::routes();
+
 Route::get('/app', function () {
     return view('layout.index');
 });
-Route::resource('admin', AdminController::class);
-Route::get('/guru', function () {
-    return redirect()->route('guru-bk.index');
+
+Route::get('/test-role', function () {
+    return Auth::user()->hasRole('Super Admin') ? 'Super Admin' : 'Not Super Admin';
 });
-Route::resource('guru-bk', GuruBkController::class);
-Route::resource('student', StudentController::class);
-Route::resource('achievement', StudentAchievementController::class);
-Route::post('/achievements', [StudentAchievementController::class, 'store'])->name('achievement.store');
-Route::resource('misconduct', StudentMisconductController::class);
-Route::resource('counseling', CounselingController::class);
+
+Route::middleware(['role:Super Admin'])->group(function () {
+    Route::resource('roles', RoleController::class);
+});
+
+Route::middleware(['role:Super Admin|Admin'])->group(function () {
+    Route::resource('admin', AdminController::class);
+    Route::resource('counselors', GuruBkController::class);
+});
+
+Route::middleware(['role:Super Admin|Admin|Guidance Counselor'])->group(function () {
+    Route::resource('counseling', CounselingController::class);
+    Route::resource('students', StudentController::class);
+    Route::resource('student-achievements', StudentAchievementController::class);
+    Route::resource('student-misconducts', StudentMisconductController::class);
+});
+
+Route::get('/counselors', [GuruBkController::class, 'index'])->middleware('permission:view-user')->name('counselors.index');
+Route::get('/counseling', [CounselingController::class, 'index'])->middleware('permission:view-counseling')->name('counseling.index');
+Route::post('/counseling', [CounselingController::class, 'store'])->middleware('permission:create-counseling')->name('counseling.store');
+Route::get('/counseling/{id}', [CounselingController::class, 'edit'])->middleware('permission:view-counseling')->name('counseling.edit');
+Route::put('/counseling/{id}', [CounselingController::class, 'update'])->middleware('permission:edit-counseling')->name('counseling.update');
+Route::get('/students', [StudentController::class, 'index'])->middleware('permission:view-student')->name('students.index');
+

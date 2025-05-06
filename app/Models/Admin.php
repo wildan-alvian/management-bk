@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Admin extends Model
 {
     use HasFactory;
-    protected $fillable = ['nip', 'nama', 'email', 'no_telepon', 'alamat'];
+    protected $fillable = ['nip', 'nama', 'email', 'no_telepon', 'alamat', 'foto'];
 }

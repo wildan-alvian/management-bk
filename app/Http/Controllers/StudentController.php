@@ -7,19 +7,25 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function index(Request $request)
+        public function index(Request $request)
     {
         $search = $request->input('search');
+        $kelas = $request->input('kelas'); // Ambil parameter filter kelas
 
         $students = Student::query()
             ->when($search, function ($query, $search) {
                 $query->where('nama_lengkap', 'like', '%' . $search . '%');
             })
+            ->when($kelas, function ($query, $kelas) {
+                $query->where('kelas', $kelas);
+            })
             ->orderBy('nama_lengkap')
-            ->paginate(10); // pakai pagination supaya links() tidak error
+            ->paginate(10)
+            ->appends(['search' => $search, 'kelas' => $kelas]); // agar parameter tetap terbawa saat navigasi halaman
 
-        return view('student.index', compact('students', 'search'));
+        return view('student.index', compact('students', 'search', 'kelas'));
     }
+
 
     public function create()
     {

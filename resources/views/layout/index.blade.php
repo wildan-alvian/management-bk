@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        .pagination ~ p,
+        .pagination-info {
+            display: none !important;
+        }
+    </style>
+    
     <meta charset="UTF-8">
     <title>{{ config('app.name') }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Alfa Slab One&display=swap" rel="stylesheet">
@@ -144,6 +151,7 @@
 
 </style>
 
+
 </head>
 <body>
     <div class="sidebar">
@@ -181,7 +189,7 @@
                 </a>
                 @endif
 
-                @if(in_array(Auth::user()->role, ['Super Admin', 'Admin', 'Guidance Counselor', 'Student', 'Student Parent']))
+                @if(in_array(Auth::user()->role, ['Super Admin', 'Admin', 'Guidance Counselor', 'Student', 'Student Parents']))
                 <a href="{{ route('students.index') }}" 
                 class="nav-link mb-2 {{ request()->routeIs('students.index') ? 'active' : '' }}">
                     <i class="bi bi-people-fill me-5"></i>
@@ -198,7 +206,41 @@
     </div> 
 
     <div class="content">
+        <div class="container mt-5" style="font-family: 'Kumbh Sans';">
+            <div class="container mt-5">
+        
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="dropdown">
+                        <a class="d-flex align-items-center text-decoration-none dropdown-toggle" style="gap: 1rem;" href="#" role="button" id="dropdownProfile" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ asset('asset/images/profile.png') }}" alt="Foto Profil" class="rounded-circle me-2" width="45" height="45">
+                            <div class="text-start">
+                                <h5 class="mb-0 fw-bold text-dark">{{ Auth::user()->nama_lengkap ?? 'M. Wildan Alvian Prastya' }}</h5>
+                                <small class="text-muted">{{ Auth::user()->role }}</small>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-animated" aria-labelledby="dropdownProfile">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('admin.edit', Auth::user()->id) }}">
+                                    <i class="bi bi-pencil-square"></i> Edit Profil
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{{ route('logout') }}"
+                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
+                            </li>
+                        </ul>
+                    </div>            
+                </div>
         @yield('content')
+            </div>
+        </div>
     </div>
+
 </body>
 </html>

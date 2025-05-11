@@ -20,30 +20,42 @@ Route::get('/app', function () {
     return view('layout.index');
 });
 
-Route::get('/test-role', function () {
-    return Auth::user()->hasRole('Super Admin') ? 'Super Admin' : 'Not Super Admin';
+Route::get('/test-role', function () { 
+    return Auth::user()->getAllPermissions()->pluck('name');
+    // return Auth::user()->hasRole('Super Admin') ? 'Super Admin' : 'Not Super Admin'; 
 });
 
-Route::middleware(['role:Super Admin'])->group(function () {
+Route::middleware(['auth', 'role:Super Admin'])->group(function () {
     Route::resource('roles', RoleController::class);
 });
 
-Route::middleware(['role:Super Admin|Admin'])->group(function () {
+Route::middleware(['auth', 'role:Super Admin|Admin'])->group(function () {
     Route::resource('admin', AdminController::class);
     Route::resource('counselors', GuruBkController::class);
 });
 
-Route::middleware(['role:Super Admin|Admin|Guidance Counselor'])->group(function () {
+Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(function () {
     Route::resource('counseling', CounselingController::class);
     Route::resource('students', StudentController::class);
     Route::resource('student-achievements', StudentAchievementController::class);
     Route::resource('student-misconducts', StudentMisconductController::class);
 });
 
-Route::get('/counselors', [GuruBkController::class, 'index'])->middleware('permission:view-user')->name('counselors.index');
-Route::get('/counseling', [CounselingController::class, 'index'])->middleware('permission:view-counseling')->name('counseling.index');
-Route::post('/counseling', [CounselingController::class, 'store'])->middleware('permission:create-counseling')->name('counseling.store');
-Route::get('/counseling/{id}', [CounselingController::class, 'edit'])->middleware('permission:view-counseling')->name('counseling.edit');
-Route::put('/counseling/{id}', [CounselingController::class, 'update'])->middleware('permission:edit-counseling')->name('counseling.update');
-Route::get('/students', [StudentController::class, 'index'])->middleware('permission:view-student')->name('students.index');
+// Individual permission routes
+Route::get('/counselors', [GuruBkController::class, 'index'])
+    ->middleware(['auth', 'permission:view-user'])->name('counselors.index');
 
+Route::get('/counseling', [CounselingController::class, 'index'])
+    ->middleware(['auth', 'permission:view-counseling'])->name('counseling.index');
+
+Route::post('/counseling', [CounselingController::class, 'store'])
+    ->middleware(['auth', 'permission:create-counseling'])->name('counseling.store');
+
+Route::get('/counseling/{id}', [CounselingController::class, 'edit'])
+    ->middleware(['auth', 'permission:view-counseling'])->name('counseling.edit');
+
+Route::put('/counseling/{id}', [CounselingController::class, 'update'])
+    ->middleware(['auth', 'permission:edit-counseling'])->name('counseling.update');
+
+Route::get('/students', [StudentController::class, 'index'])
+    ->middleware(['auth', 'permission:view-student'])->name('students.index');

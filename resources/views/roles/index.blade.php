@@ -1,17 +1,6 @@
 @extends('layout.index') 
 
 @section('content')
-<div class="container mt-5" style="font-family: 'Kumbh Sans';">
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="d-flex align-items-center">
-                <img src="{{ asset('asset/images/profile.png') }}" alt="Foto Profil" class="rounded-circle me-3" width="45" height="45">
-                <div>
-                    <h5 class="mb-0 fw-bold">M. Wildan Alvian Prastya</h5>
-                    <small class="text-muted">Administrator</small>
-                </div>
-            </div>
-        </div>
         <hr class="my-3"> 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold mb-0">Daftar Roles</h4>

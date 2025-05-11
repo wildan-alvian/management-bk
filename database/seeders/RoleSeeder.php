@@ -47,6 +47,8 @@ class RoleSeeder extends Seeder
         ]);
 
         $student->givePermissionTo([
+            'view-user',
+            'view-student',
             'view-counseling',
             'create-counseling',
             'edit-counseling',
@@ -54,6 +56,8 @@ class RoleSeeder extends Seeder
         ]);
 
         $studentParents->givePermissionTo([
+            'view-user',
+            'view-student',
             'view-counseling',
             'create-counseling',
             'edit-counseling',

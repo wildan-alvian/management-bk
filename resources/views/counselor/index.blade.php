@@ -6,7 +6,7 @@
     <h4 class="fw-bold mb-0">Daftar Guru BK</h4>
     <div class="d-flex">
         <form method="GET" action="{{ route('counselors.index') }}" class="d-flex">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-0" placeholder="Cari nama guru BK" style="max-width: 150px;">
+            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-0" placeholder="Cari nama/email/NIP" style="max-width: 250px;">
             <button type="submit" class="btn btn-outline-secondary me-3">
                 <i class="bi bi-search"></i>
             </button>
@@ -18,54 +18,86 @@
             </a>
         @endif
 
-        @if(in_array(Auth::user()->role, ['Super Admin', 'Admin']))
+        @if(Auth::user()->hasRole(['Super Admin', 'Admin']))
             <a href="{{ route('counselors.create') }}" class="btn text-white fw-bold btn-orange">+ Tambah Guru BK</a>
         @endif
     </div>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 <div class="table-responsive">
-    <table class="table table-hover align-middle text-center">
+    <table class="table table-hover align-middle">
         <thead class="table-light">
             <tr>
-                <th>No.</th>
-                <th>NIP</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Nomor Telepon</th>
-                <th></th>
+                <th class="text-center" style="width: 5%;">No.</th>
+                <th style="width: 15%;">NIP</th>
+                <th style="width: 25%;">Nama</th>
+                <th style="width: 25%;">Email</th>
+                <th style="width: 20%;">No. Telepon</th>
+                <th class="text-center" style="width: 10%;">Aksi</th>
             </tr>
         </thead>
         <tbody>
-            <tbody>
-                @forelse ($counselor as $index => $guru)
-                    <tr>
-                        <td>{{ $counselor->firstItem() + $index }}</td>
-                        <td>{{ $guru->nip }}</td>
-                        <td>{{ $guru->nama }}</td>
-                        <td>{{ $guru->email }}</td>
-                        <td>{{ $guru->no_telepon }}</td>
-                        <td>
-                            <a href="{{ route('counselors.show', $guru->id) }}" class="btn btn-sm btn-link" style="font-size: 18px;">
+            @forelse ($counselors as $index => $counselor)
+                <tr>
+                    <td class="text-center">{{ $counselors->firstItem() + $index }}</td>
+                    <td>{{ $counselor->nip }}</td>
+                    <td>{{ $counselor->name }}</td>
+                    <td>{{ $counselor->email }}</td>
+                    <td>{{ $counselor->phone ?? '-' }}</td>
+                    <td class="text-center">
+                        <div class="dropdown">
+                            <a class="btn btn-sm btn-link" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $counselor->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="bi bi-three-dots-vertical"></i>
                             </a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-muted">Tidak ada data guru BK yang tersedia.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    
-    {{-- Informasi jumlah dan pagination --}}
-        
-            <div class="d-flex justify-content-end mt-2">
-                {{ $counselor->withQueryString()->links('pagination::bootstrap-5') }}
-            </div>
-        </div>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $counselor->id }}">
+                                <a class="dropdown-item" href="{{ route('counselors.show', $counselor) }}">
+                                    <i class="bi bi-eye me-2"></i>Detail
+                                </a>
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $counselor->id }}">
+                                    <i class="bi bi-pencil me-2"></i>Edit
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $counselor->id }}">
+                                    <i class="bi bi-trash me-2"></i>Hapus
+                                </a>
+                            </div>
+                        </div>
 
-    
-    @endsection
+                        @include('counselor.partials._edit_modal', ['counselor' => $counselor])
+                        @include('counselor.partials._delete_modal', ['counselor' => $counselor])
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        @if(request('search'))
+                            Tidak ada guru BK yang ditemukan dengan kata kunci: "{{ request('search') }}"
+                        @else
+                            Tidak ada data guru BK yang tersedia.
+                        @endif
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-end mt-3">
+    {{ $counselors->links() }}
+</div>
+
+@endsection

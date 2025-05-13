@@ -13,6 +13,24 @@
             </a>         
         </div>
 
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <!-- Mulai Card -->
         <div class="card shadow-sm p-4 mb-5 bg-white rounded">
             <form action="{{ route('counselors.store') }}" method="POST">
@@ -21,62 +39,55 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="nip" class="form-label">NIP</label>
-                        <input type="text" class="form-control" name="nip" required>
+                        <input type="text" class="form-control @error('nip') is-invalid @enderror" 
+                               name="nip" value="{{ old('nip') }}" required>
+                        @error('nip')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-6">
-                        <label for="nama" class="form-label">Nama</label>
-                        <input type="text" class="form-control" name="nama" required>
+                        <label for="name" class="form-label">Nama</label>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                               name="name" value="{{ old('name') }}" required>
+                        @error('name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" required>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                               name="email" value="{{ old('email') }}" required>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-6">
-                        <label for="no_telepon" class="form-label">No Telepon</label>
-                        <input type="text" class="form-control" name="no_telepon">
+                        <label for="phone" class="form-label">No Telepon</label>
+                        <input type="text" class="form-control @error('phone') is-invalid @enderror" 
+                               name="phone" value="{{ old('phone') }}">
+                        @error('phone')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <label for="alamat" class="form-label">Alamat</label>
-                        <textarea class="form-control" name="alamat" rows="3"></textarea>
-                    </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Alamat</label>
+                    <textarea class="form-control @error('address') is-invalid @enderror" 
+                              name="address" rows="3">{{ old('address') }}</textarea>
+                    @error('address')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                <div class="d-flex justify-content-start">
-                    <button type="submit" class="btn btn-primary me-2">Simpan</button>
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                        Batal
-                    </button>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
-
             </form>
         </div>
-        <!-- Selesai Card -->
-
-        <!-- Modal Batal -->
-        <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title fw-bold" id="cancelModalLabel">Konfirmasi Batal</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                </div>
-                <div class="modal-body">
-                  Apakah anda yakin untuk membatalkan editan?
-                </div>
-                <div class="modal-footer">
-                  <a href="{{ route('counselors.index') }}" class="btn btn-danger">Yes</a>
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                </div>
-              </div>
-            </div>
-        </div>
-
     </div>
 </div>
 @endsection

@@ -88,6 +88,22 @@ class CounselingController extends Controller
 
         try {
             $counseling->update($validated);
+
+            $content = "Konseling $request->title pada $request->scheduled_at telah $request->status";
+            Notification::create([
+                'content' => $content,
+                'status' => false,
+            ]);
+
+            $details = [
+                'title' => 'Perubahan status konseling',
+                'body' => $content,
+            ];
+
+            Mail::to('anyemailrequest@gmail.com')->send( // TODO: ubah ke pengaju konseling
+                new TestMail("Perubahan status konseling $request->title", 'email.counseling.update', $details)
+            );
+
             return redirect()->route('counseling.index')
                 ->with('success', 'Data konseling berhasil diperbarui.');
         } catch (\Exception $e) {

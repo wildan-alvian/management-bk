@@ -58,7 +58,6 @@ class CounselingController extends Controller
 
     $content = "$request->submitted_by mengajukan konseling $request->title pada $request->scheduled_at";
     Notification::create([
-        'user_id' => 3, // TODO: ke semua guru bk
         'content' => $content,
         'status' => false,
     ]);
@@ -69,7 +68,7 @@ class CounselingController extends Controller
     ];
 
     Mail::to('anyemailrequest@gmail.com')->send( // TODO: ubah ke semua guru bk
-        new TestMail('Ada pengajuan konseling baru', 'email.counseling.new', $details)
+        new TestMail('Ada pengajuan konseling baru', 'email.counseling.create', $details)
     );
 
     return redirect()->route('counseling.index')->with('success', 'Data konseling berhasil ditambahkan.');

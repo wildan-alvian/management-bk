@@ -79,7 +79,7 @@ class GuruBkController extends Controller
             ];
 
             Mail::to($validated['email'])->send(
-                new TestMail('Pembuatan akun CounselLink baru', 'email.user.new', $details)
+                new TestMail('Pembuatan akun CounselLink baru', 'email.user.create', $details)
             );
 
             return redirect()->route('counselors.index')

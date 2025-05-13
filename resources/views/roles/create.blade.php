@@ -13,37 +13,32 @@
             </a>         
         </div>
 
-        <form action="{{ route('roles.store') }}" method="POST">
-            @csrf
-
         <div class="card shadow-sm p-4 mb-5 bg-white rounded">
             <form action="{{ route('roles.store') }}" method="POST">
                 @csrf
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="nama" class="form-label">Nama</label>
-                        <input type="text" class="form-control" name="nama" required>
+                        <label for="name" class="form-label">Nama</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
                         @if ($errors->has('name'))
                             <span class="text-danger">{{ $errors->first('name') }}</span>
                         @endif
                     </div>
                     <div class="col-md-6">
-                        <label for="permission" class="form-label">Hak akses</label>
-                        <select class="form-control" id="permission" name="permission" required>
-                            @forelse ($permissions as $permission)
-                                    <option value="{{ $permission->id }}" {{ in_array($permission->id, old('permissions') ?? []) ? 'selected' : '' }}>
-                                        {{ $permission->name }}
-                                    </option>
-                                @empty
-                            @endforelse
+                        <label for="permissions" class="form-label">Hak akses</label>
+                        <select class="form-select" id="permissions" name="permissions[]" multiple required>
+                            @foreach ($permissions as $permission)
+                                <option value="{{ $permission->id }}" {{ in_array($permission->id, old('permissions') ?? []) ? 'selected' : '' }}>
+                                    {{ $permission->name }}
+                                </option>
+                            @endforeach
                         </select>
                         @if ($errors->has('permissions'))
                             <span class="text-danger">{{ $errors->first('permissions') }}</span>
                         @endif
                     </div>
                 </div>
-
 
                 <div class="d-flex justify-content-start">
                     <button type="submit" class="btn btn-primary me-2">Simpan</button>
@@ -54,7 +49,6 @@
             </form>
         </div>
 
-      
         <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -75,4 +69,16 @@
 
     </div>
 </div>
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('#permissions').select2({
+            placeholder: 'Pilih hak akses',
+            allowClear: true
+        });
+    });
+</script>
+@endpush
+
 @endsection

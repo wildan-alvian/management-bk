@@ -8,9 +8,13 @@ use App\Http\Controllers\StudentAchievementController;
 use App\Http\Controllers\StudentMisconductController;
 use App\Http\Controllers\CounselingController;
 use App\Http\Controllers\RoleController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return view('layout.index');
+    if (Auth::check()) {
+        return redirect('/app');
+    }
+    return redirect('/login');
 });
 
 // Authentication Routes
@@ -18,7 +22,7 @@ Auth::routes();
 
 Route::get('/app', function () {
     return view('layout.index');
-});
+})->middleware('auth');
 
 Route::get('/test-role', function () { 
     return Auth::user()->getAllPermissions()->pluck('name');
@@ -47,6 +51,9 @@ Route::get('/counselors', [GuruBkController::class, 'index'])
 
 Route::get('/counseling', [CounselingController::class, 'index'])
     ->middleware(['auth', 'permission:view-counseling'])->name('counseling.index');
+
+Route::get('/counseling/create', [CounselingController::class, 'create'])
+    ->middleware(['auth', 'permission:view-counseling'])->name('counseling.create');
 
 Route::post('/counseling', [CounselingController::class, 'store'])
     ->middleware(['auth', 'permission:create-counseling'])->name('counseling.store');

@@ -25,12 +25,23 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): View
     {
-        return view('roles.index', [
-            'roles' => Role::orderBy('id','DESC')->paginate(10),
-            'permissions' => Permission::get()
-        ]);
+        $search = $request->get('search');
+
+        $roles = Role::when($search, function($query) use ($search) {
+                return $query->where('name', 'LIKE', '%'.$search.'%');
+            })
+            ->orderBy('id', 'DESC')
+            ->paginate(10)
+            ->withQueryString();
+
+        if ($search && $roles->isEmpty()) {
+            session()->flash('error', 'Tidak ada role yang ditemukan dengan kata kunci: ' . $search);
+        }
+
+        return view('roles.index', compact('roles', 'search'))
+            ->with('permissions', Permission::all());
     }
 
     /**

@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Counseling;
 use App\Models\User;
+use App\Models\Notification;
+use App\Mail\TestMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class CounselingController extends Controller
 {
@@ -43,7 +46,6 @@ class CounselingController extends Controller
         'submitted_by' => 'required|string|max:255',
         'counseling_type' => 'required|in:siswa,wali_murid',
         'title' => 'required|string|max:255',
-       
     ]);
 
     Counseling::create([
@@ -53,7 +55,22 @@ class CounselingController extends Controller
         'title' => $request->title,
         'status' => 'new', 
     ]);
-    
+
+    $content = "$request->submitted_by mengajukan konseling $request->title pada $request->scheduled_at";
+    Notification::create([
+        'user_id' => 3, // TODO: ke semua guru bk
+        'content' => $content,
+        'status' => false,
+    ]);
+
+    $details = [
+        'title' => 'Permintaan konseling',
+        'body' => $content,
+    ];
+
+    Mail::to('anyemailrequest@gmail.com')->send( // TODO: ubah ke semua guru bk
+        new TestMail('Ada pengajuan konseling baru', 'email.counseling.new', $details)
+    );
 
     return redirect()->route('counseling.index')->with('success', 'Data konseling berhasil ditambahkan.');
 }

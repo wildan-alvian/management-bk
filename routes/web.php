@@ -8,6 +8,7 @@ use App\Http\Controllers\StudentAchievementController;
 use App\Http\Controllers\StudentMisconductController;
 use App\Http\Controllers\CounselingController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -27,6 +28,10 @@ Route::get('/app', function () {
 Route::get('/test-role', function () { 
     return Auth::user()->getAllPermissions()->pluck('name');
     // return Auth::user()->hasRole('Super Admin') ? 'Super Admin' : 'Not Super Admin'; 
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('notifications', NotificationController::class);
 });
 
 Route::middleware(['auth', 'role:Super Admin'])->group(function () {

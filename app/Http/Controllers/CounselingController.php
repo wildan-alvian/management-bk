@@ -8,6 +8,7 @@ use App\Models\Notification;
 use App\Mail\TestMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class CounselingController extends Controller
 {
@@ -56,7 +57,8 @@ class CounselingController extends Controller
         'status' => 'new', 
     ]);
 
-    $content = "$request->submitted_by mengajukan konseling $request->title pada $request->scheduled_at";
+    $scheduled_at = Carbon::parse($request->scheduled_at)->format('d M Y H:i');
+    $content = "$request->submitted_by mengajukan konseling $request->title pada $scheduled_at";
     Notification::create([
         'content' => $content,
         'status' => false,
@@ -89,7 +91,8 @@ class CounselingController extends Controller
         try {
             $counseling->update($validated);
 
-            $content = "Konseling $request->title pada $request->scheduled_at telah $request->status";
+            $scheduled_at = Carbon::parse($request->scheduled_at)->format('d M Y H:i');
+            $content = "Konseling $request->title pada $scheduled_at telah $request->status";
             Notification::create([
                 'content' => $content,
                 'status' => false,

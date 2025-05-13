@@ -1,9 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
-use App\Models\Admin;
 
+use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -14,91 +18,134 @@ class AdminController extends Controller
 
     public function index(Request $request) 
     {
-        $search = $request->input('search'); 
-        $admins = Admin::query();
+        $search = $request->get('search');
 
-        if ($search) {
-            $admins->where(function ($query) use ($search) {
-                $query->where('nip', 'like', '%' . $search . '%')
-                      ->orWhere('nama', 'like', '%' . $search . '%')
-                      ->orWhere('email', 'like', '%' . $search . '%');
-            });
+        $admins = User::role('Admin')
+            ->when($search, function ($query) use ($search) {
+                return $query->where(function($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%")
+                      ->orWhere('nip', 'LIKE', "%{$search}%");
+                });
+            })
+            ->orderBy('id', 'DESC')
+            ->paginate(10)
+            ->withQueryString();
+
+        if ($search && $admins->isEmpty()) {
+            session()->flash('error', 'Tidak ada admin yang ditemukan dengan kata kunci: ' . $search);
         }
-        $admins = $admins->paginate(10);
-        return view('admin.index', [
-            'admins' => $admins,
-            'search' => $search
-        ]);
+
+        return view('admin.index', compact('admins', 'search'));
     }
+
     public function create()
     {
         return view('admin.create');
     }
+
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'nama' => 'required|string|max:255',
-        'nip' => 'required|string|max:50|unique:admins,nip',
-        'email' => 'required|email|unique:admins,email',
-        'no_telepon' => 'nullable|string|max:20',
-        'alamat' => 'nullable|string',
-    ]);
-
-    \App\Models\Admin::create($validated);
-
-    return redirect()->route('admin.index')->with('success', 'Admin berhasil ditambahkan!');
-}
-
-
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
     {
-        $admin = Admin::findOrFail($id);
-    return view('admin.show', compact('admin'));
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'nip' => ['required', 'string', 'max:50', 'unique:users'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string'],
+        ]);
+
+        // Generate random password
+        $password = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
+
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($password),
+                'nip' => $validated['nip'],
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
+                'role' => 'Admin'
+            ]);
+
+            $user->assignRole('Admin');
+            
+            DB::commit();
+            return redirect()->route('admin.index')
+                ->with('success', "Admin berhasil ditambahkan! Password: $password");
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Terjadi kesalahan saat menambahkan admin. ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function show(User $admin)
     {
-        //
+        return view('admin.show', compact('admin'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    
-    public function update(Request $request, $id)
-{
-    $request->validate([
-        'nip' => 'required',
-        'nama' => 'required',
-        'email' => 'required|email',
-        'no_telepon' => 'required',
-        'alamat' => 'required',
-    ]);
+    public function edit(User $admin)
+    {
+        if ($admin->hasRole('Super Admin')) {
+            abort(403, 'Tidak dapat mengedit Super Admin');
+        }
+        return view('admin.edit', compact('admin'));
+    }
 
-    $admin = Admin::findOrFail($id);
-    $admin->update($request->all());
-
-    return redirect()->route('admin.show', $id)->with('success', 'Data admin berhasil diperbarui.');
-}
+    public function update(Request $request, User $admin)
+    {
 
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-{
-    $admin = Admin::findOrFail($id);
-    $admin->delete();
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email,' . $admin->id],
+            'nip' => ['required', 'string', 'max:50', 'unique:users,nip,' . $admin->id],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string'],
+        ];
 
-    return redirect()->route('admin.index')->with('success', 'Data admin berhasil dihapus.');
-}
+        $validated = $request->validate($rules);
 
+        DB::beginTransaction();
+        try {
+            $admin->update($validated);
+            DB::commit();
+
+            return redirect()->route('admin.index', $admin)
+                ->with('success', 'Data admin berhasil diperbarui.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui data admin.')
+                ->withInput();
+        }
+    }
+
+    public function destroy(User $admin)
+    {
+        if ($admin->hasRole('Super Admin')) {
+            abort(403, 'Tidak dapat menghapus Super Admin');
+        }
+
+        if (auth()->id() === $admin->id) {
+            abort(403, 'Tidak dapat menghapus akun sendiri');
+        }
+
+        DB::beginTransaction();
+        try {
+            $admin->removeRole('Admin');
+            $admin->delete();
+            DB::commit();
+
+            return redirect()->route('admin.index')
+                ->with('success', 'Data admin berhasil dihapus.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Terjadi kesalahan saat menghapus data admin.');
+        }
+    }
 }

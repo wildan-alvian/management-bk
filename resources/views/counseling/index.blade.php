@@ -52,10 +52,12 @@
                         </span>
                     </td>
                     <td>
-                        <a href="{{ route('counseling.edit', $counseling->id) }}" class="btn btn-sm btn-link" style="font-size: 18px;">
+                        <a href="#" class="btn btn-sm btn-link" style="font-size: 18px;" data-bs-toggle="modal" data-bs-target="#editModal{{ $counseling->id }}">
                             <i class="bi bi-three-dots-vertical"></i>
                         </a>
                         <form action="{{ route('counseling.destroy', $counseling->id) }}" method="POST" class="d-inline">@csrf</form>
+
+                        @include('counseling.partials._edit_modal', ['counseling' => $counseling])
                     </td>
                 </tr>
             @empty

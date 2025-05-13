@@ -74,4 +74,27 @@ class CounselingController extends Controller
 
     return redirect()->route('counseling.index')->with('success', 'Data konseling berhasil ditambahkan.');
 }
+
+    public function update(Request $request, $id)
+    {
+        $counseling = Counseling::findOrFail($id);
+        
+        $validated = $request->validate([
+            'scheduled_at' => ['nullable', 'date'],
+            'submitted_by' => ['required', 'string', 'max:255'],
+            'counseling_type' => ['required', 'string', 'max:50', 'in:siswa,wali_murid'],
+            'title' => ['required', 'string', 'max:255'],
+            'status' => ['nullable', 'string', 'in:new,approved,rejected'],
+        ]);
+
+        try {
+            $counseling->update($validated);
+            return redirect()->route('counseling.index')
+                ->with('success', 'Data konseling berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui data konseling.');
+        }
+    }
 }

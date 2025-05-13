@@ -61,7 +61,7 @@ Route::post('/counseling', [CounselingController::class, 'store'])
 Route::get('/counseling/{id}', [CounselingController::class, 'edit'])
     ->middleware(['auth', 'permission:view-counseling'])->name('counseling.edit');
 
-Route::put('/counseling/{id}', [CounselingController::class, 'update'])
+Route::post('/counseling/{id}', [CounselingController::class, 'update'])
     ->middleware(['auth', 'permission:edit-counseling'])->name('counseling.update');
 
 Route::get('/students', [StudentController::class, 'index'])

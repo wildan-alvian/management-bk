@@ -1,12 +1,11 @@
 @extends('layout.index')
 
 @section('content')
-<hr class="my-3">
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="fw-bold mb-0">Daftar Siswa</h4>
     <div class="d-flex">
         <form method="GET" action="{{ route('students.index') }}" class="d-flex">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-0" placeholder="Cari nama/email/NISN/kelas" style="max-width: 250px;">
+            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama/email/NISN/kelas">
             <button type="submit" class="btn btn-outline-secondary me-3">
                 <i class="bi bi-search"></i>
             </button>
@@ -19,7 +18,10 @@
         @endif
 
         @can('create-student')
-            <a href="{{ route('students.create') }}" class="btn text-white fw-bold btn-orange">+ Tambah Siswa</a>
+            <a href="{{ route('students.create') }}" class="btn btn-add">
+                <i class="bi bi-plus-lg"></i>
+                Tambah Siswa
+            </a>
         @endcan
     </div>
 </div>
@@ -62,7 +64,7 @@
                     <td>{{ optional(optional($student->student)->studentParent)->family_relation ?? 'N/A' }}</td>
                     <td class="text-center">
                         <div class="dropdown">
-                            <a class="btn btn-sm btn-link" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $student->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $student->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="bi bi-three-dots-vertical"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $student->id }}">

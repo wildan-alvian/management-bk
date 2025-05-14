@@ -1,9 +1,9 @@
 <!-- Achievement Modal -->
 <div class="modal fade" id="achievementModal" tabindex="-1" aria-labelledby="achievementModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="achievementModalLabel">Tambah Prestasi</h5>
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="achievementModalLabel">Tambah Prestasi</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="achievementForm">
@@ -12,12 +12,16 @@
                 <input type="hidden" name="achievement_id" id="achievement_id">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="name" class="form-label">Nama Prestasi</label>
+                        <div class="text-start">
+                            <label for="name" class="form-label fw-bold">Nama Prestasi</label>
+                        </div>
                         <input type="text" class="form-control" id="name" name="name" required>
                         <div class="invalid-feedback" id="name-error"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="category" class="form-label">Kategori</label>
+                        <div class="text-start">
+                            <label for="category" class="form-label fw-bold">Kategori</label>
+                        </div>
                         <select class="form-select" id="category" name="category" required>
                             <option value="">Pilih Kategori</option>
                             <option value="Akademik">Akademik</option>
@@ -29,19 +33,27 @@
                         <div class="invalid-feedback" id="category-error"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="date" class="form-label">Tanggal</label>
+                        <div class="text-start">
+                            <label for="date" class="form-label fw-bold">Tanggal</label>
+                        </div>
                         <input type="date" class="form-control" id="date" name="date" required>
                         <div class="invalid-feedback" id="date-error"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="detail" class="form-label">Detail</label>
+                        <div class="text-start">
+                            <label for="detail" class="form-label fw-bold">Detail</label>
+                        </div>
                         <textarea class="form-control" id="detail" name="detail" rows="3" required></textarea>
                         <div class="invalid-feedback" id="detail-error"></div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>Simpan
+                    </button>
                 </div>
             </form>
         </div>

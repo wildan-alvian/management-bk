@@ -2,8 +2,8 @@
 <div class="modal fade" id="misconductModal" tabindex="-1" aria-labelledby="misconductModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="misconductModalLabel">Tambah Pelanggaran</h5>
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="misconductModalLabel">Tambah Pelanggaran</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="misconductForm">
@@ -12,12 +12,16 @@
                 <input type="hidden" name="misconduct_id" id="misconduct_id">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="misconduct_name" class="form-label">Nama Pelanggaran</label>
+                        <div class="text-start">
+                            <label for="misconduct_name" class="form-label fw-bold">Nama Pelanggaran</label>
+                        </div>
                         <input type="text" class="form-control" id="misconduct_name" name="name" required>
                         <div class="invalid-feedback" id="misconduct-name-error"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="misconduct_category" class="form-label">Kategori</label>
+                        <div class="text-start">
+                            <label for="misconduct_category" class="form-label fw-bold">Kategori</label>
+                        </div>
                         <select class="form-select" id="misconduct_category" name="category" required>
                             <option value="">Pilih Kategori</option>
                             <option value="Ringan">Ringan</option>
@@ -27,19 +31,27 @@
                         <div class="invalid-feedback" id="misconduct-category-error"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="misconduct_date" class="form-label">Tanggal</label>
+                        <div class="text-start">
+                            <label for="misconduct_date" class="form-label fw-bold">Tanggal</label>
+                        </div>
                         <input type="date" class="form-control" id="misconduct_date" name="date" required>
                         <div class="invalid-feedback" id="misconduct-date-error"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="misconduct_detail" class="form-label">Detail</label>
+                        <div class="text-start">
+                            <label for="misconduct_detail" class="form-label fw-bold">Detail</label>
+                        </div>
                         <textarea class="form-control" id="misconduct_detail" name="detail" rows="3" required></textarea>
                         <div class="invalid-feedback" id="misconduct-detail-error"></div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>Simpan
+                    </button>
                 </div>
             </form>
         </div>

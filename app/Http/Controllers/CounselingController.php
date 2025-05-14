@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Notification;
 use App\Mail\TestMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
@@ -20,7 +21,7 @@ class CounselingController extends Controller
     // }
 
     public function index(Request $request)
-{
+{   
     $search = $request->input('search');
     $counselings = Counseling::query()
     ->when($search, function ($query, $search) {
@@ -42,23 +43,24 @@ class CounselingController extends Controller
 
     public function store(Request $request)
 {
+    $user = Auth::user();
+
     $request->validate([
         'scheduled_at' => 'nullable|date',
-        'submitted_by' => 'required|string|max:255',
         'counseling_type' => 'required|in:siswa,wali_murid',
         'title' => 'required|string|max:255',
     ]);
 
     Counseling::create([
         'scheduled_at' => $request->scheduled_at,
-        'submitted_by' => $request->submitted_by,
+        'submitted_by' => $user->name,
         'counseling_type' => $request->counseling_type,
         'title' => $request->title,
         'status' => 'new', 
     ]);
 
     $scheduled_at = Carbon::parse($request->scheduled_at)->format('d M Y H:i');
-    $content = "$request->submitted_by mengajukan konseling $request->title pada $scheduled_at";
+    $content = "$user->name mengajukan konseling $request->title pada $scheduled_at";
     Notification::create([
         'content' => $content,
         'status' => false,

@@ -24,13 +24,8 @@
                             <div class="col-md-6">
                                 <label for="scheduled_at" class="form-label fw-bold">Jadwal Konseling</label>
                                 <input type="datetime-local" name="scheduled_at" id="scheduled_at" class="form-control" value="{{ old('scheduled_at') }}">
-                            </div>
-            
-                            <div class="col-md-6">
-                                <label for="submitted_by" class="form-label fw-bold">Diajukan Oleh</label>
-                                <input type="text" name="submitted_by" id="submitted_by" class="form-control" placeholder="Diajukan oleh" value="{{ old('submitted_by') }}">
-                            </div>                            
-            
+                            </div>                         
+
                             <div class="col-md-6">
                                 <label for="counseling_type" class="form-label fw-bold">Tipe Konseling</label>
                                 <select name="counseling_type" id="counseling_type" class="form-control">

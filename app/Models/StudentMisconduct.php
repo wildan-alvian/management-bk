@@ -17,11 +17,16 @@ class StudentMisconduct extends Model
         'detail',
     ];
 
+    protected $casts = [
+        'date' => 'date',
+    ];
+
     public function edit($id)
-{
-    $misconduct = StudentMisconduct::findOrFail($id);
-    return view('misconduct.edit', compact('misconduct'));
-}
+    {
+        $misconduct = StudentMisconduct::findOrFail($id);
+        return view('misconduct.edit', compact('misconduct'));
+    }
+
     public function student()
     {
         return $this->belongsTo(Student::class);

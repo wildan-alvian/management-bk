@@ -5,64 +5,100 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\StudentMisconduct;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class StudentMisconductController extends Controller
 {
     // Menyimpan data pelanggaran baru
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'student_id' => 'required|exists:students,id',
-            'misconducts' => 'required|array',
-            'misconducts.*.name' => 'required|string|max:255',
-            'misconducts.*.category' => 'required|string|max:255',
-            'misconducts.*.date' => 'required|date',
-            'misconducts.*.detail' => 'nullable|string',
-        ]);
-
-        foreach ($request->misconducts as $misconduct) {
-            StudentMisconduct::create([
-                'student_id' => $request->student_id,
-                'name' => $misconduct['name'],
-                'category' => $misconduct['category'],
-                'date' => $misconduct['date'],
-                'detail' => $misconduct['detail'] ?? null,
-            ]);
-        }
-
-        return redirect()->route('students.show', $request->student_id)
-                         ->with('success', 'Pelanggaran berhasil ditambahkan.');
-    }
-
-    // Memperbarui data pelanggaran
-    public function update(Request $request, $id)
-    {
-        $request->validate([
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'date' => 'required|date',
             'detail' => 'nullable|string',
         ]);
 
-        $misconduct = StudentMisconduct::findOrFail($id);
-        $misconduct->update([
-            'name' => $request->name,
-            'category' => $request->category,
-            'date' => $request->date,
-            'detail' => $request->detail,
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $misconduct = StudentMisconduct::create($request->all());
+
+            // Load the student relationship
+            $misconduct->load('student');
+
+            return response()->json([
+                'success' => true,
+                'data' => $misconduct,
+                'message' => 'Pelanggaran berhasil ditambahkan'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data'
+            ], 500);
+        }
+    }
+
+    // Memperbarui data pelanggaran
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'date' => 'required|date',
+            'detail' => 'nullable|string',
         ]);
 
-        return redirect()->back()->with('success', 'Data pelanggaran berhasil diperbarui.');
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $misconduct = StudentMisconduct::findOrFail($id);
+            $misconduct->update($request->all());
+
+            // Load the student relationship
+            $misconduct->load('student');
+
+            return response()->json([
+                'success' => true,
+                'data' => $misconduct,
+                'message' => 'Pelanggaran berhasil diperbarui'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui data'
+            ], 500);
+        }
     }
 
     // Menghapus data pelanggaran
     public function destroy($id)
     {
-        $misconduct = StudentMisconduct::findOrFail($id);
-        $studentId = $misconduct->student_id;
-        $misconduct->delete();
+        try {
+            $misconduct = StudentMisconduct::findOrFail($id);
+            $misconduct->delete();
 
-        return redirect()->route('students.show', $studentId)
-                         ->with('success', 'Pelanggaran berhasil dihapus.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Pelanggaran berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus data'
+            ], 500);
+        }
     }
 }

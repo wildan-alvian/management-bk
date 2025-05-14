@@ -5,75 +5,107 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="fw-bold mb-0">Daftar Siswa</h4>
     <div class="d-flex">
-        <form method="GET" action="{{ route('students.index') }}" class="d-flex align-items-center">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama siswa" style="max-width: 150px;">
-            <button type="submit" class="btn btn-outline-secondary me-2">
+        <form method="GET" action="{{ route('students.index') }}" class="d-flex">
+            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-0" placeholder="Cari nama/email/NISN/kelas" style="max-width: 250px;">
+            <button type="submit" class="btn btn-outline-secondary me-3">
                 <i class="bi bi-search"></i>
             </button>
-            <div class="dropdown me-2">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownKelas" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-funnel"></i>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownKelas">
-                    <li><a class="dropdown-item" href="{{ route('students.index', array_merge(request()->all(), ['kelas' => '7'])) }}">Kelas 7</a></li>
-                    <li><a class="dropdown-item" href="{{ route('students.index', array_merge(request()->all(), ['kelas' => '8'])) }}">Kelas 8</a></li>
-                    <li><a class="dropdown-item" href="{{ route('students.index', array_merge(request()->all(), ['kelas' => '9'])) }}">Kelas 9</a></li>
-                </ul>
-            </div>
         </form>
 
-        @if(request('search') || request('kelas'))
-            <a href="{{ route('students.index') }}" class="btn btn-outline-secondary me-2">
+        @if(request('search'))
+            <a href="{{ route('students.index') }}" class="btn btn-outline-secondary me-3">
                 <i class="bi bi-x-circle-fill"></i>
             </a>
         @endif
 
-        <a href="{{ route('students.create') }}" class="btn text-white fw-bold btn-orange">
-            + Tambah Siswa
-        </a>
+        @can('create-student')
+            <a href="{{ route('students.create') }}" class="btn text-white fw-bold btn-orange">+ Tambah Siswa</a>
+        @endcan
     </div>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {!! nl2br(e(session('success'))) !!}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 <div class="table-responsive">
-    <table class="table table-hover align-middle text-center">
+    <table class="table table-hover align-middle">
         <thead class="table-light">
             <tr>
-                <th>No.</th>
-                <th>NISN</th>
-                <th>Nama</th>
-                <th>Kelas</th>
-                <th>Email</th>
-                <th>Nomor Telepon</th>
-                <th></th>
+                <th class="text-center" style="width: 5%;">No.</th>
+                <th style="width: 15%;">NISN</th>
+                <th style="width: 20%;">Nama</th>
+                <th style="width: 10%;">Kelas</th>
+                <th style="width: 20%;">Wali</th>
+                <th style="width: 20%;">Hubungan</th>
+                <th class="text-center" style="width: 10%;">Aksi</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($students as $index => $student)
                 <tr>
-                    <td>{{ $students->firstItem() + $index }}</td>
-                    <td>{{ $student->nisn }}</td>
-                    <td>{{ $student->nama_lengkap }}</td>
-                    <td>{{ $student->kelas }}</td>
-                    <td>{{ $student->email_siswa }}</td>
-                    <td>{{ $student->telepon_siswa }}</td>
-                    <td>
-                        <a href="{{ route('students.show', $student->id) }}" class="btn btn-sm btn-link" style="font-size: 18px;">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </a>
-                        <form action="{{ route('students.destroy', $student->id) }}" method="POST" class="d-inline">@csrf</form>
+                    <td class="text-center">{{ $students->firstItem() + $index }}</td>
+                    <td>{{ optional($student->student)->nisn ?? 'N/A' }}</td>
+                    <td>{{ $student->name }}</td>
+                    <td>{{ optional($student->student)->class ?? 'N/A' }}</td>
+                    <td>{{ optional(optional($student->student)->studentParent)->user->name ?? 'N/A' }}</td>
+                    <td>{{ optional(optional($student->student)->studentParent)->family_relation ?? 'N/A' }}</td>
+                    <td class="text-center">
+                        <div class="dropdown">
+                            <a class="btn btn-sm btn-link" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $student->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $student->id }}">
+                                @can('view-student')
+                                <a class="dropdown-item" href="{{ route('students.show', $student->id) }}">
+                                    <i class="bi bi-eye me-2"></i>Detail
+                                </a>
+                                @endcan
+                                @can('edit-student')
+                                <a class="dropdown-item" href="{{ route('students.edit', $student->id) }}">
+                                    <i class="bi bi-pencil me-2"></i>Edit
+                                </a>
+                                @endcan
+                                @can('delete-student')
+                                <div class="dropdown-divider"></div>
+                                <form action="{{ route('students.destroy', $student->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data siswa ini?')">
+                                        <i class="bi bi-trash me-2"></i>Hapus
+                                    </button>
+                                </form>
+                                @endcan
+                            </div>
+                        </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-muted">Tidak ada data siswa yang tersedia.</td>
+                    <td colspan="7" class="text-center py-4">
+                        @if(request('search'))
+                            Tidak ada siswa yang ditemukan dengan kata kunci: "{{ request('search') }}"
+                        @else
+                            Tidak ada data siswa yang tersedia.
+                        @endif
+                    </td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 </div>
 
-{{-- Pagination --}}
-<div class="d-flex justify-content-end mt-2">
-    {{ $students->withQueryString()->links('pagination::bootstrap-5') }}
+<div class="d-flex justify-content-end mt-3">
+    {{ $students->links() }}
 </div>
 @endsection

@@ -19,7 +19,21 @@ Route::get('/', function () {
 });
 
 // Authentication Routes
-Auth::routes();
+Auth::routes([
+    'register' => false,
+    'reset' => false,
+]);
+
+// Custom Password Reset Routes
+Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])
+    ->name('password.request');
+Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])
+    ->name('password.email');
+
+// Change Password Routes
+Route::get('password/change', [App\Http\Controllers\Auth\ChangePasswordController::class, 'showChangePasswordForm'])
+    ->name('password.change');
+Route::post('password/change', [App\Http\Controllers\Auth\ChangePasswordController::class, 'changePassword']);
 
 Route::get('/app', function () {
     return view('layout.index');

@@ -15,7 +15,7 @@
         </thead>
         <tbody>
             @forelse ($notifications as $index => $notification)
-                <tr>
+                <tr style="cursor: pointer;">
                     @php
                         $contentStyle = [false => '', true => 'text-muted'];
                     @endphp
@@ -28,6 +28,16 @@
             @endforelse
         </tbody>
     </table>
+
+    <script>
+        const rows = document.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                window.location.href = '/counseling'
+            });
+        });
+    </script>
 </div>
 
 {{-- Pagination --}}

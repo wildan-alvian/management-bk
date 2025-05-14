@@ -1,11 +1,11 @@
 @extends('layout.index')
 
 @section('content')
-<div class="container mt-5" style="font-family: 'Kumbh Sans';">
-    <h2 class="fw-bold mb-4">Detail Data Admin</h2>
+<div class="container mt-5">
+    <h3 class="fw-bold mb-4">Detail Data Admin</h3>
 
     <div class="mb-4">
-        <a href="{{ route('admin.index') }}" class="fw-bold btn btn-sm rounded-pill btn-glow">
+        <a href="{{ route('admin.index') }}" class="btn rounded-pill btn-secondary">
             <i class="bi bi-caret-left-fill me-1"></i> Kembali
         </a>         
     </div>
@@ -18,8 +18,7 @@
     @endif
 
     
-    <div class="card shadow-lg p-4 mb-5 bg-light rounded">
-        <h5 class="fw-bold mb-3">Data Admin</h5>
+    <div class="p-4 mb-5 card shadow-sm">
         <div class="row mb-3">
             <div class="col-md-6">
                 <div class="card p-3 shadow-sm">

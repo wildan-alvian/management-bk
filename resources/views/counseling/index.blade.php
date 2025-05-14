@@ -1,12 +1,11 @@
 @extends('layout.index')
 
 @section('content')
-<hr class="my-3">
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="fw-bold mb-0">Daftar Konseling</h4>
     <div class="d-flex">
         <form method="GET" action="{{ route('counseling.index') }}" class="d-flex">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari judul konseling" style="max-width: 150px;">
+            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari judul konseling"">
             <button type="submit" class="btn btn-outline-secondary me-3">
                 <i class="bi bi-search"></i>
             </button>
@@ -18,7 +17,10 @@
             </a>
         @endif
 
-        <a href="{{ route('counseling.create') }}" class="btn text-white fw-bold btn-orange">+ Tambah konseling</a>
+        <a href="{{ route('counseling.create') }}" class="btn btn-add">
+            <i class="bi bi-plus-lg"></i>
+            Tambah Konseling
+        </a>
     </div>
 </div>
 
@@ -32,7 +34,7 @@
                 <th>Tipe Konseling</th>
                 <th>Judul Konseling</th>
                 <th>Status</th>
-                <th></th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -52,12 +54,27 @@
                         </span>
                     </td>
                     <td>
-                        <a href="#" class="btn btn-sm btn-link" style="font-size: 18px;" data-bs-toggle="modal" data-bs-target="#editModal{{ $counseling->id }}">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </a>
-                        <form action="{{ route('counseling.destroy', $counseling->id) }}" method="POST" class="d-inline">@csrf</form>
+                        <div class="dropdown">
+                            <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $counseling->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $counseling->id }}">
+                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $counseling->id }}">
+                                    <i class="bi bi-pencil me-2"></i>Edit
+                                </a>
+                                @if(Auth::user()->hasRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $counseling->id }}">
+                                        <i class="bi bi-trash me-2"></i>Hapus
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
 
                         @include('counseling.partials._edit_modal', ['counseling' => $counseling])
+                        @if(Auth::user()->hasRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+                            @include('counseling.partials._delete_modal', ['counseling' => $counseling])
+                        @endif
                     </td>
                 </tr>
             @empty

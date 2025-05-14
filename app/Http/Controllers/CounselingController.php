@@ -121,4 +121,29 @@ class CounselingController extends Controller
                 ->with('error', 'Terjadi kesalahan saat memperbarui data konseling.');
         }
     }
+
+    /**
+     * Remove the specified counseling from storage.
+     *
+     * @param  \App\Models\Counseling  $counseling
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Counseling $counseling)
+    {
+        try {
+            // Check if user has permission to delete
+            if (!auth()->user()->hasRole(['Super Admin', 'Admin', 'Guidance Counselor'])) {
+                return redirect()->route('counseling.index')
+                    ->with('error', 'Anda tidak memiliki izin untuk menghapus data konseling.');
+            }
+
+            $counseling->delete();
+
+            return redirect()->route('counseling.index')
+                ->with('success', 'Data konseling berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->route('counseling.index')
+                ->with('error', 'Terjadi kesalahan saat menghapus data konseling.');
+        }
+    }
 }

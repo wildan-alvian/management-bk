@@ -1,73 +1,86 @@
 @extends('layout.index')
 
 @section('content')
-<div class="container mt-5" style="font-family: 'Kumbh Sans';">
-    <div class="container">
-        <div class="mb-3">
-            <h2 class="fw-bold">Form Tambah Konseling</h2>
+<div class="container mt-5">
+    <h3 class="fw-bold mb-4">Tambah Konseling</h3>
+
+    <div class="mb-4">
+        <a href="{{ route('counseling.index') }}" class="btn rounded-pill btn-secondary">
+            <i class="bi bi-caret-left-fill me-1"></i> Kembali
+        </a>         
+    </div>
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <div class="mb-4">
-            <a href="{{ route('counseling.index') }}" 
-               class="fw-bold btn btn-sm rounded-pill btn-glow">
-               <i class="bi bi-caret-left-fill me-1"></i> Kembali
-            </a>         
-        </div>
+    @endif
 
-        <form action="{{ route('counseling.store') }}" method="POST">
-            @csrf
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <form action="{{ route('counseling.store') }}" method="POST">
+                @csrf
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="text-start">
+                            <label for="scheduled_at" class="form-label fw-bold">Jadwal Konseling</label>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                            <input type="datetime-local" name="scheduled_at" id="scheduled_at" 
+                                   class="form-control @error('scheduled_at') is-invalid @enderror" 
+                                   value="{{ old('scheduled_at') }}" required>
+                        </div>
+                        @error('scheduled_at')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-            <div class="card shadow-sm p-4 mb-5 bg-white rounded">
-                    <form action="{{ route('counseling.store') }}" method="POST">
-                        @csrf
+                    <div class="col-md-6">
+                        <div class="text-start">
+                            <label for="counseling_type" class="form-label fw-bold">Tipe Konseling</label>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                            <select name="counseling_type" id="counseling_type" 
+                                    class="form-select @error('counseling_type') is-invalid @enderror" required>
+                                <option value="">-- Pilih Tipe --</option>
+                                <option value="siswa" {{ old('counseling_type') == 'siswa' ? 'selected' : '' }}>Siswa</option>
+                                <option value="wali_murid" {{ old('counseling_type') == 'wali_murid' ? 'selected' : '' }}>Wali Murid</option>
+                            </select>
+                        </div>
+                        @error('counseling_type')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="scheduled_at" class="form-label fw-bold">Jadwal Konseling</label>
-                                <input type="datetime-local" name="scheduled_at" id="scheduled_at" class="form-control" value="{{ old('scheduled_at') }}">
-                            </div>                         
-
-                            <div class="col-md-6">
-                                <label for="counseling_type" class="form-label fw-bold">Tipe Konseling</label>
-                                <select name="counseling_type" id="counseling_type" class="form-control">
-                                    <option value="">-- Pilih Tipe --</option>
-                                    <option value="siswa" {{ old('counseling_type') == 'siswa' ? 'selected' : '' }}>Siswa</option>
-                                    <option value="wali_murid" {{ old('counseling_type') == 'wali_murid' ? 'selected' : '' }}>Wali Murid</option>
-                                </select>
-                            </div>
-            
-                            <div class="col-md-6">
-                                <label for="title" class="form-label fw-bold">Judul Konseling</label>
-                                <input type="text" name="title" id="title" class="form-control" placeholder="Masukkan judul konseling" value="{{ old('title') }}">
-                            </div>
+                    <div class="col-md-12">
+                        <div class="text-start">
+                            <label for="title" class="form-label fw-bold">Judul Konseling</label>
                         </div>
-            
-                        <div class="text-end mt-4">
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                                Batal
-                            </button>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-chat-left-text"></i></span>
+                            <input type="text" name="title" id="title" 
+                                   class="form-control @error('title') is-invalid @enderror" 
+                                   value="{{ old('title') }}" required>
                         </div>
-                    </form>
-                </div>
-            
-                <!-- Modal Konfirmasi Batal -->
-                <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title fw-bold" id="cancelModalLabel">Konfirmasi Batal</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                        </div>
-                        <div class="modal-body text-start">
-                          Apakah anda yakin ingin membatalkan pengisian form ini?
-                        </div>
-                        <div class="modal-footer">
-                          <a href="{{ route('counseling.index') }}" class="btn btn-danger">Ya, Batalkan</a>
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
-                        </div>
-                      </div>
+                        @error('title')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
-            
-            </div>
-            @endsection
+
+                <div class="d-flex justify-content-end mt-4 pt-3">
+                    <a href="{{ route('counseling.index') }}" class="btn btn-secondary me-2">
+                        <i class="bi bi-x-circle me-1"></i>Batal
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection

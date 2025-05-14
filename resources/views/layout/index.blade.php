@@ -244,6 +244,11 @@
                                     <i class="bi bi-pencil-square"></i> Edit Profil
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('password.change') }}">
+                                    <i class="bi bi-key"></i> Change Password
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item text-danger" href="{{ route('logout') }}"

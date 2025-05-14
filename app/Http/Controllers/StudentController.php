@@ -19,7 +19,7 @@ class StudentController extends Controller
         $this->middleware('role:Super Admin|Admin|Guidance Counselor|Student Parents')->only(['index', 'show']);
     }
 
-    public function index(Request $request)
+        public function index(Request $request)
     {
         $search = $request->input('search');
         $query = User::role('Student');
@@ -126,6 +126,34 @@ class StudentController extends Controller
                 'student_parent_id' => $studentParent->id
             ]);
 
+            // Send email to student
+            $name = $validated['name'];
+            $url = env('APP_URL');
+            $details = [
+                'title' => 'Pembuatan akun',
+                'body' => "
+                    Pembuatan akun baru $name telah berhasil.
+                    Silahkan login menggunakan $studentPassword dan ubah kata sandi melalui $url",
+            ];
+
+            Mail::to($validated['email'])->send(
+                new TestMail('Pembuatan akun CounselLink baru', 'email.user.create', $details)
+            );
+
+            // Send email to student parent
+            $name = $validated['parent_name'];
+            $url = env('APP_URL');
+            $details = [
+                'title' => 'Pembuatan akun',
+                'body' => "
+                    Pembuatan akun baru $parent_name telah berhasil.
+                    Silahkan login menggunakan $parentPassword dan ubah kata sandi melalui $url",
+            ];
+
+            Mail::to($validated['parent_email'])->send(
+                new TestMail('Pembuatan akun CounselLink baru', 'email.user.create', $details)
+            );
+
             DB::commit();
 
             return redirect()->route('students.index')
@@ -175,7 +203,7 @@ class StudentController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
+{
         $student = User::role('Student')->with(['student.studentParent.user'])->findOrFail($id);
         
         $validated = $request->validate([

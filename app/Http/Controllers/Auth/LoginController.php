@@ -37,13 +37,15 @@ class LoginController extends Controller{
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/app'); // or 'dashboard' if you have that route
+            return redirect()->intended('/app');
         }
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials.',
-        ])->onlyInput('email');
-
+        return back()
+            ->withErrors([
+                'email' => 'These credentials do not match our records.',
+                'password' => 'The provided password is incorrect.'
+            ])
+            ->withInput($request->only('email'));
     } 
     
     /**

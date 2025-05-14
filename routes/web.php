@@ -32,6 +32,7 @@ Route::get('/test-role', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('notifications', NotificationController::class);
+    Route::get('/notifications/read/{id}', [NotificationController::class, 'read'])->name('notification.read');
 });
 
 Route::middleware(['auth', 'role:Super Admin'])->group(function () {

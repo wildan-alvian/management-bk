@@ -171,9 +171,15 @@
                 </h4>
             </div>
             <nav class="nav flex-column">
+                @if(Auth::user()->hasAnyRole(['Guidance Counselor', 'Student', 'Student Parents']))
+                <a href="{{ route('notifications.index', ['type' => Auth::user()->role]) }}" class="nav-link text-white mb-2" style="font-family: 'Plus Jakarta Sans';">
+                    <i class="bi bi-bell-fill fs-5 me-5 text-white opacity-50"></i> <span class="text-white opacity-50">5 Notifikasi Baru</span>
+                </a>
+                @else
                 <a href="{{ route('notifications.index') }}" class="nav-link text-white mb-2" style="font-family: 'Plus Jakarta Sans';">
                     <i class="bi bi-bell-fill fs-5 me-5 text-white opacity-50"></i> <span class="text-white opacity-50">5 Notifikasi Baru</span>
                 </a>
+                @endif
                 <hr class="w-100" style="border: none; border-top: 4px solid white; margin: 0 0 20px 0;">
                 <a href="#" class="nav-link text-white mb-2" style="font-family: 'Plus Jakarta Sans';">
                     <i class="bi bi-grid me-5 text-white opacity-100"></i> <span class="text-white opacity-100">Dashboard</span>

@@ -15,7 +15,7 @@
         </thead>
         <tbody>
             @forelse ($notifications as $index => $notification)
-                <tr style="cursor: pointer;">
+                <tr style="cursor: pointer;" data-id="{{$notification->id}}">
                     @php
                         $contentStyle = [false => '', true => 'text-muted'];
                     @endphp
@@ -34,7 +34,9 @@
 
         rows.forEach(row => {
             row.addEventListener('click', function() {
-                window.location.href = '/counseling'
+                const rowId = this.getAttribute('data-id');
+
+                window.location.href = '/notifications/read/' + rowId;
             });
         });
     </script>

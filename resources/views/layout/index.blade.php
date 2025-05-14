@@ -169,14 +169,12 @@
                 <h4 class="fs-2 m-0" style="font-family: 'Alfa Slab One';">
                     <span style="color:#D3F1DF">Counsel</span><span style="color:#F9CB43">Link</span>
                 </h4>
-            </div>    
-            <div class="d-flex align-items-center mb-3 ps-3" style="font-family: 'Plus Jakarta Sans';">
-                <i class="bi bi-bell-fill fs-5 me-5 text-white opacity-50"></i>
-                <span class="text-white opacity-50">5 Notifikasi Baru</span>
-            </div>        
-            <hr class="w-100" style="border: none; border-top: 4px solid white; margin: 0 0 20px 0;">
-            
+            </div>
             <nav class="nav flex-column">
+                <a href="{{ route('notifications.index') }}" class="nav-link text-white mb-2" style="font-family: 'Plus Jakarta Sans';">
+                    <i class="bi bi-bell-fill fs-5 me-5 text-white opacity-50"></i> <span class="text-white opacity-50">5 Notifikasi Baru</span>
+                </a>
+                <hr class="w-100" style="border: none; border-top: 4px solid white; margin: 0 0 20px 0;">
                 <a href="#" class="nav-link text-white mb-2" style="font-family: 'Plus Jakarta Sans';">
                     <i class="bi bi-grid me-5 text-white opacity-100"></i> <span class="text-white opacity-100">Dashboard</span>
                 </a>

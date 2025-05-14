@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Mail\TestMail;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class GuruBkController extends Controller
 {
@@ -66,6 +68,19 @@ class GuruBkController extends Controller
             $user->assignRole('Guidance Counselor');
             
             DB::commit();
+
+            $name = $validated['name'];
+            $url = env('APP_URL');
+            $details = [
+                'title' => 'Pembuatan akun',
+                'body' => "
+                    Pembuatan akun baru $name telah berhasil.
+                    Silahkan login menggunakan $password dan ubah kata sandi melalui $url",
+            ];
+
+            Mail::to($validated['email'])->send(
+                new TestMail('Pembuatan akun CounselLink baru', 'email.user.create', $details)
+            );
 
             return redirect()->route('counselors.index')
                 ->with('success', "Guru BK berhasil ditambahkan. Password: {$password}");

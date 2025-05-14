@@ -13,6 +13,7 @@ class Counseling extends Model
     protected $fillable = [
         'scheduled_at',
         'submitted_by',
+        'submitted_by_id',
         'counseling_type',
         'title',
         'status',

@@ -63,7 +63,7 @@ class CounselingController extends Controller
     $scheduled_at = Carbon::parse($request->scheduled_at)->format('d M Y H:i');
     $content = "$user->name mengajukan konseling $request->title pada $scheduled_at";
     Notification::create([
-        'type' => 'request',
+        'type' => 'Guidance Counselor',
         'content' => $content,
         'status' => false,
     ]);
@@ -95,11 +95,13 @@ class CounselingController extends Controller
         try {
             $counseling->update($validated);
 
+            $user = User::findOrFail($counseling->submitted_by_id);
+
             $scheduled_at = Carbon::parse($request->scheduled_at)->format('d M Y H:i');
             $content = "Konseling $request->title pada $scheduled_at telah $request->status";
             Notification::create([
                 'user_id' => $counseling->submitted_by_id,
-                'type' => 'approval',
+                'type' => $user->role,
                 'content' => $content,
                 'status' => false,
             ]);

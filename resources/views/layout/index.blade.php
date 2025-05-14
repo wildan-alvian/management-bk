@@ -559,11 +559,20 @@
         </div>
 
         <nav class="nav flex-column">
-            <a href="{{ route('notifications.index') }}" class="nav-link">
-                <i class="bi bi-bell"></i>
-                <span>Notifications</span>
-                <span class="badge bg-danger rounded-pill ms-auto">5</span>
-            </a>
+
+            @if(Auth::user()->hasAnyRole(['Guidance Counselor', 'Student', 'Student Parents']))
+                <a href="{{ route('notifications.index', ['type' => Auth::user()->role]) }}" class="nav-link">
+                    <i class="bi bi-bell"></i>
+                    <span>Notifications</span>
+                    <span class="badge bg-danger rounded-pill ms-auto">5</span>
+                </a>
+            @else
+                <a href="{{ route('notifications.index') }}" class="nav-link">
+                    <i class="bi bi-bell"></i>
+                    <span>Notifications</span>
+                    <span class="badge bg-danger rounded-pill ms-auto">5</span>
+                </a>
+            @endif
 
             <a href="#" class="nav-link">
                 <i class="bi bi-grid"></i>

@@ -15,8 +15,4 @@ class Notification extends Model
         'content',
         'status',
     ];
-
-    public static function getUnread() {
-        return self::where('status', false);
-    }
 }

@@ -1,15 +1,14 @@
 @extends('layout.index') 
 
 @section('content')
-        <hr class="my-3"> 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold mb-0">Daftar Roles</h4>
             <div class="d-flex">
                 
                 <form method="GET" action="{{ route('roles.index') }}" class="d-flex">
-                    <input type="text" name="search" value="{{ $search ?? '' }}" class="form-control me-0" placeholder="Cari nama role" style="max-width: 250px;">
-                    <button type="submit" class="btn btn-outline-secondary ms-0">
-                        <i class="bi bi-search"></i> 
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama role"">
+                    <button type="submit" class="btn btn-outline-secondary me-3">
+                        <i class="bi bi-search"></i>
                     </button>
                 </form>
 
@@ -19,8 +18,9 @@
                     </a>
                 @endif
 
-                <a href="{{ route('roles.create') }}" class="btn btn-orange text-white ms-3">
-                    + Tambah Role
+                <a href="{{ route('roles.create') }}" class="btn btn-add">
+                    <i class="bi bi-plus-lg"></i>
+                    Tambah Role
                 </a>
             </div>
         </div>
@@ -62,7 +62,7 @@
                             <td class="text-center">
                                 @if($role->name !== 'Super Admin')
                                     <div class="dropdown">
-                                        <a class="btn btn-sm btn-link" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $role->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $role->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </a>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ $role->id }}">
@@ -101,10 +101,14 @@
                                         </select>
                                     </div>
                                   </div>
-                                  <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                  </div>
+                                    <div class="modal-footer border-top">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            <i class="bi bi-x-circle me-1"></i>Batal
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-save me-1"></i>Simpan
+                                        </button>
+                                    </div>
                                 </form>
                               </div>
                             </div>

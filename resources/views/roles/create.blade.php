@@ -1,15 +1,14 @@
 @extends('layout.index')
 
 @section('content')
-<div class="container mt-5" style="font-family: 'Kumbh Sans';">
+<div class="container mt-5">
     <div class="container">
         <div class="mb-3">
-            <h2 class="fw-bold">Form Tambah Role</h2>
+            <h3 class="fw-bold">Form Tambah Role</h3>
         </div>
         <div class="mb-4">
-            <a href="{{ route('roles.index') }}" 
-               class="fw-bold btn btn-sm rounded-pill btn-glow">
-               <i class="bi bi-caret-left-fill me-1"></i> Kembali
+            <a href="{{ route('roles.index') }}" class="btn rounded-pill btn-secondary">
+                <i class="bi bi-caret-left-fill me-1"></i> Kembali
             </a>         
         </div>
 
@@ -19,14 +18,18 @@
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="name" class="form-label">Nama</label>
+                        <div class="text-start">
+                            <label for="name" class="form-label fw-bold">Nama</label>
+                        </div>
                         <input type="text" class="form-control" id="name" name="name" required>
                         @if ($errors->has('name'))
                             <span class="text-danger">{{ $errors->first('name') }}</span>
                         @endif
                     </div>
                     <div class="col-md-6">
-                        <label for="permissions" class="form-label">Hak akses</label>
+                        <div class="text-start">
+                            <label for="permissions" class="form-label fw-bold">Hak akses</label>
+                        </div>
                         <select class="form-select" id="permissions" name="permissions[]" multiple required>
                             @foreach ($permissions as $permission)
                                 <option value="{{ $permission->id }}" {{ in_array($permission->id, old('permissions') ?? []) ? 'selected' : '' }}>
@@ -40,10 +43,12 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-start">
-                    <button type="submit" class="btn btn-primary me-2">Simpan</button>
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                        Batal
+                <div class="d-flex justify-content-end mt-4 pt-3">
+                    <a href="{{ route('roles.index') }}" class="btn btn-secondary me-2">
+                        <i class="bi bi-x-circle me-1"></i>Batal
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>Simpan
                     </button>
                 </div>
             </form>

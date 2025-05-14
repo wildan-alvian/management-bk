@@ -5,59 +5,97 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\StudentAchievement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class StudentAchievementController extends Controller
 {
     public function store(Request $request)
-{
-    $request->validate([
-        'student_id' => 'required|exists:students,id',
-        'achievements' => 'required|array',
-        'achievements.*.name' => 'required|string|max:255',
-        'achievements.*.category' => 'required|string|max:255',
-        'achievements.*.date' => 'required|date',
-        'achievements.*.detail' => 'nullable|string',
-    ]);
-
-    foreach ($request->achievements as $achievement) {
-        StudentAchievement::create([
-            'student_id' => $request->student_id,
-            'name' => $achievement['name'],
-            'category' => $achievement['category'],
-            'date' => $achievement['date'],
-            'detail' => $achievement['detail'] ?? null,
-        ]);
-    }
-
-    return redirect()->route('students.show', $request->student_id)
-                     ->with('success', 'Prestasi berhasil ditambahkan.');
-}
-
-
-    public function update(Request $request, $id)
     {
-        $achievement = StudentAchievement::findOrFail($id);
-
-        $request->validate([
+        $validator = Validator::make($request->all(), [
+            'student_id' => 'required|exists:students,id',
             'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'date' => 'required|date',
             'detail' => 'nullable|string',
         ]);
 
-        $achievement->update($request->all());
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
-        return redirect()->route('students.show', $achievement->student_id)
-                         ->with('success', 'Prestasi berhasil diperbarui.');
+        try {
+            $achievement = StudentAchievement::create($request->all());
+
+            // Load the student relationship
+            $achievement->load('student');
+
+            return response()->json([
+                'success' => true,
+                'data' => $achievement,
+                'message' => 'Prestasi berhasil ditambahkan'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data'
+            ], 500);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'date' => 'required|date',
+            'detail' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $achievement = StudentAchievement::findOrFail($id);
+            $achievement->update($request->all());
+
+            // Load the student relationship
+            $achievement->load('student');
+
+            return response()->json([
+                'success' => true,
+                'data' => $achievement,
+                'message' => 'Prestasi berhasil diperbarui'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui data'
+            ], 500);
+        }
     }
 
     public function destroy($id)
     {
-        $achievement = StudentAchievement::findOrFail($id);
-        $studentId = $achievement->student_id;
-        $achievement->delete();
+        try {
+            $achievement = StudentAchievement::findOrFail($id);
+            $achievement->delete();
 
-        return redirect()->route('students.show', $studentId)
-                         ->with('success', 'Prestasi berhasil dihapus.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Prestasi berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus data'
+            ], 500);
+        }
     }
 }

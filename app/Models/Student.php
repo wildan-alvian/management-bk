@@ -10,29 +10,52 @@ class Student extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
+        'student_parent_id',
         'nisn',
-        'nama_lengkap',
-        'kelas',
-        'email_siswa',
-        'tempat_lahir',
-        'tanggal_lahir',
-        'alamat_siswa',
-        'telepon_siswa',
-        'hubungan_wali',
-        'nama_wali',
-        'telepon_wali',
-        'email_wali',
-        'alamat_wali',
+        'class',
+        'gender',
+        'birthdate',
+        'birthplace'
     ];
 
-    // Relasi ke Prestasi
+    /**
+     * Get the user that owns the student profile.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the student's parent relationship.
+     */
+    public function studentParent()
+    {
+        return $this->belongsTo(StudentParent::class, 'student_parent_id');
+    }
+
+    /**
+     * Get the student's achievements.
+     */
     public function achievements()
     {
         return $this->hasMany(StudentAchievement::class);
     }
 
-    public function misconducts()  // Mengganti violations menjadi misconducts
+    /**
+     * Get the student's misconducts.
+     */
+    public function misconducts()
     {
         return $this->hasMany(StudentMisconduct::class);
+    }
+
+    /**
+     * Get the student's counseling sessions.
+     */
+    public function counselings()
+    {
+        return $this->hasMany(Counseling::class);
     }
 }

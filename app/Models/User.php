@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,10 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'nip',
         'phone',
         'address',
-        'role'
+        'role',
     ];
 
     /**
@@ -45,6 +44,37 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed', 
+        'password' => 'hashed',
     ];
+
+    /**
+     * Get the student profile associated with the user.
+     */
+    public function student()
+    {
+        return $this->hasOne(Student::class);
+    }
+
+    /**
+     * Get the parent profile associated with the user.
+     */
+    public function parentProfile()
+    {
+        return $this->hasOne(StudentParent::class);
+    }
+
+    /**
+     * Get the students that this parent is responsible for (through StudentParent).
+     */
+    public function studentsAsParent()
+    {
+        return $this->hasManyThrough(
+            Student::class,
+            StudentParent::class,
+            'user_id', // Foreign key on student_parents table
+            'student_parent_id', // Foreign key on students table
+            'id', // Local key on users table
+            'id' // Local key on student_parents table
+        );
+    }
 }

@@ -69,13 +69,10 @@ class GuruBkController extends Controller
             
             DB::commit();
 
-            $name = $validated['name'];
-            $url = env('APP_URL');
             $details = [
-                'title' => 'Pembuatan akun',
-                'body' => "
-                    Pembuatan akun baru $name telah berhasil.
-                    Silahkan login menggunakan $password dan ubah kata sandi melalui $url",
+                'name' => $validated['name'],
+                'password' => $password,
+                'url' => env('APP_URL'),
             ];
 
             Mail::to($validated['email'])->send(

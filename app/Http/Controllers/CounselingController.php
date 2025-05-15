@@ -69,8 +69,10 @@ class CounselingController extends Controller
     ]);
 
     $details = [
-        'title' => 'Permintaan konseling',
-        'body' => $content,
+        'name' => $user->name,
+        'title' => $request->title,
+        'scheduled_at' => $scheduled_at,
+        'url' => env('APP_URL') . '/counseling/'
     ];
 
     Mail::to('anyemailrequest@gmail.com')->send( // TODO: ubah ke semua guru bk
@@ -107,12 +109,14 @@ class CounselingController extends Controller
             ]);
 
             $details = [
-                'title' => 'Perubahan status konseling',
-                'body' => $content,
+                'title' => $request->title,
+                'scheduled_at' => $scheduled_at,
+                'status' => $request->status,
+                'url' => env('APP_URL') . '/counseling/'
             ];
 
-            Mail::to('anyemailrequest@gmail.com')->send( // TODO: ubah ke pengaju konseling
-                new TestMail("Perubahan status konseling $request->title", 'email.counseling.update', $details)
+            Mail::to($user->email)->send(
+                new TestMail("Perubahan status konseling", 'email.counseling.update', $details)
             );
 
             return redirect()->route('counseling.index')

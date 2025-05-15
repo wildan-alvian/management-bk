@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     if (Auth::check()) {
-        return redirect('/app');
+        return redirect('/dashboard');
     }
     return redirect('/login');
 });
@@ -35,14 +35,9 @@ Route::get('password/change', [App\Http\Controllers\Auth\ChangePasswordControlle
     ->name('password.change');
 Route::post('password/change', [App\Http\Controllers\Auth\ChangePasswordController::class, 'changePassword']);
 
-Route::get('/app', function () {
-    return view('layout.index');
-})->middleware('auth');
-
-Route::get('/test-role', function () { 
-    return Auth::user()->getAllPermissions()->pluck('name');
-    // return Auth::user()->hasRole('Super Admin') ? 'Super Admin' : 'Not Super Admin'; 
-});
+Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('notifications', NotificationController::class);

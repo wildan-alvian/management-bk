@@ -572,8 +572,8 @@
                 @endif
             </a>
 
-            <a href="#" class="nav-link">
-                <i class="bi bi-grid"></i>
+            <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <i class="bi bi-speedometer2"></i>
                 <span>Dashboard</span>
             </a>
 
@@ -618,11 +618,11 @@
                     <span>Settings</span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li>
+                    <!-- <li>
                         <a class="dropdown-item" href="{{ route('admin.edit', Auth::user()->id) }}">
                             <i class="bi bi-person me-2"></i> Edit Profile
                         </a>
-                    </li>
+                    </li> -->
                     <li>
                         <a class="dropdown-item" href="{{ route('password.change') }}">
                             <i class="bi bi-key me-2"></i> Change Password

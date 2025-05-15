@@ -21,4 +21,9 @@ class Counseling extends Model
     protected $casts = [
         'scheduled_at' => 'datetime',
     ];
+
+    public function submittedByUser()
+    {
+        return $this->belongsTo(User::class, 'submitted_by_id');
+    }
 }

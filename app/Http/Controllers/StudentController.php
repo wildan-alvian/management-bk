@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Student;
 use App\Models\StudentParent;
+use App\Mail\TestMail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
 
 class StudentController extends Controller
@@ -16,7 +18,7 @@ class StudentController extends Controller
     {
         // Allow Student Parents to view student data
         $this->middleware('role:Super Admin|Admin|Guidance Counselor')->except(['index', 'show']);
-        $this->middleware('role:Super Admin|Admin|Guidance Counselor|Student Parents')->only(['index', 'show']);
+        $this->middleware('role:Super Admin|Admin|Guidance Counselor|Student|Student Parents')->only(['index', 'show']);
     }
 
         public function index(Request $request)
@@ -141,7 +143,7 @@ class StudentController extends Controller
             );
 
             // Send email to student parent
-            $name = $validated['parent_name'];
+            $parent_name = $validated['parent_name'];
             $url = env('APP_URL');
             $details = [
                 'title' => 'Pembuatan akun',

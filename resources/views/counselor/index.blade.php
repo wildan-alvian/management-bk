@@ -66,16 +66,22 @@
                                 <i class="bi bi-three-dots-vertical"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $counselor->id }}">
+                                @can('view-user')
                                 <a class="dropdown-item" href="{{ route('counselors.show', $counselor) }}">
                                     <i class="bi bi-eye me-2"></i>Detail
                                 </a>
+                                @endcan
+                                @can('edit-user')
                                 <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $counselor->id }}">
                                     <i class="bi bi-pencil me-2"></i>Edit
                                 </a>
+                                @endcan
+                                @can('delete-user')
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $counselor->id }}">
                                     <i class="bi bi-trash me-2"></i>Hapus
                                 </a>
+                                @endcan
                             </div>
                         </div>
 

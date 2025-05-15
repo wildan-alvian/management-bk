@@ -69,8 +69,10 @@ class CounselingController extends Controller
     ]);
 
     $details = [
-        'title' => 'Permintaan konseling',
-        'body' => $content,
+        'name' => $user->name,
+        'title' => $request->title,
+        'scheduled_at' => $scheduled_at,
+        'url' => env('APP_URL') . '/counseling/'
     ];
 
     $guidanceCounselors = User::role('Guidance Counselor')->get();
@@ -110,8 +112,10 @@ class CounselingController extends Controller
             ]);
 
             $details = [
-                'title' => 'Perubahan status konseling',
-                'body' => $content,
+                'title' => $request->title,
+                'scheduled_at' => $scheduled_at,
+                'status' => $request->status,
+                'url' => env('APP_URL') . '/counseling/'
             ];
 
             Mail::to($user->email)->send(

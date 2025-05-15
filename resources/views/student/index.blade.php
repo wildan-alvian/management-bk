@@ -80,16 +80,16 @@
                                 @endcan
                                 @can('delete-student')
                                 <div class="dropdown-divider"></div>
-                                <form action="{{ route('students.destroy', $student->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data siswa ini?')">
-                                        <i class="bi bi-trash me-2"></i>Hapus
-                                    </button>
-                                </form>
+                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $student->id }}">
+                                    <i class="bi bi-trash me-2"></i>Hapus
+                                </a>
                                 @endcan
                             </div>
                         </div>
+                        
+                        @can('delete-student')
+                            @include('student.partials._delete_modal', ['student' => $student])
+                        @endcan
                     </td>
                 </tr>
             @empty

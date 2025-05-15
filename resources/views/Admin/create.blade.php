@@ -26,70 +26,70 @@
                         <div class="text-start">
                             <label for="nip" class="form-label fw-bold">NIP</label>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
                             <input type="text" class="form-control @error('nip') is-invalid @enderror" 
                                    id="nip" name="nip" value="{{ old('nip') }}" required>
+                            @error('nip')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('nip')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <div class="text-start">
                             <label for="name" class="form-label fw-bold">Nama</label>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-person"></i></span>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" 
                                    id="name" name="name" value="{{ old('name') }}" required>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <div class="text-start">
                             <label for="email" class="form-label fw-bold">Email</label>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                             <input type="email" class="form-control @error('email') is-invalid @enderror" 
                                    id="email" name="email" value="{{ old('email') }}" required>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <div class="text-start">
                             <label for="phone" class="form-label fw-bold">No Telepon</label>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-telephone"></i></span>
                             <input type="text" class="form-control @error('phone') is-invalid @enderror" 
                                    id="phone" name="phone" value="{{ old('phone') }}">
+                            @error('phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <div class="col-12">
                         <div class="text-start">
                             <label for="address" class="form-label fw-bold">Alamat</label>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
                             <textarea class="form-control @error('address') is-invalid @enderror" 
                                       id="address" name="address" rows="3">{{ old('address') }}</textarea>
+                            @error('address')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('address')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
                 </div>
 

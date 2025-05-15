@@ -129,13 +129,10 @@ class StudentController extends Controller
             ]);
 
             // Send email to student
-            $name = $validated['name'];
-            $url = env('APP_URL');
             $details = [
-                'title' => 'Pembuatan akun',
-                'body' => "
-                    Pembuatan akun baru $name telah berhasil.
-                    Silahkan login menggunakan $studentPassword dan ubah kata sandi melalui $url",
+                'name' => $validated['name'],
+                'password' => $studentPassword,
+                'url' => env('APP_URL'),
             ];
 
             Mail::to($validated['email'])->send(
@@ -143,13 +140,10 @@ class StudentController extends Controller
             );
 
             // Send email to student parent
-            $parent_name = $validated['parent_name'];
-            $url = env('APP_URL');
             $details = [
-                'title' => 'Pembuatan akun',
-                'body' => "
-                    Pembuatan akun baru $parent_name telah berhasil.
-                    Silahkan login menggunakan $parentPassword dan ubah kata sandi melalui $url",
+                'name' => $validated['parent_name'],
+                'password' => $parentPassword,
+                'url' => env('APP_URL'),
             ];
 
             Mail::to($validated['parent_email'])->send(
@@ -159,9 +153,7 @@ class StudentController extends Controller
             DB::commit();
 
             return redirect()->route('students.index')
-                ->with('success', "Data siswa berhasil ditambahkan.\n" .
-                    "Password Siswa: {$studentPassword}\n" .
-                    "Password Wali: {$parentPassword}");
+                ->with('success', "Data siswa berhasil ditambahkan.");
 
         } catch (\Exception $e) {
             DB::rollback();

@@ -14,7 +14,8 @@ class GuruBkController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Super Admin|Admin');
+        $this->middleware('role:Super Admin|Admin')->except(['index', 'show']);
+        $this->middleware('role:Super Admin|Admin|Guidance Counselor')->only(['index', 'show']);
     }
 
     public function index(Request $request)
@@ -69,13 +70,10 @@ class GuruBkController extends Controller
             
             DB::commit();
 
-            $name = $validated['name'];
-            $url = env('APP_URL');
             $details = [
-                'title' => 'Pembuatan akun',
-                'body' => "
-                    Pembuatan akun baru $name telah berhasil.
-                    Silahkan login menggunakan $password dan ubah kata sandi melalui $url",
+                'name' => $validated['name'],
+                'password' => $password,
+                'url' => env('APP_URL'),
             ];
 
             Mail::to($validated['email'])->send(
@@ -83,7 +81,7 @@ class GuruBkController extends Controller
             );
 
             return redirect()->route('counselors.index')
-                ->with('success', "Guru BK berhasil ditambahkan. Password: {$password}");
+                ->with('success', "Guru BK berhasil ditambahkan.");
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Error creating Guru BK: ' . $e->getMessage());

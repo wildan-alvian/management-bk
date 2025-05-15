@@ -14,7 +14,8 @@ class GuruBkController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:Super Admin|Admin');
+        $this->middleware('role:Super Admin|Admin')->except(['index', 'show']);
+        $this->middleware('role:Super Admin|Admin|Guidance Counselor')->only(['index', 'show']);
     }
 
     public function index(Request $request)
@@ -80,7 +81,7 @@ class GuruBkController extends Controller
             );
 
             return redirect()->route('counselors.index')
-                ->with('success', "Guru BK berhasil ditambahkan. Password: {$password}");
+                ->with('success', "Guru BK berhasil ditambahkan.");
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Error creating Guru BK: ' . $e->getMessage());

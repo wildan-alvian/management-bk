@@ -55,10 +55,10 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
 
 Route::middleware(['auth', 'role:Super Admin|Admin'])->group(function () {
     Route::resource('admin', AdminController::class);
-    Route::resource('counselors', GuruBkController::class);
 });
 
 Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(function () {
+    Route::resource('counselors', GuruBkController::class);
     Route::resource('counseling', CounselingController::class);
     Route::resource('students', StudentController::class)->except(['index', 'show']);
     Route::resource('student-achievements', StudentAchievementController::class);
@@ -70,10 +70,6 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor|Student|St
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
 });
-
-// Individual permission routes
-Route::get('/counselors', [GuruBkController::class, 'index'])
-    ->middleware(['auth', 'permission:view-user'])->name('counselors.index');
 
 Route::get('/counseling', [CounselingController::class, 'index'])
     ->middleware(['auth', 'permission:view-counseling'])->name('counseling.index');

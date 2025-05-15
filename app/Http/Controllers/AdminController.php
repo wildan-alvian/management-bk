@@ -86,7 +86,7 @@ class AdminController extends Controller
             );
 
             return redirect()->route('admin.index')
-                ->with('success', "Admin berhasil ditambahkan! Password: $password");
+                ->with('success', "Admin berhasil ditambahkan!");
 
         } catch (\Exception $e) {
             DB::rollback();

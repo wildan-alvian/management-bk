@@ -153,9 +153,7 @@ class StudentController extends Controller
             DB::commit();
 
             return redirect()->route('students.index')
-                ->with('success', "Data siswa berhasil ditambahkan.\n" .
-                    "Password Siswa: {$studentPassword}\n" .
-                    "Password Wali: {$parentPassword}");
+                ->with('success', "Data siswa berhasil ditambahkan.");
 
         } catch (\Exception $e) {
             DB::rollback();

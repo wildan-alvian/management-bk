@@ -16,9 +16,9 @@
             @forelse ($notifications as $index => $notification)
                 <tr style="cursor: pointer;" data-id="{{$notification->id}}">
                     @php
-                        $contentStyle = [false => '', true => 'text-muted'];
+                        $contentStyle = [false => 'background-color: var(--bg-light);', true => ''];
                     @endphp
-                    <td class="{{$contentStyle[$notification->status]}}">{{$notification->content}}</td>
+                    <td style="{{$contentStyle[$notification->status]}}">{{$notification->content}}</td>
                 </tr>
             @empty
                 <tr>

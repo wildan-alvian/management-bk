@@ -559,20 +559,18 @@
         </div>
 
         <nav class="nav flex-column">
+            @php
+                $notificationHref = Auth::user()->hasAnyRole(['Guidance Counselor', 'Student', 'Student Parents']) ?
+                    route('notifications.index', ['type' => Auth::user()->role]) : route('notifications.index');
+            @endphp
 
-            @if(Auth::user()->hasAnyRole(['Guidance Counselor', 'Student', 'Student Parents']))
-                <a href="{{ route('notifications.index', ['type' => Auth::user()->role]) }}" class="nav-link">
-                    <i class="bi bi-bell"></i>
-                    <span>Notifications</span>
-                    <span class="badge bg-danger rounded-pill ms-auto">5</span>
-                </a>
-            @else
-                <a href="{{ route('notifications.index') }}" class="nav-link">
-                    <i class="bi bi-bell"></i>
-                    <span>Notifications</span>
-                    <span class="badge bg-danger rounded-pill ms-auto">5</span>
-                </a>
-            @endif
+            <a href="{{ $notificationHref }}" class="nav-link">
+                <i class="bi bi-bell"></i>
+                <span>Notifications</span>
+                @if($unreadCountBadge > 0)
+                    <span class="badge bg-danger rounded-pill ms-auto">{{$unreadCountBadge}}</span>
+                @endif
+            </a>
 
             <a href="#" class="nav-link">
                 <i class="bi bi-grid"></i>

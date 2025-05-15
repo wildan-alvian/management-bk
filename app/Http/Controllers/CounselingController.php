@@ -75,9 +75,12 @@ class CounselingController extends Controller
         'url' => env('APP_URL') . '/counseling/'
     ];
 
-    Mail::to('anyemailrequest@gmail.com')->send( // TODO: ubah ke semua guru bk
-        new TestMail('Ada pengajuan konseling baru', 'email.counseling.create', $details)
-    );
+    $guidanceCounselors = User::role('Guidance Counselor')->get();
+    foreach ($guidanceCounselors as $guidanceCounselor) {
+        Mail::to($guidanceCounselor->email)->send(
+            new TestMail('Ada pengajuan konseling baru', 'email.counseling.create', $details)
+        );
+    }
 
     return redirect()->route('counseling.index')->with('success', 'Data konseling berhasil ditambahkan.');
 }
@@ -116,7 +119,7 @@ class CounselingController extends Controller
             ];
 
             Mail::to($user->email)->send(
-                new TestMail("Perubahan status konseling", 'email.counseling.update', $details)
+                new TestMail("Perubahan status konseling $request->title", 'email.counseling.update', $details)
             );
 
             return redirect()->route('counseling.index')

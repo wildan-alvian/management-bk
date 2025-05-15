@@ -29,7 +29,7 @@
     </table>
 
     <script>
-        const rows = document.querySelectorAll('tbody tr');
+        const rows = document.querySelectorAll('tbody tr[data-id]');
 
         rows.forEach(row => {
             row.addEventListener('click', function() {

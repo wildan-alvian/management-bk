@@ -34,7 +34,9 @@
                 <th>Tipe Konseling</th>
                 <th>Judul Konseling</th>
                 <th>Status</th>
-                <th>Aksi</th>
+                @if(Auth::user()->hasRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+                    <th>Aksi</th>
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -53,29 +55,29 @@
                             {{ strtoupper(str_replace('_', ' ', $counseling->status)) }}
                         </span>
                     </td>
-                    <td>
-                        <div class="dropdown">
-                            <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $counseling->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $counseling->id }}">
-                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $counseling->id }}">
-                                    <i class="bi bi-pencil me-2"></i>Edit
+                    @if(Auth::user()->hasRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+                        <td>
+                            <div class="dropdown">
+                                <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $counseling->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
                                 </a>
-                                @if(Auth::user()->hasRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $counseling->id }}">
+                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $counseling->id }}">
+                                        <i class="bi bi-pencil me-2"></i>Edit
+                                    </a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $counseling->id }}">
                                         <i class="bi bi-trash me-2"></i>Hapus
                                     </a>
-                                @endif
+                                </div>
                             </div>
-                        </div>
 
-                        @include('counseling.partials._edit_modal', ['counseling' => $counseling])
-                        @if(Auth::user()->hasRole(['Super Admin', 'Admin', 'Guidance Counselor']))
-                            @include('counseling.partials._delete_modal', ['counseling' => $counseling])
-                        @endif
-                    </td>
+                            @if(Auth::user()->hasRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+                                @include('counseling.partials._edit_modal', ['counseling' => $counseling])
+                                @include('counseling.partials._delete_modal', ['counseling' => $counseling])
+                            @endif
+                        </td>
+                    @endif
                 </tr>
             @empty
                 <tr>

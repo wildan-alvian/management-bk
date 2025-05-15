@@ -18,7 +18,7 @@ class StudentController extends Controller
     {
         // Allow Student Parents to view student data
         $this->middleware('role:Super Admin|Admin|Guidance Counselor')->except(['index', 'show']);
-        $this->middleware('role:Super Admin|Admin|Guidance Counselor|Student Parents')->only(['index', 'show']);
+        $this->middleware('role:Super Admin|Admin|Guidance Counselor|Student|Student Parents')->only(['index', 'show']);
     }
 
         public function index(Request $request)

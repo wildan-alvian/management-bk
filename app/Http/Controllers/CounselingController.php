@@ -21,17 +21,29 @@ class CounselingController extends Controller
     // }
 
     public function index(Request $request)
-{   
+{
     $search = $request->input('search');
-    $counselings = Counseling::query()
-    ->when($search, function ($query, $search) {
-        return $query->where('title', 'like', "%$search%")
-                     ->orWhere('counseling_type', 'like', "%$search%");
-    })
-    ->orderBy('created_at', 'desc')
-    ->paginate(10);
+    $status = $request->input('status');
+    $counselingType = $request->input('counseling_type');
 
-    return view('counseling.index', compact('counselings', 'search'));
+    $counselings = Counseling::query()
+        ->when($search, function ($query, $search) {
+            return $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%$search%")
+                  ->orWhere('counseling_type', 'like', "%$search%");
+            });
+        })
+        ->when($status, function ($query, $status) {
+            return $query->where('status', $status);
+        })
+        ->when($counselingType, function ($query, $counselingType) {
+            return $query->where('counseling_type', $counselingType);
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(10)
+        ->withQueryString();
+
+    return view('counseling.index', compact('counselings', 'search', 'status', 'counselingType'));
 }
 
 

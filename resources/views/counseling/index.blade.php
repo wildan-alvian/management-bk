@@ -11,6 +11,38 @@
             </button>
         </form>
 
+        <form method="GET" action="{{ route('counseling.index') }}" class="d-flex me-3">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary d-flex align-items-center" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-funnel me-1"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    {{-- Filter Status --}}
+                    <li><h6 class="dropdown-header">Status</h6></li>
+                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'new'])) }}">New</a></li>
+                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'approved'])) }}">Approved</a></li>
+                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'rejected'])) }}">Rejected</a></li>
+        
+                    <li><hr class="dropdown-divider"></li>
+        
+                    {{-- Filter Tipe Konseling --}}
+                    <li><h6 class="dropdown-header">Tipe Konseling</h6></li>
+                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['counseling_type' => 'siswa'])) }}">Siswa</a></li>
+                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['counseling_type' => 'wali_murid'])) }}">Wali Murid</a></li>
+                </ul>
+            </div>
+        </form>
+        
+        {{-- Reset Filter Button --}}
+        @if(request('status') || request('counseling_type'))
+            <a href="{{ route('counseling.index') }}" class="btn btn-outline-secondary me-3">
+                <i class="bi bi-x-circle-fill"></i>
+            </a>
+        @endif
+        
+        
+
+
         @if(request('search'))
             <a href="{{ route('counseling.index') }}" class="btn btn-outline-secondary me-3">
                 <i class="bi bi-x-circle-fill"></i>

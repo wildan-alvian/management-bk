@@ -21,36 +21,46 @@ class StudentController extends Controller
         $this->middleware('role:Super Admin|Admin|Guidance Counselor|Student|Student Parents')->only(['index', 'show']);
     }
 
-        public function index(Request $request)
+    public function index(Request $request)
     {
         $search = $request->input('search');
+        $classFilter = $request->input('class_filter');
+    
         $query = User::role('Student');
-
-        // If user is a Student Parent, only show their children
+    
         if (auth()->user()->hasRole('Student Parents')) {
             $parentId = auth()->user()->parentProfile->id;
             $query->whereHas('student', function($q) use ($parentId) {
                 $q->where('student_parent_id', $parentId);
             });
         }
-
-        $students = $query->when($search, function($query) use ($search) {
-                return $query->where(function($q) use ($search) {
-                    $q->where('name', 'LIKE', "%{$search}%")
-                      ->orWhere('email', 'LIKE', "%{$search}%")
-                      ->orWhereHas('student', function($q) use ($search) {
-                          $q->where('nisn', 'LIKE', "%{$search}%")
-                            ->orWhere('class', 'LIKE', "%{$search}%");
-                      });
-                });
-            })
+    
+        $query = $query->when($search, function($query) use ($search) {
+            return $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%")
+                  ->orWhereHas('student', function($q) use ($search) {
+                      $q->where('nisn', 'LIKE', "%{$search}%")
+                        ->orWhere('class', 'LIKE', "%{$search}%");
+                  });
+            });
+        });
+    
+        if ($classFilter) {
+            $query->whereHas('student', function($q) use ($classFilter) {
+                $q->where('class', 'LIKE', $classFilter . '%');
+            });
+        }
+    
+        $students = $query
             ->with(['student.studentParent.user'])
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
-
+    
         return view('student.index', compact('students'));
     }
+    
 
     public function create()
     {

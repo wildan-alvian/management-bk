@@ -33,7 +33,6 @@ class StudentController extends Controller
             return redirect()->route('students.show', $user->id);
         }
     
-    
         $query = User::role('Student');
     
         if (auth()->user()->hasRole('Student Parents')) {

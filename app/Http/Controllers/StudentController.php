@@ -29,11 +29,17 @@ class StudentController extends Controller
         $query = User::role('Student');
     
         if (auth()->user()->hasRole('Student Parents')) {
-            $parentId = auth()->user()->parentProfile->id;
-            $query->whereHas('student', function($q) use ($parentId) {
-                $q->where('student_parent_id', $parentId);
-            });
+            $parentProfile = auth()->user()->parentProfile;
+        
+            if ($parentProfile) {
+                $parentId = $parentProfile->id;
+        
+                $query->whereHas('student', function($q) use ($parentId) {
+                    $q->where('student_parent_id', $parentId);
+                });
+            }
         }
+        
     
         $query = $query->when($search, function($query) use ($search) {
             return $query->where(function($q) use ($search) {

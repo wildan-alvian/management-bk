@@ -21,54 +21,94 @@ class StudentController extends Controller
         $this->middleware('role:Super Admin|Admin|Guidance Counselor|Student|Student Parents')->only(['index', 'show']);
     }
 
-    public function index(Request $request)
+   public function index(Request $request)
 {
     $search = $request->input('search');
     $classFilter = $request->input('class_filter');
+    $user = auth()->user();
 
-    if (auth()->user()->hasRole('Student')) {
-        $query = User::where('id', auth()->id());
-    } else {
-        $query = User::role('Student');
-
-        if (auth()->user()->hasRole('Student Parents')) {
-            $parentProfile = auth()->user()->parentProfile;
-
-            if ($parentProfile) {
-                $parentId = $parentProfile->id;
-
-                $query->whereHas('student', function($q) use ($parentId) {
-                    $q->where('student_parent_id', $parentId);
-                });
-            }
-        }
-
-        $query = $query->when($search, function($query) use ($search) {
-            return $query->where(function($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%")
-                  ->orWhereHas('student', function($q) use ($search) {
-                      $q->where('nisn', 'LIKE', "%{$search}%")
-                        ->orWhere('class', 'LIKE', "%{$search}%");
-                  });
-            });
-        });
-
-        if ($classFilter) {
-            $query->whereHas('student', function($q) use ($classFilter) {
-                $q->where('class', 'LIKE', $classFilter . '%');
-            });
-        }
+    // Jika role adalah siswa, langsung redirect ke detail dirinya
+    if ($user->hasRole('Student')) {
+        $student = $user->load(['student.studentParent.user']);
+        return redirect()->route('students.show', $student->id);
     }
 
-    $students = $query
+    // Jika role adalah orang tua siswa
+    if ($user->hasRole('Student Parents')) {
+        $parentProfile = $user->parentProfile;
+
+        if ($parentProfile) {
+            // Ambil semua anak
+            $studentsQuery = User::role('Student')
+                ->whereHas('student', function ($q) use ($parentProfile) {
+                    $q->where('student_parent_id', $parentProfile->id);
+                })
+                ->with(['student.studentParent.user']);
+
+            $students = $studentsQuery->get();
+
+            // Redirect jika hanya 1 anak
+            if ($students->count() === 1) {
+                return redirect()->route('students.show', $students->first()->id);
+            }
+
+            // Jika lebih dari satu anak, tampilkan daftar
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $perPage = 10;
+            $paginated = new LengthAwarePaginator(
+                $students->forPage($currentPage, $perPage),
+                $students->count(),
+                $perPage,
+                $currentPage,
+                ['path' => request()->url(), 'query' => request()->query()]
+            );
+
+            return view('student.index', ['students' => $paginated]);
+        }
+
+        // Jika tidak punya profil orang tua, tampilkan kosong
+        $emptyCollection = collect([]);
+        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $emptyCollection,
+            0,
+            10,
+            1,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return view('student.index', ['students' => $paginated]);
+    }
+
+    // Role lainnya (Admin/Guru) -> tetap tampilkan semua siswa
+    $query = User::role('Student');
+
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhereHas('student', function ($q) use ($search) {
+                    $q->where('nisn', 'like', "%{$search}%")
+                        ->orWhere('class', 'like', "%{$search}%");
+                });
+        });
+    }
+
+    if ($classFilter) {
+        $query->whereHas('student', function ($q) use ($classFilter) {
+            $q->where('class', 'like', $classFilter . '%');
+        });
+    }
+
+    $paginated = $query
         ->with(['student.studentParent.user'])
         ->orderBy('name')
         ->paginate(10)
         ->withQueryString();
 
-    return view('student.index', compact('students'));
+    return view('student.index', ['students' => $paginated]);
 }
+
+
 
     
 

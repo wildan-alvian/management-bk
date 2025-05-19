@@ -10,7 +10,9 @@ use App\Mail\TestMail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\Permission\Models\Role;
+
 
 class StudentController extends Controller
 {
@@ -22,91 +24,89 @@ class StudentController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $search = $request->input('search');
-        $classFilter = $request->input('class_filter');
-        $user = auth()->user();
-    
-        // Jika role adalah siswa, langsung redirect ke detail dirinya
-        if ($user->hasRole('Student')) {
-            $student = $user->load(['student.studentParent.user']);
-            return redirect()->route('students.show', $student->id);
-        }
-    
-        // Jika role adalah orang tua siswa
-        if ($user->hasRole('Student Parents')) {
-            $parentProfile = $user->parentProfile;
-    
-            if ($parentProfile) {
-                // Ambil semua anak
-                $studentsQuery = User::role('Student')
-                    ->whereHas('student', function ($q) use ($parentProfile) {
-                        $q->where('student_parent_id', $parentProfile->id);
-                    })
-                    ->with(['student.studentParent.user']);
-    
-                $students = $studentsQuery->get();
-    
-                // Redirect jika hanya 1 anak
-                if ($students->count() === 1) {
-                    return redirect()->route('students.show', $students->first()->id);
-                }
-    
-                // Jika lebih dari satu anak, tampilkan daftar
-                $currentPage = LengthAwarePaginator::resolveCurrentPage();
-                $perPage = 10;
-                $paginated = new LengthAwarePaginator(
-                    $students->forPage($currentPage, $perPage),
-                    $students->count(),
-                    $perPage,
-                    $currentPage,
-                    ['path' => request()->url(), 'query' => request()->query()]
-                );
-    
-                return view('student.index', ['students' => $paginated]);
+{
+    $search = $request->input('search');
+    $classFilter = $request->input('class_filter');
+    $user = auth()->user();
+
+
+    if ($user->hasRole('Student')) {
+        $student = Student::where('user_id', $user->id)->firstOrFail();
+        return redirect()->route('students.show', $user->id);
+    }
+
+
+    if ($user->hasRole('Student Parents')) {
+        $parentProfile = $user->parentProfile;
+
+        if ($parentProfile) {
+            $studentsQuery = Student::where('student_parent_id', $parentProfile->id)
+                ->with(['user', 'studentParent.user']);
+
+            if ($search) {
+                $studentsQuery->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+                });
             }
-    
-            // Jika tidak punya profil orang tua, tampilkan kosong
-            $emptyCollection = collect([]);
-            $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
-                $emptyCollection,
-                0,
-                10,
-                1,
+
+            if ($classFilter) {
+                $studentsQuery->where('class', 'like', $classFilter . '%');
+            }
+
+            $students = $studentsQuery->get();
+
+            if ($students->count() === 1) {
+                return redirect()->route('students.show', $students->first()->user_id);
+            }
+
+      
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $perPage = 10;
+            $paginated = new LengthAwarePaginator(
+                $students->forPage($currentPage, $perPage),
+                $students->count(),
+                $perPage,
+                $currentPage,
                 ['path' => request()->url(), 'query' => request()->query()]
             );
-    
+
             return view('student.index', ['students' => $paginated]);
         }
-    
-        // Role lainnya (Admin/Guru) -> tetap tampilkan semua siswa
-        $query = User::role('Student');
-    
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhereHas('student', function ($q) use ($search) {
-                        $q->where('nisn', 'like', "%{$search}%")
-                            ->orWhere('class', 'like', "%{$search}%");
-                    });
-            });
-        }
-    
-        if ($classFilter) {
-            $query->whereHas('student', function ($q) use ($classFilter) {
-                $q->where('class', 'like', $classFilter . '%');
-            });
-        }
-    
-        $paginated = $query
-            ->with(['student.studentParent.user'])
-            ->orderBy('name')
-            ->paginate(10)
-            ->withQueryString();
-    
+
+        $empty = collect([]);
+        $paginated = new LengthAwarePaginator($empty, 0, 10, 1);
         return view('student.index', ['students' => $paginated]);
     }
+
+    $query = User::role('Student');
+
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%")
+              ->orWhereHas('student', function ($q) use ($search) {
+                  $q->where('nisn', 'like', "%{$search}%")
+                    ->orWhere('class', 'like', "%{$search}%");
+              });
+        });
+    }
+
+    if ($classFilter) {
+        $query->whereHas('student', function ($q) use ($classFilter) {
+            $q->where('class', 'like', $classFilter . '%');
+        });
+    }
+
+    $paginated = $query
+        ->with(['student.studentParent.user'])
+        ->orderBy('name')
+        ->paginate(10)
+        ->withQueryString();
+
+    return view('student.index', ['students' => $paginated]);
+}
+
     
 
 
@@ -118,55 +118,57 @@ class StudentController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            // Student User Data
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'nisn' => ['required', 'string', 'max:20', 'unique:students'],
-            'class' => ['required', 'string', 'max:50'],
-            'gender' => ['required', 'in:L,P'],
-            'birthdate' => ['nullable', 'date'],
-            'birthplace' => ['nullable', 'string', 'max:255'],
-            'address' => ['nullable', 'string'],
-            
-            // Parent Data
-            'parent_name' => ['required', 'string', 'max:255'],
-            'parent_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'parent_phone' => ['nullable', 'string', 'max:20'],
-            'parent_address' => ['nullable', 'string'],
-            'family_relation' => ['required', 'string', 'max:50']
+{
+    $validated = $request->validate([
+        // Student User Data
+        'name' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+        'phone' => ['nullable', 'string', 'max:20'],
+        'nisn' => ['required', 'string', 'max:20', 'unique:students'],
+        'class' => ['required', 'string', 'max:50'],
+        'gender' => ['required', 'in:L,P'],
+        'birthdate' => ['nullable', 'date'],
+        'birthplace' => ['nullable', 'string', 'max:255'],
+        'address' => ['nullable', 'string'],
+        
+        // Parent Data
+        'parent_name' => ['required', 'string', 'max:255'],
+        'parent_email' => ['required', 'string', 'email', 'max:255'],
+        'parent_phone' => ['nullable', 'string', 'max:20'],
+        'parent_address' => ['nullable', 'string'],
+        'family_relation' => ['required', 'string', 'max:50']
+    ]);
+
+    $studentPassword = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
+    $parentPassword = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
+
+    DB::beginTransaction();
+    try {
+        // Create Student User
+        $studentUser = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($studentPassword),
+            'phone' => $validated['phone'] ?? '',
+            'address' => $validated['address'] ?? '',
+            'role' => 'Student'
+        ]);
+        $studentUser->assignRole('Student');
+
+        // Create Student Profile
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'nisn' => $validated['nisn'],
+            'class' => $validated['class'],
+            'gender' => $validated['gender'],
+            'birthdate' => $validated['birthdate'],
+            'birthplace' => $validated['birthplace']
         ]);
 
-        // Generate random passwords
-        $studentPassword = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
-        $parentPassword = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
+        // Cek apakah parent user sudah ada
+        $parentUser = User::where('email', $validated['parent_email'])->first();
 
-        DB::beginTransaction();
-        try {
-            // Create Student User
-            $studentUser = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($studentPassword),
-                'phone' => $validated['phone'] ?? '',
-                'address' => $validated['address'] ?? '',
-                'role' => 'Student'
-            ]);
-            $studentUser->assignRole('Student');
-
-            // Create Student Profile
-            $student = Student::create([
-                'user_id' => $studentUser->id,
-                'nisn' => $validated['nisn'],
-                'class' => $validated['class'],
-                'gender' => $validated['gender'],
-                'birthdate' => $validated['birthdate'],
-                'birthplace' => $validated['birthplace']
-            ]);
-
-            // Create Parent User
+        if (!$parentUser) {
             $parentUser = User::create([
                 'name' => $validated['parent_name'],
                 'email' => $validated['parent_email'],
@@ -177,52 +179,50 @@ class StudentController extends Controller
             ]);
             $parentUser->assignRole('Student Parents');
 
-            // Create Parent Profile
-            $studentParent = StudentParent::create([
-                'user_id' => $parentUser->id,
-                'family_relation' => $validated['family_relation']
-            ]);
+            // Kirim email hanya jika parent baru
+            Mail::to($validated['parent_email'])->send(
+                new TestMail('Pembuatan akun CounselLink baru', 'email.user.create', [
+                    'name' => $validated['parent_name'],
+                    'password' => $parentPassword,
+                    'url' => env('APP_URL'),
+                ])
+            );
+        }
 
-            // Update student with parent relationship
-            $student->update([
-                'student_parent_id' => $studentParent->id
-            ]);
+        // Create Parent Profile
+        $studentParent = StudentParent::create([
+            'user_id' => $parentUser->id,
+            'family_relation' => $validated['family_relation']
+        ]);
 
-            // Send email to student
-            $details = [
+        // Update student with parent relationship
+        $student->update([
+            'student_parent_id' => $studentParent->id
+        ]);
+
+        // Send email to student
+        Mail::to($validated['email'])->send(
+            new TestMail('Pembuatan akun CounselLink baru', 'email.user.create', [
                 'name' => $validated['name'],
                 'password' => $studentPassword,
                 'url' => env('APP_URL'),
-            ];
+            ])
+        );
 
-            Mail::to($validated['email'])->send(
-                new TestMail('Pembuatan akun CounselLink baru', 'email.user.create', $details)
-            );
+        DB::commit();
 
-            // Send email to student parent
-            $details = [
-                'name' => $validated['parent_name'],
-                'password' => $parentPassword,
-                'url' => env('APP_URL'),
-            ];
+        return redirect()->route('students.index')
+            ->with('success', "Data siswa berhasil ditambahkan.");
 
-            Mail::to($validated['parent_email'])->send(
-                new TestMail('Pembuatan akun CounselLink baru', 'email.user.create', $details)
-            );
-
-            DB::commit();
-
-            return redirect()->route('students.index')
-                ->with('success', "Data siswa berhasil ditambahkan.");
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            \Log::error('Error creating student: ' . $e->getMessage());
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
-        }
+    } catch (\Exception $e) {
+        DB::rollback();
+        \Log::error('Error creating student: ' . $e->getMessage());
+        return redirect()->back()
+            ->withInput()
+            ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
     }
+}
+
 
     public function show($id)
     {
@@ -274,7 +274,7 @@ class StudentController extends Controller
             
             // Parent Data
             'parent_name' => ['required', 'string', 'max:255'],
-            'parent_email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . optional(optional($student->student->studentParent)->user)->id],
+            'parent_email' => ['required', 'string', 'email', 'max:255'],
             'parent_phone' => ['nullable', 'string', 'max:20'],
             'parent_address' => ['nullable', 'string'],
             'family_relation' => ['required', 'string', 'max:50']

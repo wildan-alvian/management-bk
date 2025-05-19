@@ -25,17 +25,26 @@ class CounselingController extends Controller
     $search = $request->input('search');
     $status = $request->input('status');
     $counselingType = $request->input('counseling_type');
+    $user = Auth::user();
 
     $counselings = Counseling::query()
+        // Jika role wali murid atau siswa, batasi query hanya untuk data milik mereka
+        ->when($user->hasAnyRole(['Student', 'Student Parents']), function ($query) use ($user) {
+            return $query->where('submitted_by_id', $user->id);
+        })
+        
+        // Filter search
         ->when($search, function ($query, $search) {
             return $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%$search%")
                   ->orWhere('counseling_type', 'like', "%$search%");
             });
         })
+        // Filter status
         ->when($status, function ($query, $status) {
             return $query->where('status', $status);
         })
+        // Filter counseling type
         ->when($counselingType, function ($query, $counselingType) {
             return $query->where('counseling_type', $counselingType);
         })
@@ -45,6 +54,7 @@ class CounselingController extends Controller
 
     return view('counseling.index', compact('counselings', 'search', 'status', 'counselingType'));
 }
+
 
 
     public function create()
@@ -106,7 +116,7 @@ class CounselingController extends Controller
             'submitted_by' => ['required', 'string', 'max:255'],
             'counseling_type' => ['required', 'string', 'max:50', 'in:siswa,wali_murid'],
             'title' => ['required', 'string', 'max:255'],
-            'status' => ['nullable', 'string', 'in:new,approved,rejected'],
+            'status' => ['nullable', 'string', 'in:new,approved,rejected,canceled'],
         ]);
 
         try {

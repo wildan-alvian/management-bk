@@ -4,10 +4,12 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="fw-bold mb-0">Detail Data Siswa</h4>
+    @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
     <a href="{{ route('students.index') }}" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left me-1"></i>
         Kembali
     </a>
+    @endif
 </div>
 
 @if(session('success'))
@@ -145,8 +147,10 @@
                                 <th style="width: 15%;">Kategori</th>
                                 <th style="width: 15%;">Tanggal</th>
                                 <th style="width: 30%;">Detail</th>
+                                @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
                                 <th style="width: 10%;">Aksi</th>
-                            </tr>
+                                @endif
+                                </tr>
                         </thead>
                         <tbody>
                             @forelse($student->student->achievements as $index => $achievement)
@@ -212,8 +216,10 @@
                                 <th style="width: 15%;">Kategori</th>
                                 <th style="width: 15%;">Tanggal</th>
                                 <th style="width: 30%;">Detail</th>
+                                @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
                                 <th style="width: 10%;">Aksi</th>
-                            </tr>
+                                @endif
+                                </tr>
                         </thead>
                         <tbody>
                             @forelse($student->student->misconducts as $index => $misconduct)

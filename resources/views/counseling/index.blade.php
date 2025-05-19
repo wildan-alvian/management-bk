@@ -22,7 +22,7 @@
                     <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'new'])) }}">New</a></li>
                     <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'approved'])) }}">Approved</a></li>
                     <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'rejected'])) }}">Rejected</a></li>
-        
+                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'canceled'])) }}">Canceled</a></li>
                     <li><hr class="dropdown-divider"></li>
         
                     {{-- Filter Tipe Konseling --}}
@@ -81,7 +81,7 @@
                     <td>{{ $counseling->title }}</td>
                     <td>
                         @php
-                            $statusColors = ['new' => 'secondary', 'on_progress' => 'warning', 'approved' => 'success', 'rejected' => 'danger', 'canceled' => 'dark'];
+                            $statusColors = ['new' => 'secondary', 'on_progress' => 'warning', 'approved' => 'success', 'rejected' => 'danger', 'canceled' => 'warning'];
                         @endphp
                         <span class="badge bg-{{ $statusColors[$counseling->status] ?? 'secondary' }}">
                             {{ strtoupper(str_replace('_', ' ', $counseling->status)) }}

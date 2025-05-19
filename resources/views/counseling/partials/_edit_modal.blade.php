@@ -84,6 +84,7 @@
                                     <option value="new" {{ $counseling->status == 'new' ? 'selected' : '' }}>New</option>
                                     <option value="approved" {{ $counseling->status == 'approved' ? 'selected' : '' }}>Approved</option>
                                     <option value="rejected" {{ $counseling->status == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                                    <option value="canceled" {{ $counseling->status == 'canceled' ? 'selected' : '' }}>Canceled</option>
                                 </select>
                             </div>
                             @error('status')

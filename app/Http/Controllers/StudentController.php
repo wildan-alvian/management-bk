@@ -36,10 +36,10 @@ class StudentController extends Controller
         $query = User::role('Student');
     
         if (auth()->user()->hasRole('Student Parents')) {
-            $parentProfile = auth()->user()->parentProfile;
+            $studentParent = auth()->user()->studentParent;
         
-            if ($parentProfile) {
-                $parentId = $parentProfile->id;
+            if ($studentParent) {
+                $parentId = $studentParent->id;
         
                 $query->whereHas('student', function($q) use ($parentId) {
                     $q->where('student_parent_id', $parentId);
@@ -201,7 +201,7 @@ class StudentController extends Controller
 
         // If user is a Student Parent, verify they can access this student
         if (auth()->user()->hasRole('Student Parents')) {
-            $parentId = auth()->user()->parentProfile->id;
+            $parentId = auth()->user()->studentParent->id;
             $query->whereHas('student', function($q) use ($parentId) {
                 $q->where('student_parent_id', $parentId);
             });

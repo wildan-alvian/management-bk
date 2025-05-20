@@ -59,7 +59,7 @@ class User extends Authenticatable
     /**
      * Get the parent profile associated with the user.
      */
-    public function parentProfile()
+    public function studentParent()
     {
         return $this->hasOne(StudentParent::class);
     }

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GuruBkController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentParentController;
 use App\Http\Controllers\StudentAchievementController;
 use App\Http\Controllers\StudentMisconductController;
 use App\Http\Controllers\CounselingController;
@@ -56,12 +57,14 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
     Route::resource('counselors', GuruBkController::class);
     Route::resource('counseling', CounselingController::class);
     Route::resource('students', StudentController::class)->except(['index', 'show']);
+    Route::resource('student-parents', StudentParentController::class)->except(['index', 'show']);
     Route::resource('student-achievements', StudentAchievementController::class);
     Route::resource('student-misconducts', StudentMisconductController::class);
 });
 
 // Student viewing routes with broader access
 Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor|Student|Student Parents'])->group(function () {
+    Route::get('/student-parents', [StudentParentController::class, 'index'])->name('student-parents.index');
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
 });

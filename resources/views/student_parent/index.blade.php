@@ -27,7 +27,7 @@
               </style>
               
 
-            @can('create-student')
+            @can('create-student-parent')
                 <a href="{{ route('student-parents.create') }}" class="btn btn-add">
                     <i class="bi bi-plus-lg"></i>
                     Tambah Wali Murid
@@ -61,38 +61,38 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($studentParents as $index => $parent)
+                    @forelse ($studentParents as $index => $studentParent)
                         <tr>
                             <td class="text-center">{{ $studentParents->firstItem() + $index }}</td>
-                            <td>{{ $parent->id_number }}</td>
-                            <td>{{ $parent->name }}</td>
+                            <td>{{ $studentParent->id_number }}</td>
+                            <td>{{ $studentParent->name }}</td>
                             <td class="text-center">
                                 <div class="dropdown">
-                                    <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $parent->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $studentParent->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $parent->id }}">
-                                        @can('view-parent')
-                                        <a class="dropdown-item" href="{{ route('student-parents.show', $parent->id) }}">
+                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $studentParent->id }}">
+                                        @can('view-student-parent')
+                                        <a class="dropdown-item" href="{{ route('student-parents.show', $studentParent->id) }}">
                                             <i class="bi bi-eye me-2"></i>Detail
                                         </a>
                                         @endcan
-                                        @can('edit-parent')
-                                        <a class="dropdown-item" href="{{ route('student-parents.edit', $parent->id) }}">
+                                        @can('edit-student-parent')
+                                        <a class="dropdown-item" href="{{ route('student-parents.edit', $studentParent->id) }}">
                                             <i class="bi bi-pencil me-2"></i>Edit
                                         </a>
                                         @endcan
-                                        @can('delete-parent')
+                                        @can('delete-student-parent')
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $parent->id }}">
+                                        <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $studentParent->id }}">
                                             <i class="bi bi-trash me-2"></i>Hapus
                                         </a>
                                         @endcan
                                     </div>
                                 </div>
 
-                                @can('delete-parent')
-                                    @include('student-parent.partials._delete_modal', ['parent' => $parent])
+                                @can('delete-student-parent')
+                                    @include('student_parent.partials._delete_modal', ['studentParent' => $studentParent])
                                 @endcan
                             </td>
                         </tr>

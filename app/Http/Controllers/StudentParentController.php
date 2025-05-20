@@ -100,7 +100,16 @@ class StudentParentController extends Controller
 
     public function show($id)
     {
-        
+        $query = User::role('Student Parents')
+            ->with([
+                'studentParent.students.user' => function($query) {
+                    $query->orderBy('name', 'desc');
+                },
+            ]);
+
+        $studentParent = $query->findOrFail($id);
+
+        return view('student_parent.show', compact('studentParent'));
     }
 
     public function edit($id)

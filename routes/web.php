@@ -68,6 +68,7 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
 // Student viewing routes with broader access
 Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor|Student|Student Parents'])->group(function () {
     Route::get('/student-parents', [StudentParentController::class, 'index'])->name('student-parents.index');
+    Route::get('/student-parents/{id}', [StudentParentController::class, 'show'])->name('student-parents.show');
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
     Route::get('/counseling/{counseling}', [CounselingController::class, 'show'])->name('counseling.show');

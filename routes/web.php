@@ -42,6 +42,7 @@ Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'inde
 Route::middleware(['auth'])->group(function () {
     Route::resource('notifications', NotificationController::class);
     Route::get('/notifications/read/{id}', [NotificationController::class, 'read'])->name('notification.read');
+    
 });
 
 Route::middleware(['auth', 'role:Super Admin'])->group(function () {
@@ -58,12 +59,15 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
     Route::resource('students', StudentController::class)->except(['index', 'show']);
     Route::resource('student-achievements', StudentAchievementController::class);
     Route::resource('student-misconducts', StudentMisconductController::class);
+    Route::post('/counseling/{counseling}/approve', [CounselingController::class, 'approve'])->name('counseling.approve');
+    Route::post('/counseling/{counseling}/reject', [CounselingController::class, 'reject'])->name('counseling.reject');
 });
 
 // Student viewing routes with broader access
 Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor|Student|Student Parents'])->group(function () {
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
+    Route::get('/counseling/{counseling}', [CounselingController::class, 'show'])->name('counseling.show');
 });
 
 Route::get('/counseling', [CounselingController::class, 'index'])

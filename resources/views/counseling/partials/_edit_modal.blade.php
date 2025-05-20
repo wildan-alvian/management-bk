@@ -72,6 +72,16 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        <div class="col-md-12">
+                            <div class="text-start">
+                                <label for="description" class="form-label fw-bold">Deskripsi</label>
+                            </div>
+                            <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" 
+                                            rows="3">{{ $counseling->description }}</textarea>
+                            @error('title')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <div class="col-12">
                             <div class="text-start">
                                 <label for="status" class="form-label fw-bold">Status</label>

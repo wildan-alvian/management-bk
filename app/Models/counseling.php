@@ -17,6 +17,8 @@ class Counseling extends Model
         'counseling_type',
         'title',
         'status',
+        'notes',
+        'description'
     ];
     protected $casts = [
         'scheduled_at' => 'datetime',

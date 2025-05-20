@@ -71,6 +71,7 @@ class CounselingController extends Controller
         'scheduled_at' => 'nullable|date',
         'counseling_type' => 'required|in:siswa,wali_murid',
         'title' => 'required|string|max:255',
+        'description' => 'nullable|string',
     ]);
 
     Counseling::create([
@@ -79,29 +80,32 @@ class CounselingController extends Controller
         'submitted_by_id' => $user->id,
         'counseling_type' => $request->counseling_type,
         'title' => $request->title,
-        'status' => 'new', 
+        'description' => $request->description,
+        'status' => $user->role == 'Student' || $user->role == 'Student Parents' ? 'new' : 'approved', 
     ]);
 
-    $scheduled_at = Carbon::parse($request->scheduled_at)->format('d M Y H:i');
-    $content = "$user->name mengajukan konseling $request->title pada $scheduled_at";
-    Notification::create([
-        'type' => 'Guidance Counselor',
-        'content' => $content,
-        'status' => false,
-    ]);
+    if ($user->role == 'Student' || $user->role == 'Student Parents') {
+        $scheduled_at = Carbon::parse($request->scheduled_at)->format('d M Y H:i');
+        $content = "$user->name mengajukan konseling $request->title pada $scheduled_at";
+        Notification::create([
+            'type' => 'Guidance Counselor',
+            'content' => $content,
+            'status' => false,
+        ]);
 
-    $details = [
-        'name' => $user->name,
-        'title' => $request->title,
-        'scheduled_at' => $scheduled_at,
-        'url' => env('APP_URL') . '/counseling/'
-    ];
+        $details = [
+            'name' => $user->name,
+            'title' => $request->title,
+            'scheduled_at' => $scheduled_at,
+            'url' => env('APP_URL') . '/counseling/'
+        ];
 
-    $guidanceCounselors = User::role('Guidance Counselor')->get();
-    foreach ($guidanceCounselors as $guidanceCounselor) {
-        Mail::to($guidanceCounselor->email)->send(
-            new TestMail('Ada pengajuan konseling baru', 'email.counseling.create', $details)
-        );
+        $guidanceCounselors = User::role('Guidance Counselor')->get();
+        foreach ($guidanceCounselors as $guidanceCounselor) {
+            Mail::to($guidanceCounselor->email)->send(
+                new TestMail('Ada pengajuan konseling baru', 'email.counseling.create', $details)
+            );
+        }
     }
 
     return redirect()->route('counseling.index')->with('success', 'Data konseling berhasil ditambahkan.');
@@ -116,41 +120,14 @@ class CounselingController extends Controller
             'submitted_by' => ['required', 'string', 'max:255'],
             'counseling_type' => ['required', 'string', 'max:50', 'in:siswa,wali_murid'],
             'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'status' => ['nullable', 'string', 'in:new,approved,rejected,canceled'],
         ]);
 
-        try {
-            $counseling->update($validated);
+        $counseling->update($validated);
 
-            $user = User::findOrFail($counseling->submitted_by_id);
-
-            $scheduled_at = Carbon::parse($request->scheduled_at)->format('d M Y H:i');
-            $content = "Konseling $request->title pada $scheduled_at telah $request->status";
-            Notification::create([
-                'user_id' => $counseling->submitted_by_id,
-                'type' => $user->role,
-                'content' => $content,
-                'status' => false,
-            ]);
-
-            $details = [
-                'title' => $request->title,
-                'scheduled_at' => $scheduled_at,
-                'status' => $request->status,
-                'url' => env('APP_URL') . '/counseling/'
-            ];
-
-            Mail::to($user->email)->send(
-                new TestMail("Perubahan status konseling $request->title", 'email.counseling.update', $details)
-            );
-
-            return redirect()->route('counseling.index')
-                ->with('success', 'Data konseling berhasil diperbarui.');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Terjadi kesalahan saat memperbarui data konseling.');
-        }
+        return redirect()->route('counseling.index')
+            ->with('success', 'Data konseling berhasil diperbarui.');
     }
 
     /**
@@ -175,6 +152,111 @@ class CounselingController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('counseling.index')
                 ->with('error', 'Terjadi kesalahan saat menghapus data konseling.');
+        }
+    }
+
+    public function show(Counseling $counseling)
+    {
+        return view('counseling.show', compact('counseling'));
+    }
+
+    public function approve(Request $request, Counseling $counseling)
+    {
+        // Check if user is Guidance Counselor
+        if (!auth()->user()->hasRole('Guidance Counselor')) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk menyetujui konseling.');
+        }
+
+        // Check if counseling status is new
+        if ($counseling->status !== 'new') {
+            return redirect()->back()->with('error', 'Status konseling tidak valid untuk disetujui.');
+        }
+
+        try {
+            $counseling->update([
+                'status' => 'approved',
+                'notes' => $request->notes
+            ]);
+
+            $user = User::findOrFail($counseling->submitted_by_id);
+
+            $scheduled_at = Carbon::parse($counseling->scheduled_at)->format('d M Y H:i');
+            $content = "Konseling {$counseling->title} pada {$scheduled_at} telah disetujui";
+            Notification::create([
+                'user_id' => $counseling->submitted_by_id,
+                'type' => $user->roles->first()->name,
+                'content' => $content,
+                'status' => false,
+            ]);
+
+            $details = [
+                'name' => $user->name,
+                'title' => $counseling->title,
+                'scheduled_at' => $scheduled_at,
+                'notes' => $request->notes,
+                'url' => env('APP_URL') . '/counseling/' . $counseling->id
+            ];
+
+            Mail::to($user->email)->send(
+                new TestMail("Konseling {$counseling->title} telah disetujui", 'email.counseling.approved', $details)
+            );
+
+            return redirect()->route('counseling.show', $counseling)
+                ->with('success', 'Konseling berhasil disetujui.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('counseling.show', $counseling)
+                ->with('error', 'Terjadi kesalahan saat menyetujui data konseling.');
+        }
+    }
+
+    public function reject(Request $request, Counseling $counseling)
+    {
+        // Check if user is Guidance Counselor
+        if (!auth()->user()->hasRole('Guidance Counselor')) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk menolak konseling.');
+        }
+
+        // Check if counseling status is new
+        if ($counseling->status !== 'new') {
+            return redirect()->back()->with('error', 'Status konseling tidak valid untuk ditolak.');
+        }
+
+        try {
+            $counseling->update([
+                'status' => 'rejected',
+                'notes' => $request->notes
+            ]);
+
+            $user = User::findOrFail($counseling->submitted_by_id);
+
+            $scheduled_at = Carbon::parse($counseling->scheduled_at)->format('d M Y H:i');
+            $content = "Konseling {$counseling->title} pada {$scheduled_at} ditolak";
+            Notification::create([
+                'user_id' => $counseling->submitted_by_id,
+                'type' => $user->roles->first()->name,
+                'content' => $content,
+                'status' => false,
+            ]);
+
+            $details = [
+                'name' => $user->name,
+                'title' => $counseling->title,
+                'scheduled_at' => $scheduled_at,
+                'notes' => $request->notes,
+                'url' => env('APP_URL') . '/counseling/' . $counseling->id
+            ];
+
+            Mail::to($user->email)->send(
+                new TestMail("Konseling {$counseling->title} Ditolak", 'email.counseling.rejected', $details)
+            );
+
+            return redirect()->route('counseling.show', $counseling)
+                ->with('success', 'Konseling berhasil ditolak.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('counseling.show', $counseling)
+                ->with('error', 'Terjadi kesalahan saat menolak data konseling.');
         }
     }
 }

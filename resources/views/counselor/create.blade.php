@@ -35,14 +35,14 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="text-start">
-                            <label for="nip" class="form-label fw-bold">NIP</label>
+                            <label for="id_number" class="form-label fw-bold">NIP</label>
                         </div>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                            <input type="text" class="form-control @error('nip') is-invalid @enderror" 
-                                   name="nip" id="nip" value="{{ old('nip') }}" required>
+                            <input type="text" class="form-control @error('id_number') is-invalid @enderror" 
+                                   name="id_number" id="id_number" value="{{ old('id_number') }}" required>
                         </div>
-                        @error('nip')
+                        @error('id_number')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

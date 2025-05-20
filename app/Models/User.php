@@ -19,7 +19,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'nip',
+        'id_number',
         'name',
         'email',
         'password',
@@ -59,7 +59,7 @@ class User extends Authenticatable
     /**
      * Get the parent profile associated with the user.
      */
-    public function parentProfile()
+    public function studentParent()
     {
         return $this->hasOne(StudentParent::class);
     }

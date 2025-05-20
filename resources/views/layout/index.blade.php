@@ -603,6 +603,10 @@
                 <i class="bi bi-people"></i>
                 <span>Data Siswa</span>
             </a>
+            <a href="{{ route('student-parents.index') }}" class="nav-link {{ request()->routeIs('parents.index') ? 'active' : '' }}">
+                <i class="bi bi-people"></i>
+                <span>Data Wali Murid</span>
+            </a>
             <a href="{{ route('counseling.index') }}" class="nav-link {{ request()->routeIs('counseling.index') ? 'active' : '' }}">
                 <i class="bi bi-file-earmark-text"></i>
                 <span>Data Konseling</span>

@@ -52,7 +52,7 @@
             @forelse($admins as $admin)
             <tr>
                 <td class="text-center">{{ $admins->firstItem() + $loop->index }}</td>
-                <td>{{ $admin->nip }}</td>
+                <td>{{ $admin->id_number }}</td>
                 <td>{{ $admin->name }}</td>
                 <td>{{ $admin->email }}</td>
                 <td>{{ $admin->phone ?? '-' }}</td>

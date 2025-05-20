@@ -26,7 +26,7 @@ class GuruBkController extends Controller
                 return $query->where(function($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%")
                       ->orWhere('email', 'LIKE', "%{$search}%")
-                      ->orWhere('nip', 'LIKE', "%{$search}%");
+                      ->orWhere('id_number', 'LIKE', "%{$search}%");
                 });
             })
             ->orderBy('name')
@@ -46,7 +46,7 @@ class GuruBkController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'nip' => ['required', 'string', 'max:50', 'unique:users'],
+            'id_number' => ['required', 'string', 'max:50', 'unique:users'],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string'],
         ]);
@@ -60,7 +60,7 @@ class GuruBkController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($password),
-                'nip' => $validated['nip'],
+                'id_number' => $validated['id_number'],
                 'phone' => $validated['phone'],
                 'address' => $validated['address'],
                 'role' => 'Guidance Counselor'
@@ -104,7 +104,7 @@ class GuruBkController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id],
-            'nip' => ['required', 'string', 'max:50', 'unique:users,nip,' . $id],
+            'id_number' => ['required', 'string', 'max:50', 'unique:users,id_number,' . $id],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string'],
         ]);

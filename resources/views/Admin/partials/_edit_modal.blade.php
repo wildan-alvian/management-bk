@@ -15,13 +15,13 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="text-start">
-                                <label for="nip" class="form-label fw-bold">NIP</label>
+                                <label for="id_number" class="form-label fw-bold">NIP</label>
                             </div>
                             <div class="input-group has-validation">
                                 <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                                <input type="text" name="nip" id="nip" class="form-control @error('nip') is-invalid @enderror" 
-                                       value="{{ $admin->nip }}" required>
-                                @error('nip')
+                                <input type="text" name="id_number" id="id_number" class="form-control @error('id_number') is-invalid @enderror" 
+                                       value="{{ $admin->id_number }}" required>
+                                @error('id_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

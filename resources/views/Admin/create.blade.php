@@ -24,13 +24,13 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="text-start">
-                            <label for="nip" class="form-label fw-bold">NIP</label>
+                            <label for="id_number" class="form-label fw-bold">NIP</label>
                         </div>
                         <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                            <input type="text" class="form-control @error('nip') is-invalid @enderror" 
-                                   id="nip" name="nip" value="{{ old('nip') }}" required>
-                            @error('nip')
+                            <input type="text" class="form-control @error('id_number') is-invalid @enderror" 
+                                   id="id_number" name="id_number" value="{{ old('id_number') }}" required>
+                            @error('id_number')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

@@ -22,7 +22,7 @@
             <div class="col-md-6">
                 <div class="card p-3 shadow-sm">
                     <strong>NIP:</strong>
-                    <p>{{ $counselor->nip }}</p>
+                    <p>{{ $counselor->id_number }}</p>
                 </div>
             </div>
 

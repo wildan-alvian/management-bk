@@ -56,7 +56,7 @@
             @forelse ($counselors as $index => $counselor)
                 <tr>
                     <td class="text-center">{{ $counselors->firstItem() + $index }}</td>
-                    <td>{{ $counselor->nip }}</td>
+                    <td>{{ $counselor->id_number }}</td>
                     <td>{{ $counselor->name }}</td>
                     <td>{{ $counselor->email }}</td>
                     <td>{{ $counselor->phone ?? '-' }}</td>

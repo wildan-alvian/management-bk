@@ -27,7 +27,7 @@ class AdminController extends Controller
                 return $query->where(function($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%")
                       ->orWhere('email', 'LIKE', "%{$search}%")
-                      ->orWhere('nip', 'LIKE', "%{$search}%");
+                      ->orWhere('id_number', 'LIKE', "%{$search}%");
                 });
             })
             ->orderBy('id', 'DESC')
@@ -51,7 +51,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'nip' => ['required', 'string', 'max:50', 'unique:users'],
+            'id_number' => ['required', 'string', 'max:50', 'unique:users'],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string'],
         ]);
@@ -65,7 +65,7 @@ class AdminController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($password),
-                'nip' => $validated['nip'],
+                'id_number' => $validated['id_number'],
                 'phone' => $validated['phone'],
                 'address' => $validated['address'],
                 'role' => 'Admin'
@@ -115,7 +115,7 @@ class AdminController extends Controller
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email,' . $admin->id],
-            'nip' => ['required', 'string', 'max:50', 'unique:users,nip,' . $admin->id],
+            'id_number' => ['required', 'string', 'max:50', 'unique:users,id_number,' . $admin->id],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string'],
         ];

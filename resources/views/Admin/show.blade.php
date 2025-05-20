@@ -23,7 +23,7 @@
             <div class="col-md-6">
                 <div class="card p-3 shadow-sm">
                     <strong>NIP:</strong>
-                    <p>{{ $admin->nip }}</p>
+                    <p>{{ $admin->id_number }}</p>
                 </div>
             </div>
 

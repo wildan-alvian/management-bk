@@ -83,7 +83,7 @@ class StudentController extends Controller
     public function store(Request $request)
 {
     $validated = $request->validate([
-        // Student User Data
+        'student_parent_id' => ['required'],
         'name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
         'phone' => ['nullable', 'string', 'max:20'],
@@ -92,18 +92,10 @@ class StudentController extends Controller
         'gender' => ['required', 'in:L,P'],
         'birthdate' => ['nullable', 'date'],
         'birthplace' => ['nullable', 'string', 'max:255'],
-        'address' => ['nullable', 'string'],
-        
-        // Parent Data
-        'parent_name' => ['required', 'string', 'max:255'],
-        'parent_email' => ['required', 'string', 'email', 'max:255'],
-        'parent_phone' => ['nullable', 'string', 'max:20'],
-        'parent_address' => ['nullable', 'string'],
-        'family_relation' => ['required', 'string', 'max:50']
+        'address' => ['nullable', 'string']
     ]);
 
     $studentPassword = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
-    $parentPassword = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
 
     DB::beginTransaction();
     try {
@@ -121,46 +113,12 @@ class StudentController extends Controller
         // Create Student Profile
         $student = Student::create([
             'user_id' => $studentUser->id,
+            'student_parent_id' => $validated['student_parent_id'],
             'nisn' => $validated['nisn'],
             'class' => $validated['class'],
             'gender' => $validated['gender'],
             'birthdate' => $validated['birthdate'],
             'birthplace' => $validated['birthplace']
-        ]);
-
-        // Cek apakah parent user sudah ada
-        $parentUser = User::where('email', $validated['parent_email'])->first();
-
-        if (!$parentUser) {
-            $parentUser = User::create([
-                'name' => $validated['parent_name'],
-                'email' => $validated['parent_email'],
-                'password' => Hash::make($parentPassword),
-                'phone' => $validated['parent_phone'] ?? '',
-                'address' => $validated['parent_address'] ?? '',
-                'role' => 'Student Parents'
-            ]);
-            $parentUser->assignRole('Student Parents');
-
-            // Kirim email hanya jika parent baru
-            Mail::to($validated['parent_email'])->send(
-                new TestMail('Pembuatan akun CounselLink baru', 'email.user.create', [
-                    'name' => $validated['parent_name'],
-                    'password' => $parentPassword,
-                    'url' => env('APP_URL'),
-                ])
-            );
-        }
-
-        // Create Parent Profile
-        $studentParent = StudentParent::create([
-            'user_id' => $parentUser->id,
-            'family_relation' => $validated['family_relation']
-        ]);
-
-        // Update student with parent relationship
-        $student->update([
-            'student_parent_id' => $studentParent->id
         ]);
 
         // Send email to student
@@ -223,7 +181,7 @@ class StudentController extends Controller
         $student = User::role('Student')->with(['student.studentParent.user'])->findOrFail($id);
         
         $validated = $request->validate([
-            // Student User Data
+            'student_parent_id' => ['required'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $student->id],
             'phone' => ['nullable', 'string', 'max:20'],
@@ -233,13 +191,6 @@ class StudentController extends Controller
             'gender' => ['required', 'in:L,P'],
             'birthdate' => ['nullable', 'date'],
             'birthplace' => ['nullable', 'string', 'max:255'],
-            
-            // Parent Data
-            'parent_name' => ['required', 'string', 'max:255'],
-            'parent_email' => ['required', 'string', 'email', 'max:255'],
-            'parent_phone' => ['nullable', 'string', 'max:20'],
-            'parent_address' => ['nullable', 'string'],
-            'family_relation' => ['required', 'string', 'max:50']
         ]);
 
         DB::beginTransaction();
@@ -254,27 +205,13 @@ class StudentController extends Controller
 
             // Update Student Profile
             $student->student->update([
+                'student_parent_id' => $validated['student_parent_id'],
                 'nisn' => $validated['nisn'],
                 'class' => $validated['class'],
                 'gender' => $validated['gender'],
                 'birthdate' => $validated['birthdate'],
                 'birthplace' => $validated['birthplace']
             ]);
-
-            // Update Parent User
-            if ($student->student->studentParent) {
-                $student->student->studentParent->user->update([
-                    'name' => $validated['parent_name'],
-                    'email' => $validated['parent_email'],
-                    'phone' => $validated['parent_phone'],
-                    'address' => $validated['parent_address']
-                ]);
-
-                // Update Parent Profile
-                $student->student->studentParent->update([
-                    'family_relation' => $validated['family_relation']
-                ]);
-            }
 
             DB::commit();
 
@@ -321,5 +258,27 @@ class StudentController extends Controller
             return redirect()->back()
                 ->withErrors(['error' => 'Terjadi kesalahan saat menghapus data siswa: ' . $e->getMessage()]);
         }
+    }
+
+    public function getStudentParents(Request $request)
+    {
+        $search = $request->search;
+        $guardians = StudentParent::with('user')
+            ->when($search, function($query) use ($search) {
+                $query->whereHas('user', function($q) use ($search) {
+                    $q->where('id_number', 'like', "%{$search}%")
+                      ->orWhere('name', 'like', "%{$search}%");
+                });
+            })
+            ->limit(20)
+            ->get()
+            ->map(function($parent) {
+                return [
+                    'id' => $parent->id, // id student_parents
+                    'id_number' => $parent->user->id_number,
+                    'name' => $parent->user->name
+                ];
+            });
+        return response()->json($guardians);
     }
 }

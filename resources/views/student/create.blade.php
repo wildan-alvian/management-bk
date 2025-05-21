@@ -175,85 +175,27 @@
                 </div>
 
                 <!-- Data Wali Section -->
-                <div class="col-12 mt-4">
-                    <h5 class="fw-bold mb-3">
+                <div class="col-12 mt-5">
+                    <h5 class="fw-bold">
                         <i class="bi bi-people me-2"></i>
                         Data Wali
                     </h5>
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="form-group">
-                        <label for="parent_name" class="form-label">Nama Wali</label>
+                        <label for="student_parent_id" class="form-label">Wali</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input type="text" class="form-control @error('parent_name') is-invalid @enderror" 
-                                   id="parent_name" name="parent_name" value="{{ old('parent_name') }}" required>
-                        </div>
-                        @error('parent_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="parent_email" class="form-label">Email Wali</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                            <input type="email" class="form-control @error('parent_email') is-invalid @enderror" 
-                                   id="parent_email" name="parent_email" value="{{ old('parent_email') }}" required>
-                        </div>
-                        @error('parent_email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="parent_phone" class="form-label">No. Telepon Wali</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                            <input type="text" class="form-control @error('parent_phone') is-invalid @enderror" 
-                                   id="parent_phone" name="parent_phone" value="{{ old('parent_phone') }}">
-                        </div>
-                        @error('parent_phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="family_relation" class="form-label">Hubungan dengan Siswa</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-diagram-2"></i></span>
-                            <select class="form-select @error('family_relation') is-invalid @enderror" 
-                                    id="family_relation" name="family_relation" required>
-                                <option value="">Pilih Hubungan</option>
-                                <option value="Ayah" {{ old('family_relation') == 'Ayah' ? 'selected' : '' }}>Ayah</option>
-                                <option value="Ibu" {{ old('family_relation') == 'Ibu' ? 'selected' : '' }}>Ibu</option>
-                                <option value="Wali Lainnya" {{ old('family_relation') == 'Wali Lainnya' ? 'selected' : '' }}>Wali Lainnya</option>
+                            <select class="form-select select2 @error('student_parent_id') is-invalid @enderror"
+                                    id="student_parent_id" name="student_parent_id" required>
+                                <option value="">Pilih Wali</option>
                             </select>
                         </div>
-                        @error('family_relation')
+                        @error('student_parent_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                    </div>
-                </div>
 
-                <div class="col-12">
-                    <div class="form-group">
-                        <label for="parent_address" class="form-label">Alamat Wali</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-house"></i></span>
-                            <textarea class="form-control @error('parent_address') is-invalid @enderror" 
-                                      id="parent_address" name="parent_address" rows="3">{{ old('parent_address') }}</textarea>
-                        </div>
-                        @error('parent_address')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
                 </div>
 
@@ -274,4 +216,74 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    $('#student_parent_id').select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Cari wali berdasarkan NIK atau nama...',
+        allowClear: true,
+        ajax: {
+            url: '{{ route("students.parents") }}',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    search: params.term || ''
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: $.map(data, function(item) {
+                        return {
+                            id: item.id,
+                            text: item.id_number  + ' - ' + item.name
+                        }
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0
+    });
+
+    // Trigger fetch data saat select dibuka pertama kali
+    let guardiansFetched = false;
+    $('#student_parent_id').on('select2:open', function (e) {
+        if (!guardiansFetched) {
+            $('.select2-search__field').val('').trigger('input');
+            guardiansFetched = true;
+        }
+    });
+});
+</script>
+@endpush
+
+@push('styles')
+<style>
+.input-group .select2-container {
+    flex: 1 1 auto;
+    width: 1% !important;
+}
+.input-group .select2-selection--single {
+    height: 100% !important;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #e2e8f0 !important;
+}
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__clear {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+</style>
+@endpush
 @endsection

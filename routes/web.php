@@ -52,6 +52,7 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
 
 Route::middleware(['auth', 'role:Super Admin|Admin'])->group(function () {
     Route::resource('admin', AdminController::class);
+    Route::get('/students/parents', [StudentController::class, 'getStudentParents'])->name('students.parents');
 });
 
 Route::middleware(['auth', 'role:Guidance Counselor'])->group(function () {

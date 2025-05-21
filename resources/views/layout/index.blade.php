@@ -151,6 +151,7 @@
             position: fixed;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
 
         .sidebar-brand {

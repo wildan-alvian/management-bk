@@ -57,6 +57,8 @@
                         <th class="text-center" style="width: 5%;">No.</th>
                         <th style="width: 15%;">NIK</th>
                         <th style="width: 20%;">Nama</th>
+                        <th style="width: 20%;">Email</th>
+                        <th style="width: 20%;">No. Telepon</th>
                         <th class="text-center" style="width: 10%;">Aksi</th>
                     </tr>
                 </thead>
@@ -66,6 +68,8 @@
                             <td class="text-center">{{ $studentParents->firstItem() + $index }}</td>
                             <td>{{ $studentParent->id_number }}</td>
                             <td>{{ $studentParent->name }}</td>
+                            <td>{{ $studentParent->email }}</td>
+                            <td>{{ $studentParent->phone }}</td>
                             <td class="text-center">
                                 <div class="dropdown">
                                     <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $studentParent->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

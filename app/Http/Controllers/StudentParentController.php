@@ -124,6 +124,33 @@ class StudentParentController extends Controller
 
     public function destroy($id)
     {
-        
+        $studentParent = User::role('Student Parents')->with(['studentParent.students.user'])->findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            foreach ($studentParent->studentParent->students as $student) {
+                $student->delete();
+
+                if ($student->user) {
+                    $student->user->delete();
+                }
+            }
+
+            if ($studentParent->studentParent) {
+                $studentParent->studentParent->delete();
+            }
+
+            $studentParent->delete();
+
+            DB::commit();
+            return redirect()->route('student-parents.index')
+                ->with('success', 'Data wali murid berhasil dihapus.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Error deleting student parent: ' . $e->getMessage());
+            return redirect()->back()
+                ->withErrors(['error' => 'Terjadi kesalahan saat menghapus data wali murid: ' . $e->getMessage()]);
+        }
     }
 }

@@ -8,6 +8,9 @@
             </div>
             <div class="modal-body text-start">
                 Apakah Anda yakin ingin menghapus data wali murid <strong>{{ $studentParent->name }}</strong>?
+                <div class="mt-2 text-danger">
+                    <small><i class="bi bi-exclamation-triangle-fill me-1"></i>Tindakan ini juga akan menghapus semua data siswa yang terkait.</small>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">

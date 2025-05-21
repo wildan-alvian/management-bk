@@ -603,7 +603,7 @@
                 <i class="bi bi-people"></i>
                 <span>Data Siswa</span>
             </a>
-            <a href="{{ route('student-parents.index') }}" class="nav-link {{ request()->routeIs('parents.index') ? 'active' : '' }}">
+            <a href="{{ route('student-parents.index') }}" class="nav-link {{ request()->routeIs('student-parents.index') ? 'active' : '' }}">
                 <i class="bi bi-people"></i>
                 <span>Data Wali Murid</span>
             </a>

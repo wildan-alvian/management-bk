@@ -108,7 +108,13 @@
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $counseling->id }}">
                                     <a class="dropdown-item" href="{{ route('counseling.show', $counseling->id) }}">
                                         <i class="bi bi-eye me-2"></i>Detail
-                                    </a>  
+                                    </a> 
+                                    @if(Auth::user()->hasRole(['Guidance Counselor']) && $counseling->status !== 'canceled')
+                                        <div class="dropdown-divider"></div>  
+                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $counseling->id }}">
+                                            <i class="bi bi-pencil me-2"></i>Cancel
+                                        </a>
+                                    @endif 
                                     @if(Auth::user()->hasRole(['Super Admin', 'Admin']))
                                         <div class="dropdown-divider"></div>  
                                         <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $counseling->id }}">
@@ -121,6 +127,11 @@
                                     @endif
                                 </div>
                             </div>
+
+                            
+                            @if(Auth::user()->hasRole(['Guidance Counselor']))
+                                @include('counseling.partials._cancel_modal', ['counseling' => $counseling])
+                            @endif
 
                             @if(Auth::user()->hasRole(['Super Admin', 'Admin']))
                                 @include('counseling.partials._edit_modal', ['counseling' => $counseling])

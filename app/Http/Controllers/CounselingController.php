@@ -259,4 +259,54 @@ class CounselingController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menolak data konseling.');
         }
     }
+
+    public function cancel(Request $request, Counseling $counseling)
+    {
+        // Check if user is Guidance Counselor
+        if (!auth()->user()->hasRole('Guidance Counselor')) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk membatalkan konseling.');
+        }
+
+        // Check if counseling status is new
+        if ($counseling->status === 'canceled') {
+            return redirect()->back()->with('error', 'Status konseling tidak valid untuk dibatalkan.');
+        }
+
+        try {
+            $counseling->update([
+                'status' => 'canceled',
+                'notes' => $request->notes
+            ]);
+
+            $user = User::findOrFail($counseling->submitted_by_id);
+
+            $scheduled_at = Carbon::parse($counseling->scheduled_at)->format('d M Y H:i');
+            $content = "Konseling {$counseling->title} pada {$scheduled_at} dibatalkan";
+            Notification::create([
+                'user_id' => $counseling->submitted_by_id,
+                'type' => $user->roles->first()->name,
+                'content' => $content,
+                'status' => false,
+            ]);
+
+            $details = [
+                'name' => $user->name,
+                'title' => $counseling->title,
+                'scheduled_at' => $scheduled_at,
+                'notes' => $request->notes,
+                'url' => env('APP_URL') . '/counseling/' . $counseling->id
+            ];
+
+            Mail::to($user->email)->send(
+                new TestMail("Konseling {$counseling->title} Dibatalkan", 'email.counseling.canceled', $details)
+            );
+
+            return redirect()->route('counseling.index', $counseling)
+                ->with('success', 'Konseling berhasil dibatalkan.');
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('counseling.show', $counseling)
+                ->with('error', 'Terjadi kesalahan saat membatalkan data konseling.');
+        }
+    }
 }

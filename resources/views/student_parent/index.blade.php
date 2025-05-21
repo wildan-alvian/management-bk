@@ -78,7 +78,7 @@
                                         </a>
                                         @endcan
                                         @can('edit-student-parent')
-                                        <a class="dropdown-item" href="{{ route('student-parents.edit', $studentParent->id) }}">
+                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $studentParent->id }}">
                                             <i class="bi bi-pencil me-2"></i>Edit
                                         </a>
                                         @endcan
@@ -91,6 +91,9 @@
                                     </div>
                                 </div>
 
+                                @can('edit-student-parent')
+                                    @include('student_parent.partials._edit_modal', ['studentParent' => $studentParent])
+                                @endcan
                                 @can('delete-student-parent')
                                     @include('student_parent.partials._delete_modal', ['studentParent' => $studentParent])
                                 @endcan

@@ -112,14 +112,44 @@ class StudentParentController extends Controller
         return view('student_parent.show', compact('studentParent'));
     }
 
-    public function edit($id)
-    {
-        
-    }
-
     public function update(Request $request, $id)
     {
+        $studentParent = User::role('Student Parents')->findOrFail($id);
+
+        $validated = $request->validate([
+            'id_number' => ['required', 'string', 'max:20', 'unique:users,id_number,' . $id],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'family_relation' => ['required', 'string', 'max:50'],
+            'address' => ['nullable', 'string'],
+        ]);
         
+        DB::beginTransaction();
+        try {
+            $studentParent->update([
+                'id_number' => $validated['id_number'],
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
+            ]);
+
+            $studentParent->studentParent->update([
+                'family_relation' => $validated['family_relation'],
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('student-parents.show', $studentParent->id)
+                ->with('success', 'Data Wali Murid berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan saat memperbarui data Wali Murid.');
+        }
     }
 
     public function destroy($id)

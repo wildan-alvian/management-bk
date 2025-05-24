@@ -65,7 +65,7 @@
                 <tbody>
                     @forelse ($studentParents as $index => $studentParent)
                         <tr>
-                            <td class="text-center">{{ $studentParents->firstItem() + $index }}</td>
+                            <td class="text-center">{{ method_exists($studentParents, 'firstItem') ? $studentParents->firstItem() + $index : $index + 1 }}</td>
                             <td>{{ $studentParent->id_number }}</td>
                             <td>{{ $studentParent->name }}</td>
                             <td>{{ $studentParent->email }}</td>

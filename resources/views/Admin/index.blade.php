@@ -11,7 +11,7 @@
             </button>
         </form>
         @if(isset($search))
-            <a href="{{ route('admin.index') }}" class="btn btn-outline-secondary ms-3">
+            <a href="{{ route('admin.index') }}" class="btn btn-outline-secondary me-3">
                 <i class="bi bi-x-circle-fill"></i>
             </a>
         @endif

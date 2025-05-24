@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class StudentParentController extends Controller
 {
@@ -19,26 +21,60 @@ class StudentParentController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $search = $request->input('search');
+{
+    $user = auth()->user();
+    $search = $request->input('search');
 
-        $query = User::role('Student Parents');
-
-        $query = $query->when($search, function($query) use ($search) {
-            return $query->where(function($q) use ($search) {
-                $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('id_number', 'LIKE', "%{$search}%");
-            });
-        });
-
-        $studentParents = $query
-            ->orderBy('name')
-            ->paginate(10)
-            ->withQueryString();
+    // Jika Student Parents, tampilkan data diri sendiri dengan pagination (meskipun 1 item)
+    if ($user->hasRole('Student Parents')) {
+        $studentParents = User::role('Student Parents')
+            ->where('id', $user->id)
+            ->paginate(1);
 
         return view('student_parent.index', compact('studentParents'));
     }
-    
+
+    // Jika Student, tampilkan wali murid dengan paginator manual
+    if ($user->hasRole('Student')) {
+        $student = $user->student;
+
+        if (!$student || !$student->studentParent) {
+            // kosong tapi harus paginator agar kompatibel dengan view
+            $studentParents = new LengthAwarePaginator([], 0, 10);
+            return view('student_parent.index', compact('studentParents'));
+        }
+
+        $parentUser = $student->studentParent->user;
+        $items = collect([$parentUser]);
+
+        $perPage = 10;
+        $page = Paginator::resolveCurrentPage('page');
+        $itemsForCurrentPage = $items->slice(($page - 1) * $perPage, $perPage)->values();
+
+        $studentParents = new LengthAwarePaginator(
+            $itemsForCurrentPage,
+            $items->count(),
+            $perPage,
+            $page,
+            ['path' => Paginator::resolveCurrentPath()]
+        );
+
+        return view('student_parent.index', compact('studentParents'));
+    }
+
+    // Role lain: tampilkan semua wali murid dengan search dan pagination
+    $query = User::role('Student Parents');
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'LIKE', "%{$search}%")
+              ->orWhere('id_number', 'LIKE', "%{$search}%");
+        });
+    }
+
+    $studentParents = $query->orderBy('name')->paginate(10)->withQueryString();
+
+    return view('student_parent.index', compact('studentParents'));
+}
 
     public function create()
     {
@@ -99,18 +135,31 @@ class StudentParentController extends Controller
     }
 
     public function show($id)
-    {
-        $query = User::role('Student Parents')
-            ->with([
-                'studentParent.students.user' => function($query) {
-                    $query->orderBy('name', 'desc');
-                },
-            ]);
+{
+    $user = auth()->user();
 
-        $studentParent = $query->findOrFail($id);
-
-        return view('student_parent.show', compact('studentParent'));
+    if ($user->hasRole('Student Parents') && $user->id != $id) {
+        abort(403, 'Tidak diizinkan melihat data orang tua lain.');
     }
+
+    if ($user->hasRole('Student')) {
+        $student = $user->student;
+
+        if (!$student || !$student->studentParent || $student->studentParent->user_id != $id) {
+            abort(403, 'Tidak diizinkan melihat data orang tua lain.');
+        }
+    }
+
+    $studentParent = User::role('Student Parents')
+        ->with([
+            'studentParent.students.user' => function ($query) {
+                $query->orderBy('name', 'desc');
+            },
+        ])
+        ->findOrFail($id);
+
+    return view('student_parent.show', compact('studentParent'));
+}
 
     public function update(Request $request, $id)
     {

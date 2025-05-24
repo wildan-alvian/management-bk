@@ -18,7 +18,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tidak</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
                     <button type="submit" class="btn btn-danger">Ya</button>
                 </div>
             </form>

@@ -38,15 +38,12 @@ class ForgotPasswordController extends Controller
             $user->save();
 
             // Send email with new password
-            $name = $user->name;
-            $url = env('APP_URL');
             $details = [
-                'title' => 'Reset Password',
-                'body' => "
-                    Password reset request for $name has been processed.
-                    Your new password is: $newPassword
-                    Please login with this password at $url and change it immediately.",
+                'name' => $user->name,
+                'password' => $newPassword,
+                'url' => env('APP_URL') . '/login',
             ];
+            
 
             Mail::to($user->email)->send(
                 new TestMail('Password Reset - CounselLink', 'email.user.create', $details)

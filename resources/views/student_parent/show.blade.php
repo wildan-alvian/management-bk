@@ -84,7 +84,7 @@
                 </div>
             </div>
         </div>
-    </div
+    </div>
 
     <div class="col-12">
         <div class="card shadow-sm border-0">
@@ -108,10 +108,24 @@
                                 <th>Kelas</th>
                                 </tr>
                         </thead>
+                        <thead class="table-light">
+                            <tr>
+                                @unless(Auth::user()->hasRole(['Student Parents', 'Student']))
+                                <th style="width: 5%;">No</th>
+                                @endunless
+                                <th>NISN</th>
+                                <th>Nama</th>
+                                <th>Email</th>
+                                <th>No. Telepon</th>
+                                <th>Kelas</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             @forelse($studentParent->studentParent->students as $index => $student)
                             <tr id="student-{{ $student->id }}">
+                                @unless(Auth::user()->hasRole(['Student Parents', 'Student']))
                                 <td>{{ $index + 1 }}</td>
+                                @endunless
                                 <td>{{ $student->nisn }}</td>
                                 <td>{{ $student->user->name }}</td>
                                 <td>{{ $student->user->email }}</td>
@@ -119,12 +133,12 @@
                                 <td>{{ $student->class }}</td>
                             </tr>
                             @empty
-                            <tr id="no-students">
+                            <tr>
                                 <td colspan="6" class="text-center py-3 text-muted">Tidak ada data siswa</td>
                             </tr>
                             @endforelse
                         </tbody>
-                    </table>
+                        
                 </div>
             </div>
         </div>

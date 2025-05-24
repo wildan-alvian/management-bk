@@ -3,6 +3,11 @@
 @section('content')
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Alfa Slab One:wght@300;400;500;600;700&display=swap');
+    :root {
+        --primary-color: #5A6C57;
+        --accent-color: #F9CB43;
+    }
 
     body {
         font-family: 'Poppins', sans-serif;
@@ -179,9 +184,7 @@
             width: 60px;
         }
 
-        .brand-name {
-            font-size: 1.75rem;
-        }
+        
 
         .welcome-text h1 {
             font-size: 1.5rem;
@@ -193,9 +196,9 @@
     <div class="login-container">
         <div class="brand">
             <img src="{{ asset('asset/images/dapuda.png') }}" alt="Logo">
-            <h1 class="brand-name">
-                <span class="counsel">Counsel</span><span class="link">Link</span>
-            </h1>
+            <h4 class="m-0" style="font-family: 'Alfa Slab One'; font-size: 2rem;">
+                <span style="color: var(--primary-color)">Counsel</span><span style="color: var(--accent-color)">Link</span>
+            </h4>
         </div>
 
         <div class="welcome-text">

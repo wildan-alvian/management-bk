@@ -4,11 +4,9 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="fw-bold mb-0"><i class="bi bi-person-vcard me-2"></i>Detail Data Wali Murid</h4>
-    @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor', 'Student Parents']))
     <a href="{{ route('student-parents.index') }}" class="btn btn-outline-secondary">
         <i></i>Kembali
     </a>
-    @endif
 </div>
 
 @if(session('success'))

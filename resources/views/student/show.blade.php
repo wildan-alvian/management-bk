@@ -139,7 +139,7 @@
                 </div>
 
                 <div class="table-responsive" style="min-height: fit-content">
-                    <table class="table table-hover align-middle">
+                    <table class="table table-hover align-middle" id="achievementsTable">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 5%;">No</th>
@@ -209,16 +209,16 @@
                 </div>
 
                 <div class="table-responsive" style="min-height: fit-content">
-                    <table class="table table-hover align-middle">
+                    <table class="table table-hover align-middle" id="misconductsTable">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 5%;">No</th>
                                 <th style="width: 25%;">Nama Pelanggaran</th>
                                 <th style="width: 15%;">Kategori</th>
                                 <th style="width: 15%;">Tanggal</th>
-                                <th style="width: 25%;">Detail</th>
+                                <th style="width: 30%;">Detail</th>
                                 @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
-                                <th style="width: 15%;">Aksi</th>
+                                <th style="width: 10%;">Aksi</th>
                                 @endif
                                 </tr>
                         </thead>

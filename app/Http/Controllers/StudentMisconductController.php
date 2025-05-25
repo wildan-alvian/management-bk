@@ -18,6 +18,7 @@ class StudentMisconductController extends Controller
             'category' => 'required|string|max:255',
             'date' => 'required|date',
             'detail' => 'nullable|string',
+            'file' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -28,7 +29,14 @@ class StudentMisconductController extends Controller
         }
 
         try {
-            $misconduct = StudentMisconduct::create($request->all());
+            $data = $request->all();
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $filename = uniqid('misconduct_') . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/misconducts', $filename);
+                $data['file'] = $filename;
+            }
+            $misconduct = StudentMisconduct::create($data);
 
             // Load the student relationship
             $misconduct->load('student');
@@ -54,6 +62,7 @@ class StudentMisconductController extends Controller
             'category' => 'required|string|max:255',
             'date' => 'required|date',
             'detail' => 'nullable|string',
+            'file' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -65,7 +74,18 @@ class StudentMisconductController extends Controller
 
         try {
             $misconduct = StudentMisconduct::findOrFail($id);
-            $misconduct->update($request->all());
+            $data = $request->all();
+            if ($request->hasFile('file')) {
+                // Hapus file lama jika ada
+                if ($misconduct->file && \Storage::disk('public')->exists('misconducts/' . $misconduct->file)) {
+                    \Storage::disk('public')->delete('misconducts/' . $misconduct->file);
+                }
+                $file = $request->file('file');
+                $filename = uniqid('misconduct_') . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/misconducts', $filename);
+                $data['file'] = $filename;
+            }
+            $misconduct->update($data);
 
             // Load the student relationship
             $misconduct->load('student');

@@ -168,7 +168,8 @@
                                             data-name="{{ $achievement->name }}"
                                             data-category="{{ $achievement->category }}"
                                             data-date="{{ $achievement->date }}"
-                                            data-detail="{{ $achievement->detail }}">
+                                            data-detail="{{ $achievement->detail }}"
+                                            data-file="{{ $achievement->file }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                         <button type="button" class="btn btn-danger btn-sm delete-achievement" data-id="{{ $achievement->id }}">
@@ -215,9 +216,9 @@
                                 <th style="width: 25%;">Nama Pelanggaran</th>
                                 <th style="width: 15%;">Kategori</th>
                                 <th style="width: 15%;">Tanggal</th>
-                                <th style="width: 30%;">Detail</th>
+                                <th style="width: 25%;">Detail</th>
                                 @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
-                                <th style="width: 10%;">Aksi</th>
+                                <th style="width: 15%;">Aksi</th>
                                 @endif
                                 </tr>
                         </thead>
@@ -237,7 +238,8 @@
                                             data-name="{{ $misconduct->name }}"
                                             data-category="{{ $misconduct->category }}"
                                             data-date="{{ $misconduct->date }}"
-                                            data-detail="{{ $misconduct->detail }}">
+                                            data-detail="{{ $misconduct->detail }}"
+                                            data-file="{{ $misconduct->file }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                         <button type="button" class="btn btn-danger btn-sm delete-misconduct" data-id="{{ $misconduct->id }}">

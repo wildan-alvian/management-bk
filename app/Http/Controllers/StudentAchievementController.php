@@ -17,6 +17,7 @@ class StudentAchievementController extends Controller
             'category' => 'required|string|max:255',
             'date' => 'required|date',
             'detail' => 'nullable|string',
+            'file' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -27,7 +28,14 @@ class StudentAchievementController extends Controller
         }
 
         try {
-            $achievement = StudentAchievement::create($request->all());
+            $data = $request->all();
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $filename = uniqid('achievement_') . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/achievements', $filename);
+                $data['file'] = $filename;
+            }
+            $achievement = StudentAchievement::create($data);
 
             // Load the student relationship
             $achievement->load('student');
@@ -52,6 +60,7 @@ class StudentAchievementController extends Controller
             'category' => 'required|string|max:255',
             'date' => 'required|date',
             'detail' => 'nullable|string',
+            'file' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -63,7 +72,25 @@ class StudentAchievementController extends Controller
 
         try {
             $achievement = StudentAchievement::findOrFail($id);
-            $achievement->update($request->all());
+            $data = $request->all();
+            // Hapus file lama jika user klik hapus file
+            if ($request->has('remove_old_file')) {
+                if ($achievement->file && \Storage::disk('public')->exists('achievements/' . $achievement->file)) {
+                    \Storage::disk('public')->delete('achievements/' . $achievement->file);
+                }
+                $data['file'] = null;
+            }
+            if ($request->hasFile('file')) {
+                // Hapus file lama jika ada
+                if ($achievement->file && \Storage::disk('public')->exists('achievements/' . $achievement->file)) {
+                    \Storage::disk('public')->delete('achievements/' . $achievement->file);
+                }
+                $file = $request->file('file');
+                $filename = uniqid('achievement_') . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/achievements', $filename);
+                $data['file'] = $filename;
+            }
+            $achievement->update($data);
 
             // Load the student relationship
             $achievement->load('student');

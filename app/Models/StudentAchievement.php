@@ -15,6 +15,7 @@ class StudentAchievement extends Model
         'category',
         'date',
         'detail',
+        'file',
     ];
 
     public function student()

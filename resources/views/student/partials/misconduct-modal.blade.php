@@ -44,6 +44,16 @@
                         <textarea class="form-control" id="misconduct_detail" name="detail" rows="3" required></textarea>
                         <div class="invalid-feedback" id="misconduct-detail-error"></div>
                     </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="text-start">
+                                <label for="misconduct_file" class="form-label fw-bold">File Pelanggaran (opsional)</label>
+                            </div>
+                            <div id="misconduct-file-action-icons" class="ms-auto"></div>
+                        </div>
+                        <input type="file" class="form-control" id="misconduct_file" name="file" accept=".png,.jpg,.jpeg,.pdf">
+                        <div class="invalid-feedback" id="misconduct-file-error"></div>
+                    </div>
                 </div>
                 <div class="modal-footer border-top">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -67,6 +77,8 @@ $(document).ready(function() {
         $('#misconduct_id').val('');
         $('#misconductModalLabel').text('Tambah Pelanggaran');
         clearMisconductErrors();
+        $('#misconduct-file-action-icons').html('');
+        $('#remove_old_file').remove();
     });
 
     // Handle misconduct form submission
@@ -143,6 +155,7 @@ $(document).ready(function() {
         const category = button.data('category');
         const fullDate = button.data('date');
         const detail = button.data('detail');
+        const file = button.data('file');
         
         const date = fullDate.split(' ')[0];
 
@@ -151,6 +164,18 @@ $(document).ready(function() {
         $('#misconduct_category').val(category);
         $('#misconduct_date').val(date);
         $('#misconduct_detail').val(detail);
+
+        // Tampilkan icon preview & trash jika user pilih file baru
+        if (file) {
+            let url = `/storage/misconducts/${file}`;
+            let ext = file.split('.').pop().toLowerCase();
+            let icon = `<a href="${url}" target="_blank" title="Preview"><i class="bi bi-eye ms-2"></i></a>`;
+            icon += `<a href="#" id="remove-misconduct-file-btn" class="text-danger ms-2" title="Hapus File"><i class="bi bi-trash"></i></a>`;
+            $('#misconduct-file-action-icons').html(icon);
+            $('#misconduct_file').val(""); // reset file input
+        } else {
+            $('#misconduct-file-action-icons').html('');
+        }
 
         $('#misconductModalLabel').text('Edit Pelanggaran');
         $('#misconductModal').modal('show');
@@ -220,6 +245,33 @@ $(document).ready(function() {
         });
     });
 
+    // Tampilkan icon preview & trash jika user pilih file baru
+    $('#misconduct_file').on('change', function() {
+        const fileInput = this;
+        if (fileInput.files && fileInput.files[0]) {
+            let file = fileInput.files[0];
+            let url = URL.createObjectURL(file);
+            let ext = file.name.split('.').pop().toLowerCase();
+            let icon = `<a href="${url}" target="_blank" title="Preview"><i class="bi bi-eye ms-2"></i></a>`;
+            icon += `<a href="#" id="remove-misconduct-file-btn" class="text-danger ms-2" title="Hapus File"><i class="bi bi-trash"></i></a>`;
+            $('#misconduct-file-action-icons').html(icon);
+            $('#remove_old_file').remove();
+        } else {
+            $('#misconduct-file-action-icons').html('');
+        }
+    });
+
+    // Hapus file dari tampilan jika klik icon trash
+    $(document).on('click', '#remove-misconduct-file-btn', function(e) {
+        e.preventDefault();
+        $('#misconduct-file-action-icons').html('');
+        $('#misconduct_file').val("");
+        // Tambahkan hidden input untuk menandai penghapusan file lama
+        if ($('#remove_old_file').length === 0) {
+            $('#misconductForm').append('<input type="hidden" name="remove_old_file" id="remove_old_file" value="1">');
+        }
+    });
+
     // Helper function to add new misconduct row
     function addMisconductRow(misconduct) {
         const rowCount = $('#misconductsTable tbody tr:not(#no-misconducts)').length;
@@ -258,7 +310,8 @@ $(document).ready(function() {
                     data-name="${misconduct.name}"
                     data-category="${misconduct.category}"
                     data-date="${misconduct.date}"
-                    data-detail="${misconduct.detail}">
+                    data-detail="${misconduct.detail}"
+                    data-file="${misconduct.file}">
                     <i class="bi bi-pencil-square"></i>
                 </button>
                 <button type="button" class="btn btn-danger btn-sm delete-misconduct" data-id="${misconduct.id}">

@@ -15,6 +15,7 @@ class StudentMisconduct extends Model
         'category',
         'date',
         'detail',
+        'file',
     ];
 
     protected $casts = [

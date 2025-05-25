@@ -46,6 +46,16 @@
                         <textarea class="form-control" id="detail" name="detail" rows="3" required></textarea>
                         <div class="invalid-feedback" id="detail-error"></div>
                     </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="text-start">
+                                <label for="file" class="form-label fw-bold">File Penghargaan (opsional)</label>
+                            </div>
+                            <div id="file-action-icons" class="ms-auto"></div>
+                        </div>
+                        <input type="file" class="form-control" id="file" name="file" accept=".png,.jpg,.jpeg,.pdf">
+                        <div class="invalid-feedback" id="file-error"></div>
+                    </div>
                 </div>
                 <div class="modal-footer border-top">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -69,6 +79,8 @@ $(document).ready(function() {
         $('#achievement_id').val('');
         $('#achievementModalLabel').text('Tambah Prestasi');
         clearErrors();
+        $('#file-action-icons').html('');
+        $('#remove_old_file').remove();
     });
 
     // Handle form submission
@@ -145,7 +157,7 @@ $(document).ready(function() {
         const category = button.data('category');
         const fullDate = button.data('date');
         const detail = button.data('detail');
-        
+        const file = button.data('file');
         const date = fullDate.split(' ')[0];
 
         $('#achievement_id').val(id);
@@ -153,6 +165,18 @@ $(document).ready(function() {
         $('#category').val(category);
         $('#date').val(date);
         $('#detail').val(detail);
+
+        // Tampilkan icon preview & trash jika user pilih file baru
+        if (file) {
+            let url = `/storage/achievements/${file}`;
+            let ext = file.split('.').pop().toLowerCase();
+            let icon = `<a href="${url}" target="_blank" title="Preview"><i class="bi bi-eye ms-2"></i></a>`;
+            icon += `<a href="#" id="remove-file-btn" class="text-danger ms-2" title="Hapus File"><i class="bi bi-trash"></i></a>`;
+            $('#file-action-icons').html(icon);
+            $('#file').val(""); // reset file input
+        } else {
+            $('#file-action-icons').html('');
+        }
 
         $('#achievementModalLabel').text('Edit Prestasi');
         $('#achievementModal').modal('show');
@@ -260,7 +284,8 @@ $(document).ready(function() {
                     data-name="${achievement.name}"
                     data-category="${achievement.category}"
                     data-date="${achievement.date}"
-                    data-detail="${achievement.detail}">
+                    data-detail="${achievement.detail}"
+                    data-file="${achievement.file ? achievement.file : ''}">
                     <i class="bi bi-pencil-square"></i>
                 </button>
                 <button type="button" class="btn btn-danger btn-sm delete-achievement" data-id="${achievement.id}">
@@ -286,6 +311,33 @@ $(document).ready(function() {
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').text('');
     }
+
+    // Tampilkan icon preview & trash jika user pilih file baru
+    $('#file').on('change', function() {
+        const fileInput = this;
+        if (fileInput.files && fileInput.files[0]) {
+            let file = fileInput.files[0];
+            let url = URL.createObjectURL(file);
+            let ext = file.name.split('.').pop().toLowerCase();
+            let icon = `<a href="${url}" target="_blank" title="Preview"><i class="bi bi-eye ms-2"></i></a>`;
+            icon += `<a href="#" id="remove-file-btn" class="text-danger ms-2" title="Hapus File"><i class="bi bi-trash"></i></a>`;
+            $('#file-action-icons').html(icon);
+            $('#remove_old_file').remove();
+        } else {
+            $('#file-action-icons').html('');
+        }
+    });
+
+    // Hapus file dari tampilan jika klik icon trash
+    $(document).on('click', '#remove-file-btn', function(e) {
+        e.preventDefault();
+        $('#file-action-icons').html('');
+        $('#file').val("");
+        // Tambahkan hidden input untuk menandai penghapusan file lama
+        if ($('#remove_old_file').length === 0) {
+            $('#achievementForm').append('<input type="hidden" name="remove_old_file" id="remove_old_file" value="1">');
+        }
+    });
 });
 </script>
 @endpush 

@@ -18,13 +18,15 @@
 
     <div class="row">
         <div class="container mt-5">
-            <h3 class="fw-bold mb-4">Tambah Konseling</h3>
-
-            <div class="mb-4">
-                <a href="{{ route('counseling.index') }}" class="btn rounded-pill btn-secondary">
-                    <i class="bi bi-caret-left-fill me-1"></i> Kembali
-                </a>         
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">
+                    <i class="bi bi-person-plus-fill me-2"></i>Tambah Konseling
+                </h3>
+                <a href="{{ route('counseling.index') }}" class="btn btn-outline-secondary">
+                    <i></i> Kembali
+                </a>
             </div>
+            
 
             <div class="card shadow-sm">
                 <div class="card-body p-4">

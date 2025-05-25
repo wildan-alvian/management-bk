@@ -2,24 +2,26 @@
 
 @section('content')
 <div class="container mt-5">
-    <h3 class="fw-bold mb-4">Tambah Guru BK</h3>
-
-    <div class="mb-4">
-        <a href="{{ route('counselors.index') }}" class="btn rounded-pill btn-secondary">
-            <i class="bi bi-caret-left-fill me-1"></i> Kembali
-        </a>         
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold mb-0">
+            <i class="bi bi-person-plus-fill me-2"></i>Tambah Guru BK
+        </h3>
+        <a href="{{ route('counselors.index') }}" class="btn btn-outline-secondary">
+            <i></i> Kembali
+        </a>
     </div>
 
     @if(session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <ul class="mb-0">
+            <i class="bi bi-x-circle-fill me-2"></i>Terjadi kesalahan:
+            <ul class="mb-0 mt-2">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -28,88 +30,90 @@
         </div>
     @endif
 
-    <div class="card shadow-sm">
+    <div class="card shadow-sm border-0">
         <div class="card-body p-4">
             <form action="{{ route('counselors.store') }}" method="POST">
                 @csrf
                 <div class="row g-3">
+
+                    {{-- NIP --}}
                     <div class="col-md-6">
-                        <div class="text-start">
-                            <label for="id_number" class="form-label fw-bold">NIP</label>
-                        </div>
-                        <div class="input-group">
+                        <label for="id_number" class="form-label fw-semibold">NIP</label>
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                            <input type="text" class="form-control @error('id_number') is-invalid @enderror" 
-                                   name="id_number" id="id_number" value="{{ old('id_number') }}" required>
+                            <input type="text" name="id_number" id="id_number" 
+                                   class="form-control @error('id_number') is-invalid @enderror" 
+                                   value="{{ old('id_number') }}" required>
+                            @error('id_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('id_number')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
+                    {{-- Nama --}}
                     <div class="col-md-6">
-                        <div class="text-start">
-                            <label for="name" class="form-label fw-bold">Nama</label>
-                        </div>
-                        <div class="input-group">
+                        <label for="name" class="form-label fw-semibold">Nama</label>
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                   name="name" id="name" value="{{ old('name') }}" required>
+                            <input type="text" name="name" id="name" 
+                                   class="form-control @error('name') is-invalid @enderror" 
+                                   value="{{ old('name') }}" required>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
+                    {{-- Email --}}
                     <div class="col-md-6">
-                        <div class="text-start">
-                            <label for="email" class="form-label fw-bold">Email</label>
-                        </div>
-                        <div class="input-group">
+                        <label for="email" class="form-label fw-semibold">Email</label>
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                            <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                   name="email" id="email" value="{{ old('email') }}" required>
+                            <input type="email" name="email" id="email" 
+                                   class="form-control @error('email') is-invalid @enderror" 
+                                   value="{{ old('email') }}" required>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
+                    {{-- Telepon --}}
                     <div class="col-md-6">
-                        <div class="text-start">
-                            <label for="phone" class="form-label fw-bold">No Telepon</label>
-                        </div>
-                        <div class="input-group">
+                        <label for="phone" class="form-label fw-semibold">No Telepon</label>
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                            <input type="text" class="form-control @error('phone') is-invalid @enderror" 
-                                   name="phone" id="phone" value="{{ old('phone') }}">
+                            <input type="text" name="phone" id="phone" 
+                                   class="form-control @error('phone') is-invalid @enderror" 
+                                   value="{{ old('phone') }}">
+                            @error('phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
+                    {{-- Alamat --}}
                     <div class="col-12">
-                        <div class="text-start">
-                            <label for="address" class="form-label fw-bold">Alamat</label>
-                        </div>
-                        <div class="input-group">
+                        <label for="address" class="form-label fw-semibold">Alamat</label>
+                        <div class="input-group has-validation">
                             <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                            <textarea class="form-control @error('address') is-invalid @enderror" 
-                                      name="address" id="address" rows="3">{{ old('address') }}</textarea>
+                            <textarea name="address" id="address" rows="3" 
+                                      class="form-control @error('address') is-invalid @enderror">{{ old('address') }}</textarea>
+                            @error('address')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        @error('address')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
+
                 </div>
 
-                <div class="d-flex justify-content-end mt-4 pt-3">
-                    <a href="{{ route('counselors.index') }}" class="btn btn-secondary me-2">
+                {{-- Tombol --}}
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="{{ route('counselors.index') }}" class="btn btn-outline-secondary me-2">
                         <i class="bi bi-x-circle me-1"></i>Batal
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save me-1"></i>Simpan
+                        <i class="bi bi-save2 me-1"></i>Simpan
                     </button>
                 </div>
             </form>

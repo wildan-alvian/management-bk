@@ -2,9 +2,12 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0">Tambah Data Siswa</h4>
+    <h4 class="fw-bold mb-0">
+        <i class="bi bi-person-plus-fill me-2"></i>
+        Tambah Data Siswa
+    </h4>
     <a href="{{ route('students.index') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-1"></i>
+        <i></i>
         Kembali
     </a>
 </div>

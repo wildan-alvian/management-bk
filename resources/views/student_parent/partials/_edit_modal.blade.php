@@ -17,8 +17,11 @@
                             <div class="text-start">
                                 <label for="id_number" class="form-label fw-bold">NIK</label>
                             </div>
-                            <input type="text" name="id_number" id="id_number" class="form-control @error('id_number') is-invalid @enderror" 
-                                   value="{{ $studentParent->id_number }}" required>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-credit-card-2-front"></i></span>
+                                <input type="text" name="id_number" id="id_number" class="form-control @error('id_number') is-invalid @enderror" 
+                                       value="{{ $studentParent->id_number }}" required>
+                            </div>
                             @error('id_number')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -27,8 +30,11 @@
                             <div class="text-start">
                                 <label for="name" class="form-label fw-bold">Nama</label>
                             </div>
-                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" 
-                                   value="{{ $studentParent->name }}" required>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" 
+                                       value="{{ $studentParent->name }}" required>
+                            </div>
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -37,8 +43,11 @@
                             <div class="text-start">
                                 <label for="email" class="form-label fw-bold">Email</label>
                             </div>
-                            <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" 
-                                   value="{{ $studentParent->email }}" required>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope-at"></i></span>
+                                <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" 
+                                       value="{{ $studentParent->email }}" required>
+                            </div>
                             @error('email')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -100,4 +109,4 @@
             </form>
         </div>
     </div>
-</div> 
+</div>

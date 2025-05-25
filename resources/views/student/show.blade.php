@@ -3,10 +3,12 @@
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0">Detail Data Siswa</h4>
+    <h4 class="fw-bold mb-0">
+        <i class="bi bi-person-lines-fill me-2"></i>Detail Data Siswa
+    </h4>
     @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor', 'Student Parents']))
     <a href="{{ route('students.index') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-1"></i>
+        <i></i>
         Kembali
     </a>
     @endif
@@ -139,7 +141,7 @@
                 </div>
 
                 <div class="table-responsive" style="min-height: fit-content">
-                    <table class="table table-hover align-middle" id="achievementsTable">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 5%;">No</th>
@@ -168,8 +170,7 @@
                                             data-name="{{ $achievement->name }}"
                                             data-category="{{ $achievement->category }}"
                                             data-date="{{ $achievement->date }}"
-                                            data-detail="{{ $achievement->detail }}"
-                                            data-file="{{ $achievement->file }}">
+                                            data-detail="{{ $achievement->detail }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                         <button type="button" class="btn btn-danger btn-sm delete-achievement" data-id="{{ $achievement->id }}">
@@ -209,7 +210,7 @@
                 </div>
 
                 <div class="table-responsive" style="min-height: fit-content">
-                    <table class="table table-hover align-middle" id="misconductsTable">
+                    <table class="table table-hover align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 5%;">No</th>
@@ -238,8 +239,7 @@
                                             data-name="{{ $misconduct->name }}"
                                             data-category="{{ $misconduct->category }}"
                                             data-date="{{ $misconduct->date }}"
-                                            data-detail="{{ $misconduct->detail }}"
-                                            data-file="{{ $misconduct->file }}">
+                                            data-detail="{{ $misconduct->detail }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                         <button type="button" class="btn btn-danger btn-sm delete-misconduct" data-id="{{ $misconduct->id }}">

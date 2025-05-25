@@ -2,78 +2,85 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0">Daftar Admin</h4>
+    <h4 class="fw-bold mb-0"><i class="bi bi-people-fill me-2"></i>Daftar Admin</h4>
     <div class="d-flex">
-        <form method="GET" action="{{ route('admin.index') }}" class="d-flex">
+        <form method="GET" action="{{ route('admin.index') }}" class="d-flex me-2">
             <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama/email/NIP">
-            <button type="submit" class="btn btn-outline-secondary me-3">
+            <button type="submit" class="btn btn-outline-secondary">
                 <i class="bi bi-search"></i>
             </button>
         </form>
-        @if(isset($search))
-            <a href="{{ route('admin.index') }}" class="btn btn-outline-secondary me-3">
+        @if(request('search'))
+            <a href="{{ route('admin.index') }}" class="btn btn-outline-danger me-2" title="Reset Pencarian">
                 <i class="bi bi-x-circle-fill"></i>
             </a>
         @endif
-        <a href="{{ route('admin.create') }}" class="btn btn-add">
-            <i class="bi bi-plus-lg"></i>
-            Tambah Admin
+        <a href="{{ route('admin.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Tambah Admin
         </a>
     </div>
 </div>
 
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
+        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
 @if(session('error'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ session('error') }}
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
-<div class="table-responsive">
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th class="text-center" style="width: 5%;">No.</th>
-                <th style="width: 15%;">NIP</th>
-                <th style="width: 25%;">Nama</th>
-                <th style="width: 25%;">Email</th>
-                <th style="width: 20%;">No. Telepon</th>
-                <th class="text-center" style="width: 10%;">Aksi</th>
-            </tr>
-        </thead>
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-primary">
+                    <tr>
+                        <th class="fw-bold text-center"></i>No</th>
+                        <th class="fw-bold"><i class="bi bi-card-list me-1"></i>NIP</th>
+                        <th class="fw-bold"><i class="bi bi-person-badge-fill me-1"></i>Nama</th>
+                        <th class="fw-bold text-center"><i class="bi bi-envelope-fill me-1"></i>Email</th>
+                        <th class="fw-bold"><i class="bi bi-telephone-fill me-1"></i>No. Telepon</th>
+                        <th class="fw-bold text-center"><i class="bi bi-gear-fill me-1"></i>Aksi</th>
+                    </tr>                    
+                </thead>
+                
+
         <tbody>
             @forelse($admins as $admin)
             <tr>
                 <td class="text-center">{{ $admins->firstItem() + $loop->index }}</td>
-                <td>{{ $admin->id_number }}</td>
-                <td>{{ $admin->name }}</td>
-                <td>{{ $admin->email }}</td>
-                <td>{{ $admin->phone ?? '-' }}</td>
+                <td class="text-start">{{ $admin->id_number }}</td>
+                <td class="text-start">{{ $admin->name }}</td>
+                <td class="text-start">{{ $admin->email }}</td>
+                <td class="text-start">{{ $admin->phone ?? '-' }}</td>
                 <td class="text-center">
                     @if(!$admin->hasRole('Super Admin'))
                         <div class="dropdown">
-                            <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $admin->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button class="btn btn-light btn-sm rounded-circle shadow-sm border-0" id="dropdownMenuLink{{ $admin->id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-three-dots-vertical"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $admin->id }}">
-                                <a class="dropdown-item" href="{{ route('admin.show', $admin) }}">
-                                    <i class="bi bi-eye me-2"></i>Detail
-                                </a>
-                                <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $admin->id }}">
-                                    <i class="bi bi-pencil me-2"></i>Edit
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $admin->id }}">
-                                    <i class="bi bi-trash me-2"></i>Hapus
-                                </a>
-                            </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $admin->id }}">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('admin.show', $admin) }}">
+                                        <i class="bi bi-eye me-2"></i>Detail
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $admin->id }}">
+                                        <i class="bi bi-pencil-square me-2"></i>Edit
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $admin->id }}">
+                                        <i class="bi bi-trash3-fill me-2"></i>Hapus
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
 
                         @include('admin.partials._edit_modal', ['admin' => $admin])
@@ -87,9 +94,11 @@
             @empty
             <tr>
                 <td colspan="6" class="text-center py-4">
-                    @if(isset($search))
-                        Tidak ada admin yang ditemukan dengan kata kunci: "{{ $search }}"
+                    @if(request('search'))
+                        <i class="bi bi-info-circle me-1"></i>
+                        Tidak ada admin yang ditemukan dengan kata kunci: <strong>"{{ request('search') }}"</strong>
                     @else
+                        <i class="bi bi-info-circle me-1"></i>
                         Tidak ada data admin yang tersedia.
                     @endif
                 </td>
@@ -99,8 +108,9 @@
     </table>
 </div>
 
+@if($admins->total() > 10)
 <div class="d-flex justify-content-end mt-3">
     {{ $admins->links() }}
 </div>
-
+@endif
 @endsection

@@ -16,8 +16,10 @@
     </div>
     @endif
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold mb-0">Daftar Konseling</h4>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">
+            <i class="bi bi-journal-text me-2"></i>Daftar Konseling
+        </h4>
         <div class="d-flex">
             <form method="GET" action="{{ route('counseling.index') }}" class="d-flex">
                 <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari judul konseling"">
@@ -75,15 +77,15 @@
         <table class="table table-hover align-middle text-center">
             <thead class="table-light">
                 <tr>
-                    <th>No.</th>
-                    <th>Jadwal</th>
-                    <th>Diajukan Oleh</th>
-                    <th>Tipe Konseling</th>
-                    <th>Judul Konseling</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
+                    <th><strong>No</strong></th>
+                    <th><i class="bi bi-calendar-event me-2"></i><strong>Jadwal</strong></th>
+                    <th><i class="bi bi-person-lines-fill me-2"></i><strong>Diajukan Oleh</strong></th>
+                    <th><i class="bi bi-people-fill me-2"></i><strong>Tipe Konseling</strong></th>
+                    <th><i class="bi bi-chat-left-dots me-2"></i><strong>Judul Konseling</strong></th>
+                    <th><i class="bi bi-info-circle me-2"></i><strong>Status</strong></th>
+                    <th><i class="bi bi-gear-fill me-2"></i><strong>Aksi</strong></th>
                 </tr>
-            </thead>
+            </thead>            
             <tbody>
                 @forelse ($counselings as $index => $counseling)
                     <tr>
@@ -102,7 +104,7 @@
                         </td>
                         <td>
                             <div class="dropdown">
-                                <a class="btn btn-sm" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $counseling->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a class="btn btn-light btn-sm rounded-circle shadow-sm border-0" style="font-size: 18px;" href="#" role="button" id="dropdownMenuLink{{ $counseling->id }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink{{ $counseling->id }}">

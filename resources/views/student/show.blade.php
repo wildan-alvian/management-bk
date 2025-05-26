@@ -6,12 +6,20 @@
     <h4 class="fw-bold mb-0">
         <i class="bi bi-person-lines-fill me-2"></i>Detail Data Siswa
     </h4>
-    @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor', 'Student Parents']))
-    <a href="{{ route('students.index') }}" class="btn btn-outline-secondary">
-        <i></i>
-        Kembali
-    </a>
-    @endif
+    <div class="d-flex gap-2">
+        @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+            <a href="{{ route('students.exportPdf', $student->id) }}" class="btn btn-outline-danger">
+                <i class="bi bi-file-earmark-pdf me-1"></i>
+                Export PDF
+            </a>
+        @endif
+        @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor', 'Student Parents']))
+            <a href="{{ route('students.index') }}" class="btn btn-outline-secondary">
+                <i></i>
+                Kembali
+            </a>
+        @endif
+    </div>
 </div>
 
 @if(session('success'))

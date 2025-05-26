@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StudentController extends Controller
 {
@@ -280,5 +282,23 @@ class StudentController extends Controller
                 ];
             });
         return response()->json($guardians);
+    }
+
+    public function exportPdf($id)
+{
+    $student = User::with([
+        'student.achievements',
+        'student.misconducts',
+        'student.studentParent.user'
+    ])->findOrFail($id);
+    
+    $user = Auth::user(); // Ambil data user yang sedang login
+    
+    $pdf = Pdf::loadView('student.pdf', [
+        'student' => $student,
+        'user' => $user
+    ])->setPaper('A4', 'portrait');
+    
+    return $pdf->download('detail-siswa.pdf');
     }
 }

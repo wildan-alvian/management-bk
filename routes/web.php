@@ -52,13 +52,6 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
 
 Route::middleware(['auth', 'role:Super Admin|Admin'])->group(function () {
     Route::resource('admin', AdminController::class);
-    Route::get('/students/parents', [StudentController::class, 'getStudentParents'])->name('students.parents');
-});
-
-Route::middleware(['auth', 'role:Guidance Counselor'])->group(function () {
-    Route::post('/counseling/{counseling}/approve', [CounselingController::class, 'approve'])->name('counseling.approve');
-    Route::post('/counseling/{counseling}/reject', [CounselingController::class, 'reject'])->name('counseling.reject');
-    Route::post('/counseling/{counseling}/cancel', [CounselingController::class, 'cancel'])->name('counseling.cancel');
 });
 
 Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(function () {
@@ -68,12 +61,14 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
     Route::resource('student-parents', StudentParentController::class)->except(['index', 'show']);
     Route::resource('student-achievements', StudentAchievementController::class);
     Route::resource('student-misconducts', StudentMisconductController::class);
+    Route::post('/counseling/{counseling}/approve', [CounselingController::class, 'approve'])->name('counseling.approve');
+    Route::post('/counseling/{counseling}/reject', [CounselingController::class, 'reject'])->name('counseling.reject');
+    Route::get('/students/{student}/export-pdf', [StudentController::class, 'exportPdf'])->name('students.exportPdf');
 });
 
 // Student viewing routes with broader access
 Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor|Student|Student Parents'])->group(function () {
     Route::get('/student-parents', [StudentParentController::class, 'index'])->name('student-parents.index');
-    Route::get('/student-parents/{id}', [StudentParentController::class, 'show'])->name('student-parents.show');
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
     Route::get('/counseling/{counseling}', [CounselingController::class, 'show'])->name('counseling.show');

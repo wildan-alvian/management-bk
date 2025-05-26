@@ -14,6 +14,7 @@
         </form>
 
         <!-- Filter Dropdown -->
+        @can('create-student')
         <div class="dropdown">
             <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-funnel-fill me-1"></i>
@@ -23,6 +24,7 @@
                 <li><a class="dropdown-item {{ request('class_filter') == '8' ? 'active' : '' }}" href="?class_filter=8">Kelas 8</a></li>
                 <li><a class="dropdown-item {{ request('class_filter') == '9' ? 'active' : '' }}" href="?class_filter=9">Kelas 9</a></li>
             </ul>
+            @endcan
         </div>
 
         <!-- Clear Filter Button -->

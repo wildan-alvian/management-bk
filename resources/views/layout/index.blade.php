@@ -667,7 +667,7 @@
                 if (window.innerWidth <= 768 && !document.getElementById('mobileMenuBtn')) {
                     const menuBtn = document.createElement('button');
                     menuBtn.id = 'mobileMenuBtn';
-                    menuBtn.className = 'btn btn-primary position-fixed top-0 start-0 m-3 d-md-none';
+                    menuBtn.className = 'btn btn-primary position-fixed top-0 end-0 m-3 d-md-none';
                     menuBtn.innerHTML = '<i class="bi bi-list"></i>';
                     menuBtn.style.zIndex = "1100";
                     menuBtn.onclick = () => document.querySelector('.sidebar').classList.toggle('show');

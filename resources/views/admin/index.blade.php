@@ -1,24 +1,26 @@
 @extends('layout.index') 
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="row align-items-center mb-4 g-2">
+  <div class="col-12 col-md-auto mb-2 mb-md-0">
     <h4 class="fw-bold mb-0"><i class="bi bi-people-fill me-2"></i>Daftar Admin</h4>
-    <div class="d-flex">
-        <form method="GET" action="{{ route('admin.index') }}" class="d-flex me-2">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama/email/NIP">
-            <button type="submit" class="btn btn-outline-secondary">
-                <i class="bi bi-search"></i>
-            </button>
-        </form>
-        @if(request('search'))
-            <a href="{{ route('admin.index') }}" class="btn btn-outline-danger me-2" title="Reset Pencarian">
-                <i class="bi bi-x-circle-fill"></i>
-            </a>
-        @endif
-        <a href="{{ route('admin.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i>Tambah Admin
-        </a>
-    </div>
+  </div>
+  <div class="col-12 col-md d-flex justify-content-md-end flex-wrap gap-2">
+    <form method="GET" action="{{ route('admin.index') }}" class="d-flex me-2">
+      <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama/email/NIP">
+      <button type="submit" class="btn btn-outline-secondary">
+        <i class="bi bi-search"></i>
+      </button>
+    </form>
+    @if(request('search'))
+      <a href="{{ route('admin.index') }}" class="btn btn-outline-danger me-2" title="Reset Pencarian">
+        <i class="bi bi-x-circle-fill"></i>
+      </a>
+    @endif
+    <a href="{{ route('admin.create') }}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>Tambah Admin
+    </a>
+  </div>
 </div>
 
 @if(session('success'))

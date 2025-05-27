@@ -15,61 +15,50 @@
 </div>
 @endif
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="row align-items-center mb-4 g-2">
+  <div class="col-12 col-md-auto mb-2 mb-md-0">
     <h4 class="fw-bold mb-0">
-        <i class="bi bi-journal-text me-2"></i>Daftar Konseling
+      <i class="bi bi-journal-text me-2"></i>Daftar Konseling
     </h4>
-    <div class="d-flex">
-        <form method="GET" action="{{ route('counseling.index') }}" class="d-flex">
-            <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari judul konseling">
-            <button type="submit" class="btn btn-outline-secondary me-3">
-                <i class="bi bi-search"></i>
-            </button>
-        </form>
-
-        <form method="GET" action="{{ route('counseling.index') }}" class="d-flex me-3">
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary d-flex align-items-center" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-funnel me-1"></i>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                    {{-- Filter Status --}}
-                    <li><h6 class="dropdown-header">Status</h6></li>
-                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'new'])) }}">New</a></li>
-                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'approved'])) }}">Approved</a></li>
-                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'rejected'])) }}">Rejected</a></li>
-                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'canceled'])) }}">Canceled</a></li>
-                    <li><hr class="dropdown-divider"></li>
-        
-                    {{-- Filter Tipe Konseling --}}
-                    <li><h6 class="dropdown-header">Tipe Konseling</h6></li>
-                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['counseling_type' => 'siswa'])) }}">Siswa</a></li>
-                    <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['counseling_type' => 'wali_murid'])) }}">Wali Murid</a></li>
-                </ul>
-            </div>
-        </form>
-        
-        {{-- Reset Filter Button --}}
-        @if(request('status') || request('counseling_type'))
-            <a href="{{ route('counseling.index') }}" class="btn btn-outline-secondary me-3">
-                <i class="bi bi-x-circle-fill"></i>
-            </a>
-        @endif
-        
-        
-
-
-        @if(request('search'))
-            <a href="{{ route('counseling.index') }}" class="btn btn-outline-secondary me-3">
-                <i class="bi bi-x-circle-fill"></i>
-            </a>
-        @endif
-
-        <a href="{{ route('counseling.create') }}" class="btn btn-add">
-            <i class="bi bi-plus-lg"></i>
-            Tambah Konseling
-        </a>
+  </div>
+  <div class="col-12 col-md d-flex justify-content-md-end flex-wrap gap-2">
+    <form method="GET" action="{{ route('counseling.index') }}" class="d-flex align-items-center">
+      <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari judul konseling">
+      <button type="submit" class="btn btn-outline-secondary me-2">
+        <i class="bi bi-search"></i>
+      </button>
+    </form>
+    <div class="dropdown">
+      <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-funnel me-1"></i>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+        <li><h6 class="dropdown-header">Status</h6></li>
+        <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'new'])) }}">New</a></li>
+        <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'approved'])) }}">Approved</a></li>
+        <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'rejected'])) }}">Rejected</a></li>
+        <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'canceled'])) }}">Canceled</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><h6 class="dropdown-header">Tipe Konseling</h6></li>
+        <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['counseling_type' => 'siswa'])) }}">Siswa</a></li>
+        <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['counseling_type' => 'wali_murid'])) }}">Wali Murid</a></li>
+      </ul>
     </div>
+    @if(request('status') || request('counseling_type'))
+      <a href="{{ route('counseling.index') }}" class="btn btn-outline-secondary" title="Reset filter">
+        <i class="bi bi-x-circle-fill"></i>
+      </a>
+    @endif
+    @if(request('search'))
+      <a href="{{ route('counseling.index') }}" class="btn btn-outline-secondary" title="Reset search">
+        <i class="bi bi-x-circle-fill"></i>
+      </a>
+    @endif
+    <a href="{{ route('counseling.create') }}" class="btn btn-add">
+      <i class="bi bi-plus-lg"></i>
+      Tambah Konseling
+    </a>
+  </div>
 </div>
 
 <div class="table-responsive">

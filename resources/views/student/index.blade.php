@@ -1,19 +1,17 @@
 @extends('layout.index')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="fw-bold mb-0"><i class="bi bi-people-fill me-2"></i>Daftar Siswa</h4>
-    
-    <div class="d-flex align-items-center flex-wrap gap-2">
-        <!-- Search Form -->
+<div class="row align-items-center mb-3 g-2">
+    <div class="col-12 col-md-auto mb-2 mb-md-0">
+        <h4 class="fw-bold mb-0"><i class="bi bi-people-fill me-2"></i>Daftar Siswa</h4>
+    </div>
+    <div class="col-12 col-md d-flex justify-content-md-end flex-wrap gap-2">
         <form method="GET" action="{{ route('students.index') }}" class="d-flex align-items-center" id="filterForm">
             <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama/email/NISN/kelas">
             <button type="submit" class="btn btn-outline-secondary me-2">
                 <i class="bi bi-search"></i>
             </button>
         </form>
-
-        <!-- Filter Dropdown -->
         @can('create-student')
         <div class="dropdown">
             <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -24,17 +22,13 @@
                 <li><a class="dropdown-item {{ request('class_filter') == '8' ? 'active' : '' }}" href="?class_filter=8">Kelas 8</a></li>
                 <li><a class="dropdown-item {{ request('class_filter') == '9' ? 'active' : '' }}" href="?class_filter=9">Kelas 9</a></li>
             </ul>
-            @endcan
         </div>
-
-        <!-- Clear Filter Button -->
+        @endcan
         @if(request('search') || request('class_filter'))
             <a href="{{ route('students.index') }}" class="btn btn-outline-secondary" title="Reset filter">
                 <i class="bi bi-x-circle-fill"></i>
             </a>
         @endif
-
-        <!-- Tambah Siswa -->
         @can('create-student')
             <a href="{{ route('students.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i> Tambah Siswa

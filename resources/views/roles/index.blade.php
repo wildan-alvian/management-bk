@@ -1,23 +1,22 @@
 @extends('layout.index') 
 
 @section('content')
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold mb-0">Daftar Roles</h4>
-            <div class="d-flex">
-                
+        <div class="row align-items-center mb-4 g-2">
+            <div class="col-12 col-md-auto mb-2 mb-md-0">
+                <h4 class="fw-bold mb-0">Daftar Roles</h4>
+            </div>
+            <div class="col-12 col-md d-flex justify-content-md-end flex-wrap gap-2">
                 <form method="GET" action="{{ route('roles.index') }}" class="d-flex">
-                    <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama role"">
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama role">
                     <button type="submit" class="btn btn-outline-secondary me-3">
                         <i class="bi bi-search"></i>
                     </button>
                 </form>
-
                 @if(isset($search))
                     <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary ms-3">
                         <i class="bi bi-x-circle-fill"></i>
                     </a>
                 @endif
-
                 <a href="{{ route('roles.create') }}" class="btn btn-add">
                     <i class="bi bi-plus-lg"></i>
                     Tambah Role

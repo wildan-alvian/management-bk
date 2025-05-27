@@ -1,24 +1,24 @@
 @extends('layout.index')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold mb-0">
-        <i class="bi bi-people-fill me-2"></i>Daftar Guru BK
-    </h4>
-    <div class="d-flex">
+<div class="row align-items-center mb-4 g-2">
+    <div class="col-12 col-md-auto mb-2 mb-md-0">
+        <h4 class="fw-bold mb-0">
+            <i class="bi bi-people-fill me-2"></i>Daftar Guru BK
+        </h4>
+    </div>
+    <div class="col-12 col-md d-flex justify-content-md-end flex-wrap gap-2">
         <form method="GET" action="{{ route('counselors.index') }}" class="d-flex">
             <input type="text" name="search" value="{{ request('search') }}" class="form-control me-2" placeholder="Cari nama/email/NIP">
             <button type="submit" class="btn btn-outline-secondary me-2">
                 <i class="bi bi-search"></i>
             </button>
         </form>
-
         @if(request('search'))
-            <a href="{{ route('counselors.index') }}" class="btn btn-outline-secondary me-2">
+            <a href="{{ route('counselors.index') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-x-circle-fill"></i>
             </a>
         @endif
-
         @if(Auth::user()->hasRole(['Super Admin', 'Admin']))
             <a href="{{ route('counselors.create') }}" class="btn btn-add">
                 <i class="bi bi-plus-lg me-1"></i>Tambah Guru BK

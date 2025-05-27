@@ -25,7 +25,10 @@
         border-radius: 20px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
         padding: 3rem;
-        margin: 2rem;
+        margin: 2rem auto;
+        min-width: 650px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .brand {
@@ -171,24 +174,21 @@
         .login-container {
             margin: 1rem;
             padding: 2rem;
-            max-width: 100%;
+            min-width: 100%;
         }
 
         .brand img {
             height: 60px;
             width: 60px;
         }
-
-        
-
         .welcome-text h1 {
             font-size: 1.5rem;
         }
     }
 </style>
 
-<div class="container container-wrap">
-    <div class="login-container">
+<div class="container">
+    <div class="login-container mx-auto my-5 col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
         <div class="brand">
             <img src="{{ asset('asset/images/dapuda.png') }}" alt="Logo">
             <h4 class="m-0" style="font-family: 'Alfa Slab One'; font-size: 2rem;">

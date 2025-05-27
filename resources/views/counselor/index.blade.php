@@ -27,7 +27,6 @@
     </div>
 </div>
 
-{{-- Alert --}}
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -42,8 +41,6 @@
     </div>
 @endif
 
-{{-- Table --}}
-{{-- Table --}}
 <div class="table-responsive">
     <table class="table table-hover align-middle">
         <thead class="table-light fw-bold">
@@ -109,8 +106,6 @@
     </table>
 </div>
 
-
-{{-- Pagination --}}
 @if($counselors->total() > 10)
     <div class="d-flex justify-content-end mt-3">
         {{ $counselors->links() }}

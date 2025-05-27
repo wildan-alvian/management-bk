@@ -192,6 +192,7 @@
             margin-left: 280px;
             padding: 2rem;
             transition: var(--transition-base);
+            overflow: auto;
         }
 
         /* Card Styles */

@@ -15,15 +15,10 @@
         justify-content: center;
     }
 
-    .container-wrap {
-        min-width: 650px;
-    }
-
     .login-container {
         background: white;
         border-radius: 20px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-        width: 100%;
         padding: 3rem;
         margin: 2rem;
     }

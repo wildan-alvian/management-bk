@@ -292,7 +292,7 @@ class StudentController extends Controller
         'student.studentParent.user'
     ])->findOrFail($id);
     
-    $user = Auth::user(); // Ambil data user yang sedang login
+    $user = Auth::user(); 
     
     $pdf = Pdf::loadView('student.pdf', [
         'student' => $student,

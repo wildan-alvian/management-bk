@@ -52,7 +52,6 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
 
 Route::middleware(['auth', 'role:Super Admin|Admin'])->group(function () {
     Route::resource('admin', AdminController::class);
-    Route::get('/students/parents', [StudentController::class, 'getStudentParents'])->name('students.parents');
 });
 
 Route::middleware(['auth', 'role:Guidance Counselor'])->group(function () {
@@ -69,6 +68,7 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
     Route::resource('student-achievements', StudentAchievementController::class);
     Route::resource('student-misconducts', StudentMisconductController::class);
     Route::get('/students/{student}/export-pdf', [StudentController::class, 'exportPdf'])->name('students.exportPdf');
+    Route::get('/students/parents', [StudentController::class, 'getStudentParents'])->name('students.parents');
 });
 
 // Student viewing routes with broader access

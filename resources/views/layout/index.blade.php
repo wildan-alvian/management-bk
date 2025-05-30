@@ -682,6 +682,28 @@
         });
     </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleButton = document.getElementById('toggleSidebar');
+
+            
+            toggleButton.addEventListener('click', function () {
+                sidebar.classList.toggle('show');
+            });
+
+            
+            document.addEventListener('click', function (e) {
+                const isClickInsideSidebar = sidebar.contains(e.target);
+                const isClickOnToggle = toggleButton.contains(e.target);
+
+                if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        });
+    </script>
+
     @stack('scripts')
 </body>
 </html>

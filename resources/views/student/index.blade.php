@@ -30,6 +30,9 @@
             </a>
         @endif
         @can('create-student')
+        <a href="{{ route('students.import') }}" class="btn btn-outline-success">
+            <i class="bi bi-upload me-1"></i> Import
+        </a>
             <a href="{{ route('students.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i> Tambah Siswa
             </a>

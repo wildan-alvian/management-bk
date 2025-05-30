@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CounselorsImport;
 
 class GuruBkController extends Controller
 {
@@ -133,4 +135,21 @@ class GuruBkController extends Controller
                 ->with('error', 'Terjadi kesalahan saat menghapus data Guru BK.');
         }
     }
+
+    public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,csv'
+    ]);
+
+    try {
+        Excel::import(new CounselorsImport, $request->file('file'));
+        return redirect()->route('counselors.index')
+            ->with('success', 'Data Guru BK berhasil diimport.');
+    } catch (\Exception $e) {
+        \Log::error('Import error: ' . $e->getMessage());
+        return redirect()->back()
+            ->with('error', 'Terjadi kesalahan saat mengimport data: ' . $e->getMessage());
+    }
+}
 }

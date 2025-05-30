@@ -1,6 +1,7 @@
 @extends('layout.index')
 
 @section('content')
+    
 <div class="row align-items-center mb-4 g-2">
     <div class="col-12 col-md-auto mb-2 mb-md-0">
         <h4 class="fw-bold mb-0">
@@ -20,6 +21,9 @@
             </a>
         @endif
         @if(Auth::user()->hasRole(['Super Admin', 'Admin']))
+        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="bi bi-upload"></i> Import
+        </button>
             <a href="{{ route('counselors.create') }}" class="btn btn-add">
                 <i class="bi bi-plus-lg me-1"></i>Tambah Guru BK
             </a>
@@ -106,9 +110,36 @@
     </table>
 </div>
 
-@if($counselors->total() > 10)
-    <div class="d-flex justify-content-end mt-3">
-        {{ $counselors->links() }}
+<!-- Modal Import -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form action="{{ route('counselors.import') }}" method="POST" enctype="multipart/form-data" class="modal-content">
+          @csrf
+          <div class="modal-header">
+              <h5 class="modal-title" id="importModalLabel">Import Data Guru BK</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <div class="mb-3">
+                  <label for="file" class="form-label">Upload File (Excel .xlsx/.csv)</label>
+                  <input type="file" class="form-control" name="file" accept=".csv, .xlsx" required>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+              <button type="submit" class="btn btn-success">Import</button>
+          </div>
+      </form>
     </div>
+  </div>
+  
+
+  @if($counselors->hasPages())
+  <div class="d-flex justify-content-end align-items-center mt-4 flex-wrap gap-2">
+      <nav>
+          {{ $counselors->onEachSide(1)->links() }}
+      </nav>
+  </div>
 @endif
+
 @endsection

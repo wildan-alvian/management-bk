@@ -17,6 +17,9 @@
         <i class="bi bi-x-circle-fill"></i>
       </a>
     @endif
+    <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#importModal">
+        <i class="bi bi-upload"></i> Import
+    </button>
     <a href="{{ route('admin.create') }}" class="btn btn-primary">
       <i class="bi bi-plus-lg me-1"></i>Tambah Admin
     </a>
@@ -110,6 +113,30 @@
     </table>
 </div>
 
+<!-- Modal Import -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form action="{{ route('admin.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="importModalLabel">Import Data Admin</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="file" class="form-label">Upload File (Excel .xlsx/.csv)</label>
+              <input type="file" class="form-control" name="file" accept=".xlsx,.xls" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Import</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
 @if($admins->total() > 10)
 <div class="d-flex justify-content-end mt-3">
     {{ $admins->links() }}

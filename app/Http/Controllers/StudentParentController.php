@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Imports\StudentParentsImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StudentParentController extends Controller
 {
@@ -232,4 +234,21 @@ class StudentParentController extends Controller
                 ->withErrors(['error' => 'Terjadi kesalahan saat menghapus data wali murid: ' . $e->getMessage()]);
         }
     }
+
+    public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|file|mimes:xlsx,csv,xls',
+    ]);
+
+    try {
+        Excel::import(new StudentParentsImport, $request->file('file'));
+
+        return redirect()->route('student-parents.index')
+            ->with('success', 'Data wali murid berhasil diimpor.');
+    } catch (\Exception $e) {
+        return redirect()->route('student-parents.index')
+            ->with('error', 'Terjadi kesalahan saat impor data: ' . $e->getMessage());
+    }
+}
 }

@@ -10,6 +10,8 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use App\Imports\AdminsImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
@@ -161,4 +163,19 @@ class AdminController extends Controller
             return back()->with('error', 'Terjadi kesalahan saat menghapus data admin.');
         }
     }
+
+    public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls'
+    ]);
+
+    try {
+        Excel::import(new AdminsImport, $request->file('file'));
+
+        return redirect()->route('admin.index')->with('success', 'Data admin berhasil diimport!');
+    } catch (\Exception $e) {
+        return back()->with('error', 'Gagal mengimport data: ' . $e->getMessage());
+    }
+}
 }

@@ -24,7 +24,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     [
                         'name' => $row['nama_wali'],
                         'email' => $row['email_wali'],
-                        'password' => Hash::make($password),
+                        'password' => Hash::make($row['no_telepon_wali']),
                         'phone' => $row['no_telepon_wali'] ?? '',
                         'address' => $row['alamat_wali'] ?? '',
                         'role' => 'Student Parents',
@@ -41,7 +41,7 @@ class StudentImport implements ToCollection, WithHeadingRow
                     [
                         'name' => $row['nama'],
                         'email' => $row['email'],
-                        'password' => Hash::make($password),
+                        'password' => Hash::make($row['no_telepon']),
                         'phone' => $row['no_telepon'] ?? '',
                         'address' => $row['alamat'] ?? '',
                         'role' => 'Student',

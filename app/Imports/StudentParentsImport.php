@@ -29,7 +29,7 @@ class StudentParentsImport implements ToCollection, WithHeadingRow
                     [
                         'name' => $row['nama'],
                         'email' => $row['email'],
-                        'password' => Hash::make($password),
+                        'password' => Hash::make($row['no_telepon']),
                         'phone' => $row['no_telepon'] ?? '',
                         'address' => $row['alamat'] ?? '',
                         'role' => 'Student Parents',

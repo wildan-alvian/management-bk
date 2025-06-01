@@ -6,46 +6,47 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
-use Illuminate\Validation\Rule;
-use Maatwebsite\Excel\Concerns\ToModel;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class CounselorsImport implements ToModel, WithHeadingRow
+class CounselorsImport implements ToCollection, WithHeadingRow
 {
-    public function model(array $row)
+    public function collection(Collection $rows)
     {
-        
-        if (User::where('email', $row['email'])->exists()) {
-            return null;
+        DB::beginTransaction();try {
+            foreach ($rows as $row) {
+              
+                $password = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&!$%^&'), 0, 10);
+
+                $user = User::firstOrCreate(
+                    ['id_number' => $row['nip']],
+                    [
+                        'name' => $row['nama'],
+                        'email' => $row['email'],
+                        'password' => Hash::make($password),
+                        'phone' => $row['no_telepon'] ?? '',
+                        'address' => $row['alamat'] ?? '',
+                        'role' => 'Guidance Counselor',
+                    ]
+                );
+                $user->assignRole('Guidance Counselor');
+
+                Mail::to($user->email)->send(new TestMail(
+                    'Pembuatan akun CounselLink baru',
+                    'email.user.create',
+                    [
+                        'name' => $user->name,
+                        'password' => $password,
+                        'url' => env('APP_URL')
+                    ]
+                ));        
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
         }
-
-        
-        $password = substr(str_shuffle('abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!$%^&'), 0, 10);
-
-        $user = new User([
-            'name'      => $row['nama'],
-            'email'     => $row['email'],
-            'id_number' => $row['nip'],
-            'phone'     => $row['no_telepon'],
-            'address'   => $row['alamat'],
-            'password'  => Hash::make($password),
-            'role'      => 'Guidance Counselor',
-        ]);
-
-        $user->save();
-        $user->assignRole('Guidance Counselor');
-
-      
-        Mail::to($user->email)->send(new TestMail(
-            'Pembuatan akun CounselLink baru',
-            'email.user.create',
-            [
-                'name' => $user->name,
-                'password' => $password,
-                'url' => env('APP_URL')
-            ]
-        ));
-
-        return $user;
     }
 }

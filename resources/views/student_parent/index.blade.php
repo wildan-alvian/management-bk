@@ -19,10 +19,10 @@
                 <i class="bi bi-x-circle-fill"></i>
             </a>
         @endif
-        @can('create-student-parent')
-        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#importModal">
-            <i class="bi bi-upload"></i> Import
-        </button>        
+            @can('create-student-parent')
+            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#importModal">
+                <i class="bi bi-upload"></i> Import
+            </button>        
             <a href="{{ route('student-parents.create') }}" class="btn btn-primary ms-2">
                 <i class="bi bi-plus-lg"></i> Tambah Wali Murid
             </a>

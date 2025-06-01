@@ -69,8 +69,7 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
     Route::resource('student-achievements', StudentAchievementController::class);
     Route::resource('student-misconducts', StudentMisconductController::class);
     Route::get('/students/{student}/export-pdf', [StudentController::class, 'exportPdf'])->name('students.exportPdf');
-    Route::get('/students/import', [StudentController::class, 'importForm'])->name('students.import');
-    Route::get('/student-parents/import', [StudentParentController::class, 'showImportForm'])->name('student-parents.import.form');
+    Route::post('/students/import', [StudentController::class, 'import'])->name('students.import');
     Route::post('/student-parents/import', [StudentParentController::class, 'import'])->name('student-parents.import');
     Route::post('/counselors/import', [GuruBkController::class, 'import'])->name('counselors.import');
     Route::get('/students/parents', [StudentController::class, 'getStudentParents'])->name('students.parents');

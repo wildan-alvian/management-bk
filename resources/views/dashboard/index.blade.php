@@ -172,6 +172,75 @@
         </div>
         @endif
     </div>
+
+    @if(!($isStudent && $isParent))
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="mb-0 fw-bold">
+                                    <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                                    5 Siswa dengan Pelanggaran Terbanyak
+                                </h5>
+                            </div>
+                            <div class="col-auto">
+                                <div class="btn-group">
+                                    <a href="{{ route('dashboard.index', ['class' => '7']) }}" 
+                                       class="btn btn-sm {{ $selectedClass == '7' ? 'btn-primary' : 'btn-outline-primary' }}">
+                                        Kelas 7
+                                    </a>
+                                    <a href="{{ route('dashboard.index', ['class' => '8']) }}" 
+                                       class="btn btn-sm {{ $selectedClass == '8' ? 'btn-primary' : 'btn-outline-primary' }}">
+                                        Kelas 8
+                                    </a>
+                                    <a href="{{ route('dashboard.index', ['class' => '9']) }}" 
+                                       class="btn btn-sm {{ $selectedClass == '9' ? 'btn-primary' : 'btn-outline-primary' }}">
+                                        Kelas 9
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-center" style="width: 50px">No</th>
+                                        <th>Nama Siswa</th>
+                                        <th>NISN</th>
+                                        <th class="text-center">Kelas</th>
+                                        <th class="text-center">Total Pelanggaran</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($topMisconductStudents as $index => $student)
+                                        <tr>
+                                            <td class="text-center">{{ $index + 1 }}</td>
+                                            <td>{{ $student->student_name }}</td>
+                                            <td>{{ $student->nisn }}</td>
+                                            <td class="text-center">{{ $student->class }}</td>
+                                            <td class="text-center">
+                                                <span class="badge bg-danger">{{ $student->total_misconducts }}</span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-3">
+                                                Tidak ada data pelanggaran untuk kelas {{ $selectedClass }}
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 
 @push('scripts')

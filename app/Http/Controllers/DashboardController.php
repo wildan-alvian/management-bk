@@ -5,19 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Counseling;
 use App\Models\User;
+use App\Models\StudentMisconduct;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $isStudent = $user->hasRole('Student');
         $isParent = $user->hasRole('Student Parents');
         $isGuidanceCounselor = $user->hasRole('Guidance Counselor');
         $isAdmin = $user->hasRole(['Super Admin', 'Admin']);
+
+        // Get selected class from request, default to 7
+        $selectedClass = $request->get('class', '7');
 
         // Base query conditions
         $baseQuery = function() use ($user, $isStudent, $isParent) {
@@ -80,6 +84,27 @@ class DashboardController extends Controller
             ];
         }
 
+        // Get top 5 students with most misconducts by class (only for Admin and Guidance Counselor)
+        $topMisconductStudents = null;
+        if ($isAdmin || $isGuidanceCounselor) {
+            $topMisconductStudents = StudentMisconduct::select(
+                'users.name as student_name',
+                'students.nisn',
+                'students.class',
+                DB::raw('COUNT(student_misconducts.id) as total_misconducts')
+            )
+            ->join('students', 'student_misconducts.student_id', '=', 'students.id')
+            ->join('users', 'students.user_id', '=', 'users.id')
+            ->where('students.class', $selectedClass)
+            ->whereHas('student.user', function ($query) {
+                $query->role('Student');
+            })
+            ->groupBy('students.id', 'users.name', 'students.nisn', 'students.class')
+            ->orderByDesc('total_misconducts')
+            ->take(5)
+            ->get();
+        }
+
         return view('dashboard.index', compact(
             'totalCounseling',
             'newCounseling',
@@ -93,7 +118,9 @@ class DashboardController extends Controller
             'isAdmin',
             'isGuidanceCounselor',
             'isStudent',
-            'isParent'
+            'isParent',
+            'topMisconductStudents',
+            'selectedClass'
         ));
     }
 } 

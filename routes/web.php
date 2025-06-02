@@ -11,6 +11,7 @@ use App\Http\Controllers\CounselingController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -36,9 +37,8 @@ Route::get('password/change', [App\Http\Controllers\Auth\ChangePasswordControlle
     ->name('password.change');
 Route::post('password/change', [App\Http\Controllers\Auth\ChangePasswordController::class, 'changePassword']);
 
-Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
-    ->middleware('auth')
-    ->name('dashboard');
+// Dashboard Route
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('notifications', NotificationController::class);

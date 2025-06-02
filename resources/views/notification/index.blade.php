@@ -14,7 +14,7 @@
         </thead>
         <tbody>
             @forelse ($notifications as $index => $notification)
-                <tr style="cursor: pointer;" data-id="{{$notification->id}}">
+                <tr style="cursor: pointer;" data-id="{{$notification->id}}" data-url="{{ $notification->url ?? '' }}">
                     @php
                         $contentStyle = [false => 'background-color: var(--bg-light);', true => ''];
                     @endphp
@@ -34,8 +34,13 @@
         rows.forEach(row => {
             row.addEventListener('click', function() {
                 const rowId = this.getAttribute('data-id');
+                const redirectUrl = this.getAttribute('data-url');
 
-                window.location.href = '/notifications/read/' + rowId;
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                } else {
+                    window.location.href = '/notifications/read/' + rowId;
+                }
             });
         });
     </script>

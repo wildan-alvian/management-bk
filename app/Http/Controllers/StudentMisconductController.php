@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use App\Models\StudentMisconduct;
+use App\Models\Notification;
+use App\Mail\TestMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
 
 class StudentMisconductController extends Controller
 {
@@ -38,8 +41,35 @@ class StudentMisconductController extends Controller
             }
             $misconduct = StudentMisconduct::create($data);
 
-            // Load the student relationship
-            $misconduct->load('student');
+            $misconduct->load('student.user', 'student.studentParent.user');
+
+            if ($misconduct->student && $misconduct->student->studentParent && $misconduct->student->studentParent->user) {
+                $parentUser = $misconduct->student->studentParent->user;
+                $studentUser = $misconduct->student->user;
+
+                $notificationContent = "{$studentUser->name} melakukan pelanggaran {$misconduct->name} pada {$misconduct->created_at->format('d M Y')}";
+                Notification::create([
+                    'user_id' => $parentUser->id,
+                    'type' => $parentUser->roles->first()->name ?? 'Student Parents',
+                    'content' => $notificationContent,
+                    'status' => false,
+                    'url' => route('students.show', $misconduct->student_id),
+                ]);
+
+                $emailDetails = [
+                    'parent_name' => $parentUser->name,
+                    'student_name' => $studentUser->name,
+                    'student_class' => $misconduct->student->class,
+                    'student_nisn' => $misconduct->student->nisn,
+                    'misconduct_name' => $misconduct->name,
+                    'misconduct_date' => $misconduct->created_at->format('d M Y'),
+                    'detail_url' => route('students.show', $misconduct->student_id),
+                ];
+
+                Mail::to($parentUser->email)->send(
+                    new TestMail('Pemberitahuan Pelanggaran Siswa', 'email.misconduct.parent_notification', $emailDetails)
+                );
+            }
 
             return response()->json([
                 'success' => true,
@@ -49,7 +79,8 @@ class StudentMisconductController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat menyimpan data'
+                'message' => 'Terjadi kesalahan saat menyimpan data',
+                'error_detail' => $e->getMessage()
             ], 500);
         }
     }

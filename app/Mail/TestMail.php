@@ -35,9 +35,7 @@ class TestMail extends Mailable
     {
         return new Content(
             view: $this->view,
-            with: [
-                'contents' => $this->contents
-            ],
+            with: $this->contents
         );
     }
 

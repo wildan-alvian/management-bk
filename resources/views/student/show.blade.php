@@ -224,7 +224,7 @@
                 </div>
 
                 <div class="table-responsive" style="min-height: fit-content">
-                    <table class="table table-hover align-middle">
+                    <table class="table table-hover align-middle" id="misconductsTable">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 5%;">No</th>

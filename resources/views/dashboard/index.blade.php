@@ -173,7 +173,7 @@
         @endif
     </div>
 
-    @if(!($isStudent && $isParent))
+    @if($isAdmin || $isGuidanceCounselor)
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card shadow-sm">

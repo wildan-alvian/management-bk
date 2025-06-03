@@ -53,7 +53,7 @@ class StudentMisconductController extends Controller
                     'type' => $parentUser->roles->first()->name ?? 'Student Parents',
                     'content' => $notificationContent,
                     'status' => false,
-                    'url' => route('students.show', $misconduct->student_id),
+                    'url' => route('students.show', $studentUser->id),
                 ]);
 
                 $emailDetails = [

@@ -37,7 +37,7 @@ class StudentMisconductController extends Controller
                 $file = $request->file('file');
                 $filename = uniqid('misconduct_') . '.' . $file->getClientOriginalExtension();
                 $file->storeAs('public/misconducts', $filename);
-                $data['file'] = $filename;
+                $data['file'] = 'misconducts/' . $filename;
             }
             $misconduct = StudentMisconduct::create($data);
 
@@ -114,7 +114,7 @@ class StudentMisconductController extends Controller
                 $file = $request->file('file');
                 $filename = uniqid('misconduct_') . '.' . $file->getClientOriginalExtension();
                 $file->storeAs('public/misconducts', $filename);
-                $data['file'] = $filename;
+                $data['file'] = 'misconducts/' . $filename;
             }
             $misconduct->update($data);
 

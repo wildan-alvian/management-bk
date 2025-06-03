@@ -156,6 +156,7 @@
                                 <th style="width: 25%;">Nama Prestasi</th>
                                 <th style="width: 15%;">Kategori</th>
                                 <th style="width: 15%;">Tanggal</th>
+                                <th style="width: 20%;">Lampiran</th>
                                 <th style="width: 30%;">Detail</th>
                                 @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
                                 <th style="width: 10%;">Aksi</th>
@@ -169,6 +170,11 @@
                                 <td>{{ $achievement->name }}</td>
                                 <td>{{ $achievement->category }}</td>
                                 <td>{{ date('d F Y', strtotime($achievement->date)) }}</td>
+                                <td>
+                                    @if($achievement->file)
+                                <a href="{{ Storage::url($achievement->file) }}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-paperclip me-1"></i>Lihat Lampiran</a>
+                                @endif
+                                </td>                                
                                 <td>{{ $achievement->detail }}</td>
                                 <td>
                                     @can('edit-student')
@@ -225,6 +231,7 @@
                                 <th style="width: 25%;">Nama Pelanggaran</th>
                                 <th style="width: 15%;">Kategori</th>
                                 <th style="width: 15%;">Tanggal</th>
+                                <th style="width: 20%;">Lampiran</th>
                                 <th style="width: 30%;">Detail</th>
                                 @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
                                 <th style="width: 10%;">Aksi</th>
@@ -238,6 +245,11 @@
                                 <td>{{ $misconduct->name }}</td>
                                 <td>{{ $misconduct->category }}</td>
                                 <td>{{ date('d F Y', strtotime($misconduct->date)) }}</td>
+                                <td>
+                                @if($misconduct->file)
+                                <a href="{{ Storage::url($misconduct->file) }}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-paperclip me-1"></i>Lihat Lampiran</a>
+                                @endif
+                                </td> 
                                 <td>{{ $misconduct->detail }}</td>
                                 <td>
                                     @can('edit-student')

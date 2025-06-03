@@ -33,7 +33,7 @@ class StudentAchievementController extends Controller
                 $file = $request->file('file');
                 $filename = uniqid('achievement_') . '.' . $file->getClientOriginalExtension();
                 $file->storeAs('public/achievements', $filename);
-                $data['file'] = $filename;
+                $data['file'] = 'achievements/' . $filename;
             }
             $achievement = StudentAchievement::create($data);
 
@@ -88,7 +88,7 @@ class StudentAchievementController extends Controller
                 $file = $request->file('file');
                 $filename = uniqid('achievement_') . '.' . $file->getClientOriginalExtension();
                 $file->storeAs('public/achievements', $filename);
-                $data['file'] = $filename;
+                $data['file'] = 'achievements/' . $filename;
             }
             $achievement->update($data);
 

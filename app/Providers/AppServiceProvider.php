@@ -31,7 +31,9 @@ class AppServiceProvider extends ServiceProvider
                 if ($user->hasRole(['Student', 'Student Parents'])) {
                     $notifications = $notifications->where('user_id', $user->id);
                 }
-                $notifications = $notifications->where('type', $user->role);
+                if ($user->hasRole('Guidance Counselor')) {
+                     $notifications = $notifications->where('type', $user->role);
+                }
             }
 
             $unreadCount = $notifications->where('status', false)->count();

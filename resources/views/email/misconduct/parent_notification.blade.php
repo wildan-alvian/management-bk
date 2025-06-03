@@ -12,20 +12,20 @@
             <h1 style="margin: 0; font-size: 24px;">Pemberitahuan Pelanggaran Siswa</h1>
         </div>
         <div class="content" style="padding: 0 20px 20px 20px;">
-            <p>Yth. Bapak/Ibu {{ $parent_name }},</p>
+            <p>Yth. Bapak/Ibu {{ $contents['parent_name'] }},</p>
 
             <p>Dengan ini kami memberitahukan bahwa siswa/i Anda dengan detail:</p>
 
-            <div class="detail-item" style="margin-bottom: 10px;"><strong style="display: inline-block; width: 80px;">Nama:</strong> {{ $student_name }}</div>
-            <div class="detail-item" style="margin-bottom: 10px;"><strong style="display: inline-block; width: 80px;">Kelas:</strong> {{ $student_class }}</div>
-            <div class="detail-item" style="margin-bottom: 10px;"><strong style="display: inline-block; width: 80px;">NISN:</strong> {{ $student_nisn }}</div>
+            <div class="detail-item" style="margin-bottom: 10px;"><strong style="display: inline-block; width: 80px;">Nama:</strong> {{ $contents['student_name'] }}</div>
+            <div class="detail-item" style="margin-bottom: 10px;"><strong style="display: inline-block; width: 80px;">Kelas:</strong> {{ $contents['student_class'] }}</div>
+            <div class="detail-item" style="margin-bottom: 10px;"><strong style="display: inline-block; width: 80px;">NISN:</strong> {{ $contents['student_nisn'] }}</div>
 
-            <p>telah melakukan pelanggaran <strong style="font-weight: bold;">{{ $misconduct_name }}</strong> pada tanggal {{ $misconduct_date }}.</p>
+            <p>telah melakukan pelanggaran <strong style="font-weight: bold;">{{ $contents['misconduct_name'] }}</strong> pada tanggal {{ $contents['misconduct_date'] }}.</p>
 
             <p>Mohon perhatian Bapak/Ibu terkait hal ini. Untuk melihat detail pelanggaran lebih lanjut, silakan klik tombol di bawah:</p>
 
             <p style="text-align: center;">
-                <a href="{{ $detail_url }}" class="button" style="display: inline-block; background-color: #F9CB43; color: #333 !important; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Lihat Detail Siswa</a>
+                <a href="{{ $contents['detail_url'] }}" class="button" style="display: inline-block; background-color: #F9CB43; color: #333 !important; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Lihat Detail Siswa</a>
             </p>
 
             <p>Terima kasih atas perhatian dan kerja sama Bapak/Ibu.</p>

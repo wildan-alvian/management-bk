@@ -9,15 +9,20 @@ class NotificationController extends Controller
 {
     public function index(Request $request)
     {
+        $user = auth()->user();
         $type = $request->query('type');
 
-        $rawNotifications = Notification::orderBy('created_at', 'desc')
+        $notifications = Notification::orderBy('created_at', 'desc')
             ->when($type, function ($query, $type) {
                 return $query->where('type', $type);
+            })
+            ->when($user->hasRole(['Student', 'Student Parents']), function ($query) use ($user) {
+                return $query->where('user_id', $user->id);
             });
 
-        $notifications = $rawNotifications->paginate(10);
-        $unreadCount = $rawNotifications->where('status', false)->count();
+        $unreadCount = $notifications->where('status', false)->count();
+
+        $notifications = $notifications->paginate(10);
 
         return view('notification.index', compact('notifications', 'unreadCount'));
     }

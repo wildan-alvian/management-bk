@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
-
+use App\Models\TindakLanjut;
 
 class Counseling extends Model
 {
@@ -29,4 +29,10 @@ class Counseling extends Model
     {
         return $this->belongsTo(User::class, 'submitted_by_id');
     }
+
+        public function tindaklanjuts()
+    {
+        return $this->hasMany(TindakLanjut::class);
+    }
+
 }

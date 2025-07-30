@@ -568,7 +568,7 @@
 
             <a href="{{ $notificationHref }}" class="nav-link">
                 <i class="bi bi-bell"></i>
-                <span>Notifications</span>
+                <span>Notifikasi</span>
                 @if($unreadCountBadge > 0)
                     <span class="badge bg-danger rounded-pill ms-auto">{{$unreadCountBadge}}</span>
                 @endif
@@ -576,7 +576,7 @@
 
             <a href="{{ route('dashboard.index') }}" class="nav-link {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
+                <span>Beranda</span>
             </a>
 
             @if(Auth::user()->hasRole('Super Admin'))
@@ -621,7 +621,7 @@
             <div class="dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                     <i class="bi bi-gear"></i>
-                    <span>Settings</span>
+                    <span>Pengaturan</span>
                 </a>
                 <ul class="dropdown-menu">
                     <!-- <li>
@@ -631,14 +631,14 @@
                     </li> -->
                     <li>
                         <a class="dropdown-item" href="{{ route('password.change') }}">
-                            <i class="bi bi-key me-2"></i> Change Password
+                            <i class="bi bi-key me-2"></i> Gnati Kata Sandi
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
                         <a class="dropdown-item text-danger" href="{{ route('logout') }}"
                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            <i class="bi bi-box-arrow-right me-2"></i> Keluar
                         </a>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                             @csrf

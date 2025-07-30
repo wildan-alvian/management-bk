@@ -193,8 +193,8 @@
         </div>
 
         <div class="welcome-text">
-            <h1>Change Password</h1>
-            <p>Please enter your current password and choose a new password for your account</p>
+            <h1>Ganti Kata Sandi</h1>
+            <p>Silakan masukkan kata sandi Anda saat ini dan pilih kata sandi baru untuk akun Anda</p>
         </div>
 
         @if (session('status'))
@@ -217,7 +217,7 @@
             @csrf
 
             <div class="form-group">
-                <label for="current_password">Current Password</label>
+                <label for="current_password">Kata Sandi Lama</label>
                 <div class="input-wrapper">
                     <i class="bi bi-lock input-icon"></i>
                     <input type="password" 
@@ -232,7 +232,7 @@
             </div>
 
             <div class="form-group">
-                <label for="password">New Password</label>
+                <label for="password">Kata Sandi Baru</label>
                 <div class="input-wrapper">
                     <i class="bi bi-lock input-icon"></i>
                     <input type="password" 
@@ -247,7 +247,7 @@
             </div>
 
             <div class="form-group">
-                <label for="password_confirmation">Confirm New Password</label>
+                <label for="password_confirmation">Konfirmasi Kata Sandi</label>
                 <div class="input-wrapper">
                     <i class="bi bi-lock input-icon"></i>
                     <input type="password" 
@@ -262,15 +262,15 @@
             </div>
 
             <button type="submit" class="btn-submit">
-                Change Password
+                Ganti Kata Sandi
             </button>
         </form>
 
         <div class="text-center mt-4">
             <p class="mb-0">
-                Want to go back to login page? 
+                Ingin kembali ke halaman Menu? 
                 <a href="{{ route('login') }}" class="text-decoration-none" style="color: #5A6C57; font-weight: 600;">
-                    Click here
+                    Klik di sini 
                 </a>
             </p>
         </div>

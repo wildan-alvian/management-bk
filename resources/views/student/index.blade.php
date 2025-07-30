@@ -138,7 +138,7 @@
           </div>
           <div class="modal-body">
               <div class="mb-3">
-                  <label for="importFile" class="form-label">Upload File (Excel .xlsx/.csv)</label>
+                  <label for="importFile" class="form-label">Upload File (csv)</label>
                   <input type="file" class="form-control" name="file" id="importFile" required accept=".csv, .xlsx, .xls">
               </div>
           </div>

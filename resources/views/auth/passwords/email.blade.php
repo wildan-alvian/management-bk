@@ -195,8 +195,8 @@
         </div>
 
         <div class="welcome-text">
-            <h1>Reset Password</h1>
-            <p>Enter your email address and we'll send you a new password to access your account</p>
+            <h1>Reset Kata Sandi</h1>
+            <p>Masukkan alamat email Anda dan kami akan mengirimkan kata sandi baru untuk mengakses akun Anda</p>
         </div>
 
         @if (session('status'))
@@ -234,12 +234,12 @@
             </div>
 
             <button type="submit" class="btn-submit">
-                Send Password Reset Link
+                Kirim Link Reset Kata Sandi
             </button>
         </form>
 
         <a href="{{ route('login') }}" class="back-to-login">
-            <i class="bi bi-arrow-left"></i> Back to Login
+            <i class="bi bi-arrow-left"></i> Kembali ke Halaman Masuk
         </a>
     </div>
 </div>

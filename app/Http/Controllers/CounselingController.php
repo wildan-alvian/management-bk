@@ -155,10 +155,13 @@ class CounselingController extends Controller
         }
     }
 
-    public function show(Counseling $counseling)
+
+        public function show($id)
     {
+        $counseling = Counseling::with('tindaklanjuts')->findOrFail($id);
         return view('counseling.show', compact('counseling'));
     }
+
 
     public function approve(Request $request, Counseling $counseling)
     {

@@ -197,8 +197,8 @@
         </div>
 
         <div class="welcome-text">
-            <h1>Welcome Back!</h1>
-            <p>Please sign in to your account</p>
+            <h1>Selamat Datang</h1>
+            <p>Silahkan Masukkan Akun Anda</p>
         </div>
 
         <form method="POST" action="{{ route('login') }}">
@@ -225,7 +225,7 @@
             </div>
 
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">Kata Sandi</label>
                 <div class="input-wrapper">
                     <i class="bi bi-lock input-icon"></i>
                     <input type="password" 
@@ -248,20 +248,20 @@
                     id="showPassword" 
                     onclick="togglePassword()">
                 <label class="form-check-label" for="showPassword">
-                    Show Password
+                    Lihat Kata Sandi
                 </label>
             </div>
 
             @if (Route::has('password.request'))
                 <div class="text-center mb-3">
                     <a class="forgot-password" href="{{ route('password.request') }}">
-                        Forgot your password?
+                        Lupa Kata Sandi?
                     </a>
                 </div>
             @endif
 
             <button type="submit" class="btn-login">
-                Sign In
+                Masuk
             </button>
         </form>
     </div>

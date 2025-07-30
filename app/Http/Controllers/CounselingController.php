@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Counseling;
+use App\Models\Tindaklanjut;
 use App\Models\User;
 use App\Models\Notification;
 use App\Mail\TestMail;
@@ -156,11 +157,13 @@ class CounselingController extends Controller
     }
 
 
-        public function show($id)
+    public function show($id)
     {
-        $counseling = Counseling::with('Tindaklanjuts')->findOrFail($id);
-        return view('counseling.show', compact('counseling'));
-    }
+        $counseling = Counseling::findOrFail($id);
+        $tindaklanjuts = Tindaklanjut::where('counseling_id', $id)->get();
+    
+        return view('counseling.show', compact('counseling', 'tindaklanjuts'));
+    }    
 
 
     public function approve(Request $request, Counseling $counseling)

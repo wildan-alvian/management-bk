@@ -12,7 +12,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\TindaklanjutController;
+use App\Http\Controllers\TindakLanjutController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -74,9 +74,9 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
     Route::post('/student-parents/import', [StudentParentController::class, 'import'])->name('student-parents.import');
     Route::post('/counselors/import', [GuruBkController::class, 'import'])->name('counselors.import');
     Route::get('/students/parents', [StudentController::class, 'getStudentParents'])->name('students.parents');
-    Route::post('/counseling/{id}/tindaklanjut', [TindaklanjutController::class, 'store'])->name('tindaklanjut.store');
-    Route::put('/tindaklanjut/{tindaklanjut}', [TindaklanjutController::class, 'update'])->name('tindaklanjut.update');
-    Route::delete('/tindaklanjut/{tindakLanjut}', [TindakLanjutController::class, 'destroy'])->name('tindaklanjut.destroy');
+    Route::post('/counseling/{id}/tindakLanjut', [TindakLanjutController::class, 'store'])->name('tindaklanjut.store');
+    Route::put('/TindakLanjut/{TindakLanjut}', [TindakLanjutController::class, 'update'])->name('tindaklanjut.update');
+    Route::delete('/TindakLanjut/{TindakLanjut}', [TindakLanjutController::class, 'destroy'])->name('tindaklanjut.destroy');
 });
 
 // Student viewing routes with broader access

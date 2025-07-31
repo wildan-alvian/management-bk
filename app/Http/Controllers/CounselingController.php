@@ -160,9 +160,9 @@ class CounselingController extends Controller
     public function show($id)
     {
         $counseling = Counseling::findOrFail($id);
-        $tindaklanjuts = Tindaklanjut::where('counseling_id', $id)->get();
+        $tindaklanjuts = TindakLanjut::where('counseling_id', $id)->get();
     
-        return view('counseling.show', compact('counseling', 'tindaklanjuts'));
+        return view('counseling.show', compact('counseling', 'TindakLanjuts'));
     }    
 
 

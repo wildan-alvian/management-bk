@@ -30,9 +30,9 @@ class Counseling extends Model
         return $this->belongsTo(User::class, 'submitted_by_id');
     }
 
-        public function tindaklanjuts()
+        public function TindakLanjuts()
     {
-        return $this->hasMany(Tindaklanjut::class);
+        return $this->hasMany(TindakLanjut::class);
     }
 
 }

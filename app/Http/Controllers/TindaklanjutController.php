@@ -16,7 +16,7 @@ class TindakLanjutController extends Controller
             'tanggal' => 'required|date',
         ]);
     
-        TindakLanjut::create([
+        tindaklanjut::create([
             'counseling_id' => $request->counseling_id,
             'description' => $request->description,
             'tanggal' => $request->tanggal,
@@ -40,7 +40,7 @@ class TindakLanjutController extends Controller
         return redirect()->back()->with('success', 'Tindak lanjut berhasil diperbarui');
     }
 
-    public function destroy(TindakLanjut $tindakLanjut)
+    public function destroy(tindaklanjut $tindakLanjut)
     {
         $tindakLanjut->delete();
         return redirect()->back()->with('success', 'Tindak lanjut berhasil dihapus.');

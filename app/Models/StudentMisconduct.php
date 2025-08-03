@@ -32,5 +32,14 @@ class StudentMisconduct extends Model
     {
         return $this->belongsTo(Student::class);
     }
+
+  // app/Models/StudentMisconduct.php
+
+    public function followUp()
+    {
+        return $this->hasOne(Lanjutan::class, 'misconduct_id');
+    }
+
+
 }
 

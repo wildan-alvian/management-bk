@@ -184,7 +184,8 @@
                                             data-name="{{ $achievement->name }}"
                                             data-category="{{ $achievement->category }}"
                                             data-date="{{ $achievement->date }}"
-                                            data-detail="{{ $achievement->detail }}">
+                                            data-detail="{{ $achievement->detail }}"
+                                            data-file="{{ $achievement->file }}">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                         <button type="button" class="btn btn-danger btn-sm delete-achievement" data-id="{{ $achievement->id }}">
@@ -196,7 +197,7 @@
                             </tr>
                             @empty
                             <tr id="no-achievements">
-                                <td colspan="6" class="text-center py-3 text-muted">Tidak ada data prestasi</td>
+                                <td colspan="7" class="text-center py-3 text-muted">Tidak ada data prestasi</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -232,7 +233,7 @@
                                 <th style="width: 15%;">Kategori</th>
                                 <th style="width: 15%;">Tanggal</th>
                                 <th style="width: 20%;">Lampiran</th>
-                                <th style="width: 30%;">Detail</th>
+                                <th style="width: 30%;">Keterangan</th>
                                 @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
                                 <th style="width: 10%;">Aksi</th>
                                 @endif
@@ -246,35 +247,53 @@
                                 <td>{{ $misconduct->category }}</td>
                                 <td>{{ date('d F Y', strtotime($misconduct->date)) }}</td>
                                 <td>
-                                @if($misconduct->file)
-                                <a href="{{ Storage::url($misconduct->file) }}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-paperclip me-1"></i>Lihat Lampiran</a>
-                                @endif
-                                </td> 
+                                    @if($misconduct->file)
+                                    <a href="{{ Storage::url($misconduct->file) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-paperclip me-1"></i>Lihat Lampiran
+                                    </a>
+                                    @endif
+                                </td>
                                 <td>{{ $misconduct->detail }}</td>
+                            
+                                {{-- INI SELALU MEMUNCULKAN KOLOM <td> AGAR TIDAK LOMPAT BARIS --}}
                                 <td>
                                     @can('edit-student')
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-warning btn-sm edit-misconduct" 
-                                            data-id="{{ $misconduct->id }}"
-                                            data-name="{{ $misconduct->name }}"
-                                            data-category="{{ $misconduct->category }}"
-                                            data-date="{{ $misconduct->date }}"
-                                            data-detail="{{ $misconduct->detail }}">
-                                            <i class="bi bi-pencil-square"></i>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-light border" type="button" id="dropdownMenuButton{{ $misconduct->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
                                         </button>
-                                        <button type="button" class="btn btn-danger btn-sm delete-misconduct" data-id="{{ $misconduct->id }}">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ $misconduct->id }}">
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('student-misconducts.show', $misconduct->id) }}">
+                                                    <i class="bi bi-eye me-2"></i> Detail
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item edit-misconduct" href="javascript:void(0);"
+                                                    data-id="{{ $misconduct->id }}"
+                                                    data-name="{{ $misconduct->name }}"
+                                                    data-category="{{ $misconduct->category }}"
+                                                    data-date="{{ $misconduct->date }}"
+                                                    data-detail="{{ $misconduct->detail }}">
+                                                    <i class="bi bi-pencil-square me-2"></i> Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger delete-misconduct" href="javascript:void(0);" data-id="{{ $misconduct->id }}">
+                                                    <i class="bi bi-trash me-2"></i> Hapus
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
                                     @endcan
                                 </td>
                             </tr>
                             @empty
                             <tr id="no-misconducts">
-                                <td colspan="6" class="text-center py-3 text-muted">Tidak ada data pelanggaran</td>
+                                <td colspan="7" class="text-center py-3 text-muted">Tidak ada data pelanggaran</td>
                             </tr>
                             @endforelse
-                        </tbody>
+                            </tbody>                            
                     </table>
                 </div>
             </div>

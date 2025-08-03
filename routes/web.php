@@ -62,6 +62,10 @@ Route::middleware(['auth', 'role:Guidance Counselor'])->group(function () {
     Route::post('/counseling/{counseling}/cancel', [CounselingController::class, 'cancel'])->name('counseling.cancel');
 });
 
+Route::middleware(['auth', 'role:Student|Student Parents'])->group(function () {
+    Route::post('/counseling/{counseling}/reschedule', [CounselingController::class, 'reschedule'])->name('counseling.reschedule');
+});
+
 Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(function () {
     Route::resource('counselors', GuruBkController::class);
     Route::resource('counseling', CounselingController::class);
@@ -69,6 +73,7 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
     Route::resource('student-parents', StudentParentController::class)->except(['index', 'show']);
     Route::resource('student-achievements', StudentAchievementController::class);
     Route::resource('student-misconducts', StudentMisconductController::class);
+    Route::get('/student-misconducts/{id}', [StudentMisconductController::class, 'show'])->name('student-misconducts.show');
     Route::get('/students/{student}/export-pdf', [StudentController::class, 'exportPdf'])->name('students.exportPdf');
     Route::post('/students/import', [StudentController::class, 'import'])->name('students.import');
     Route::post('/student-parents/import', [StudentParentController::class, 'import'])->name('student-parents.import');

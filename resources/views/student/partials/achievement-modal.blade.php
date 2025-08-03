@@ -217,17 +217,18 @@ $(document).ready(function() {
                             $(`#achievement-${id}`).remove();
                             
                             // Check if there are any remaining rows except the "no data" row
-                            const remainingRows = $('#achievementsTable tbody tr:not(#no-achievements)').length;
+                            const table = $('h5:contains("Prestasi Siswa")').closest('.card').find('table');
+                            const remainingRows = table.find('tbody tr:not(#no-achievements)').length;
                             
                             if (remainingRows === 0) {
-                                $('#achievementsTable tbody').html(`
+                                table.find('tbody').html(`
                                     <tr id="no-achievements">
-                                        <td colspan="6" class="text-center">Tidak ada data prestasi</td>
+                                        <td colspan="7" class="text-center">Tidak ada data prestasi</td>
                                     </tr>
                                 `);
                             } else {
                                 // Reorder remaining rows
-                                $('#achievementsTable tbody tr:not(#no-achievements)').each(function(index) {
+                                table.find('tbody tr:not(#no-achievements)').each(function(index) {
                                     $(this).find('td:first').text(index + 1);
                                 });
                             }
@@ -248,14 +249,15 @@ $(document).ready(function() {
 
     // Helper function to add new achievement row
     function addAchievementRow(achievement) {
-        const rowCount = $('#achievementsTable tbody tr:not(#no-achievements)').length;
+        const table = $('h5:contains("Prestasi Siswa")').closest('.card').find('table');
+        const rowCount = table.find('tbody tr:not(#no-achievements)').length;
         const newRow = createAchievementRow(achievement, rowCount);
         
         if ($('#no-achievements').length) {
             $('#no-achievements').remove();
         }
         
-        $('#achievementsTable tbody').append(newRow);
+        table.find('tbody').append(newRow);
     }
 
     // Helper function to update existing achievement row
@@ -276,21 +278,28 @@ $(document).ready(function() {
 
         const canEdit = {{ auth()->user()->can('edit-student') ? 'true' : 'false' }};
         
+        let fileHtml = '';
+        if (achievement.file) {
+            fileHtml = `<a href="/storage/${achievement.file}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-paperclip me-1"></i>Lihat Lampiran</a>`;
+        }
+        
         let actionsHtml = '';
         if (canEdit) {
             actionsHtml = `
-                <button type="button" class="btn btn-warning btn-sm edit-achievement"
-                    data-id="${achievement.id}"
-                    data-name="${achievement.name}"
-                    data-category="${achievement.category}"
-                    data-date="${achievement.date}"
-                    data-detail="${achievement.detail}"
-                    data-file="${achievement.file ? achievement.file : ''}">
-                    <i class="bi bi-pencil-square"></i>
-                </button>
-                <button type="button" class="btn btn-danger btn-sm delete-achievement" data-id="${achievement.id}">
-                    <i class="bi bi-trash"></i>
-                </button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-warning btn-sm edit-achievement"
+                        data-id="${achievement.id}"
+                        data-name="${achievement.name}"
+                        data-category="${achievement.category}"
+                        data-date="${achievement.date}"
+                        data-detail="${achievement.detail}"
+                        data-file="${achievement.file ? achievement.file : ''}">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm delete-achievement" data-id="${achievement.id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
             `;
         }
 
@@ -300,6 +309,7 @@ $(document).ready(function() {
                 <td>${achievement.name}</td>
                 <td>${achievement.category}</td>
                 <td>${date}</td>
+                <td>${fileHtml}</td>
                 <td>${achievement.detail}</td>
                 <td>${actionsHtml}</td>
             </tr>

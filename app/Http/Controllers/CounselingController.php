@@ -186,16 +186,30 @@ class CounselingController extends Controller
 
             $user = User::findOrFail($counseling->submitted_by_id);
 
-            $scheduled_at = Carbon::parse($counseling->scheduled_at)->format('d M Y H:i');
+            // Check if scheduled_at exists before formatting
+            $scheduled_at = $counseling->scheduled_at ? Carbon::parse($counseling->scheduled_at)->format('d M Y H:i') : 'Belum dijadwalkan';
             $content = "Konseling {$counseling->title} pada {$scheduled_at} telah disetujui";
-            Notification::create([
-                'user_id' => $counseling->submitted_by_id,
-                'type' => $user->roles->first()->name,
-                'content' => $content,
-                'status' => false,
-            ]);
+            
+            // Create notification with proper error handling
+            try {
+                $notificationData = [
+                    'user_id' => $counseling->submitted_by_id,
+                    'content' => $content,
+                    'status' => false,
+                ];
+                
+                // Only add type if user has roles
+                if ($user->roles && $user->roles->first()) {
+                    $notificationData['type'] = $user->roles->first()->name;
+                }
+                
+                Notification::create($notificationData);
+            } catch (\Exception $notificationError) {
+                // Log notification error but don't fail the whole process
+                \Log::error('Notification creation failed: ' . $notificationError->getMessage());
+            }
 
-            $details = [
+            $contents = [
                 'name' => $user->name,
                 'title' => $counseling->title,
                 'scheduled_at' => $scheduled_at,
@@ -203,16 +217,23 @@ class CounselingController extends Controller
                 'url' => env('APP_URL') . '/counseling/' . $counseling->id
             ];
 
-            Mail::to($user->email)->send(
-                new TestMail("Konseling {$counseling->title} telah disetujui", 'email.counseling.approved', $details)
-            );
+            // Send email with proper error handling
+            try {
+                Mail::to($user->email)->send(
+                    new TestMail("Konseling {$counseling->title} telah disetujui", 'email.counseling.approved', $contents)
+                );
+            } catch (\Exception $emailError) {
+                // Log email error but don't fail the whole process
+                \Log::error('Email sending failed: ' . $emailError->getMessage());
+            }
 
             return redirect()->route('counseling.show', $counseling)
                 ->with('success', 'Konseling berhasil disetujui.');
         } catch (\Exception $e) {
+            \Log::error('Counseling approval failed: ' . $e->getMessage());
             return redirect()
                 ->route('counseling.show', $counseling)
-                ->with('error', 'Terjadi kesalahan saat menyetujui data konseling.');
+                ->with('error', 'Terjadi kesalahan saat menyetujui data konseling: ' . $e->getMessage());
         }
     }
 
@@ -236,16 +257,30 @@ class CounselingController extends Controller
 
             $user = User::findOrFail($counseling->submitted_by_id);
 
-            $scheduled_at = Carbon::parse($counseling->scheduled_at)->format('d M Y H:i');
+            // Check if scheduled_at exists before formatting
+            $scheduled_at = $counseling->scheduled_at ? Carbon::parse($counseling->scheduled_at)->format('d M Y H:i') : 'Belum dijadwalkan';
             $content = "Konseling {$counseling->title} pada {$scheduled_at} ditolak";
-            Notification::create([
-                'user_id' => $counseling->submitted_by_id,
-                'type' => $user->roles->first()->name,
-                'content' => $content,
-                'status' => false,
-            ]);
+            
+            // Create notification with proper error handling
+            try {
+                $notificationData = [
+                    'user_id' => $counseling->submitted_by_id,
+                    'content' => $content,
+                    'status' => false,
+                ];
+                
+                // Only add type if user has roles
+                if ($user->roles && $user->roles->first()) {
+                    $notificationData['type'] = $user->roles->first()->name;
+                }
+                
+                Notification::create($notificationData);
+            } catch (\Exception $notificationError) {
+                // Log notification error but don't fail the whole process
+                \Log::error('Notification creation failed: ' . $notificationError->getMessage());
+            }
 
-            $details = [
+            $contents = [
                 'name' => $user->name,
                 'title' => $counseling->title,
                 'scheduled_at' => $scheduled_at,
@@ -253,16 +288,23 @@ class CounselingController extends Controller
                 'url' => env('APP_URL') . '/counseling/' . $counseling->id
             ];
 
-            Mail::to($user->email)->send(
-                new TestMail("Konseling {$counseling->title} Ditolak", 'email.counseling.rejected', $details)
-            );
+            // Send email with proper error handling
+            try {
+                Mail::to($user->email)->send(
+                    new TestMail("Konseling {$counseling->title} Ditolak", 'email.counseling.rejected', $contents)
+                );
+            } catch (\Exception $emailError) {
+                // Log email error but don't fail the whole process
+                \Log::error('Email sending failed: ' . $emailError->getMessage());
+            }
 
             return redirect()->route('counseling.show', $counseling)
                 ->with('success', 'Konseling berhasil ditolak.');
         } catch (\Exception $e) {
+            \Log::error('Counseling rejection failed: ' . $e->getMessage());
             return redirect()
                 ->route('counseling.show', $counseling)
-                ->with('error', 'Terjadi kesalahan saat menolak data konseling.');
+                ->with('error', 'Terjadi kesalahan saat menolak data konseling: ' . $e->getMessage());
         }
     }
 
@@ -285,16 +327,30 @@ class CounselingController extends Controller
 
             $user = User::findOrFail($counseling->submitted_by_id);
 
-            $scheduled_at = Carbon::parse($counseling->scheduled_at)->format('d M Y H:i');
+            // Check if scheduled_at exists before formatting
+            $scheduled_at = $counseling->scheduled_at ? Carbon::parse($counseling->scheduled_at)->format('d M Y H:i') : 'Belum dijadwalkan';
             $content = "Konseling {$counseling->title} pada {$scheduled_at} dibatalkan";
-            Notification::create([
-                'user_id' => $counseling->submitted_by_id,
-                'type' => $user->roles->first()->name,
-                'content' => $content,
-                'status' => false,
-            ]);
+            
+            // Create notification with proper error handling
+            try {
+                $notificationData = [
+                    'user_id' => $counseling->submitted_by_id,
+                    'content' => $content,
+                    'status' => false,
+                ];
+                
+                // Only add type if user has roles
+                if ($user->roles && $user->roles->first()) {
+                    $notificationData['type'] = $user->roles->first()->name;
+                }
+                
+                Notification::create($notificationData);
+            } catch (\Exception $notificationError) {
+                // Log notification error but don't fail the whole process
+                \Log::error('Notification creation failed: ' . $notificationError->getMessage());
+            }
 
-            $details = [
+            $contents = [
                 'name' => $user->name,
                 'title' => $counseling->title,
                 'scheduled_at' => $scheduled_at,
@@ -302,16 +358,23 @@ class CounselingController extends Controller
                 'url' => env('APP_URL') . '/counseling/' . $counseling->id
             ];
 
-            Mail::to($user->email)->send(
-                new TestMail("Konseling {$counseling->title} Dibatalkan", 'email.counseling.canceled', $details)
-            );
+            // Send email with proper error handling
+            try {
+                Mail::to($user->email)->send(
+                    new TestMail("Konseling {$counseling->title} Dibatalkan", 'email.counseling.canceled', $contents)
+                );
+            } catch (\Exception $emailError) {
+                // Log email error but don't fail the whole process
+                \Log::error('Email sending failed: ' . $emailError->getMessage());
+            }
 
-            return redirect()->route('counseling.index', $counseling)
+            return redirect()->route('counseling.index')
                 ->with('success', 'Konseling berhasil dibatalkan.');
         } catch (\Exception $e) {
+            \Log::error('Counseling cancellation failed: ' . $e->getMessage());
             return redirect()
                 ->route('counseling.show', $counseling)
-                ->with('error', 'Terjadi kesalahan saat membatalkan data konseling.');
+                ->with('error', 'Terjadi kesalahan saat membatalkan data konseling: ' . $e->getMessage());
         }
     }
 

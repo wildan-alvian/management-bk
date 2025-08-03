@@ -1,6 +1,6 @@
 <!-- Misconduct Modal -->
 <div class="modal fade" id="misconductModal" tabindex="-1" aria-labelledby="misconductModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header border-bottom">
                 <h5 class="modal-title fw-bold" id="misconductModalLabel">Tambah Pelanggaran</h5>
@@ -11,48 +11,67 @@
                 <input type="hidden" name="student_id" value="{{ $student->student->id }}">
                 <input type="hidden" name="misconduct_id" id="misconduct_id">
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <div class="text-start">
-                            <label for="misconduct_name" class="form-label fw-bold">Nama Pelanggaran</label>
+                    <!-- Existing fields -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="misconduct_name" class="form-label fw-bold">Nama Pelanggaran</label>
+                                <input type="text" class="form-control" id="misconduct_name" name="name" required>
+                                <div class="invalid-feedback" id="misconduct-name-error"></div>
+                            </div>
                         </div>
-                        <input type="text" class="form-control" id="misconduct_name" name="name" required>
-                        <div class="invalid-feedback" id="misconduct-name-error"></div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="misconduct_category" class="form-label fw-bold">Kategori</label>
+                                <select class="form-select" id="misconduct_category" name="category" required>
+                                    <option value="">Pilih Kategori</option>
+                                    <option value="Ringan">Ringan</option>
+                                    <option value="Sedang">Sedang</option>
+                                    <option value="Berat">Berat</option>
+                                </select>
+                                <div class="invalid-feedback" id="misconduct-category-error"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <div class="text-start">
-                            <label for="misconduct_category" class="form-label fw-bold">Kategori</label>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="misconduct_date" class="form-label fw-bold">Tanggal</label>
+                                <input type="date" class="form-control" id="misconduct_date" name="date" required>
+                                <div class="invalid-feedback" id="misconduct-date-error"></div>
+                            </div>
                         </div>
-                        <select class="form-select" id="misconduct_category" name="category" required>
-                            <option value="">Pilih Kategori</option>
-                            <option value="Ringan">Ringan</option>
-                            <option value="Sedang">Sedang</option>
-                            <option value="Berat">Berat</option>
-                        </select>
-                        <div class="invalid-feedback" id="misconduct-category-error"></div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="misconduct_file" class="form-label fw-bold">File Pelanggaran (opsional)</label>
+                                <div class="d-flex align-items-center">
+                                    <input type="file" class="form-control" id="misconduct_file" name="file" accept=".png,.jpg,.jpeg,.pdf">
+                                    <div id="misconduct-file-action-icons" class="ms-2"></div>
+                                </div>
+                                <div class="invalid-feedback" id="misconduct-file-error"></div>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="mb-3">
-                        <div class="text-start">
-                            <label for="misconduct_date" class="form-label fw-bold">Tanggal</label>
-                        </div>
-                        <input type="date" class="form-control" id="misconduct_date" name="date" required>
-                        <div class="invalid-feedback" id="misconduct-date-error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="text-start">
-                            <label for="misconduct_detail" class="form-label fw-bold">Detail</label>
-                        </div>
+                        <label for="misconduct_detail" class="form-label fw-bold">Detail</label>
                         <textarea class="form-control" id="misconduct_detail" name="detail" rows="3" required></textarea>
                         <div class="invalid-feedback" id="misconduct-detail-error"></div>
                     </div>
+
+                    <!-- TINDAK LANJUT SECTION -->
+                    <hr>
+                    <h6 class="fw-bold">Tindak Lanjut</h6>
                     <div class="mb-3">
-                        <div class="d-flex align-items-center">
-                            <div class="text-start">
-                                <label for="misconduct_file" class="form-label fw-bold">File Pelanggaran (opsional)</label>
-                            </div>
-                            <div id="misconduct-file-action-icons" class="ms-auto"></div>
-                        </div>
-                        <input type="file" class="form-control" id="misconduct_file" name="file" accept=".png,.jpg,.jpeg,.pdf">
-                        <div class="invalid-feedback" id="misconduct-file-error"></div>
+                        <label for="followup_notes" class="form-label fw-bold">Catatan</label>
+                        <textarea class="form-control" id="followup_notes" name="followup_notes" rows="3"></textarea>
+                        <div class="invalid-feedback" id="followup-notes-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="followup_file" class="form-label fw-bold">File Tindak Lanjut (opsional)</label>
+                        <input type="file" class="form-control" id="followup_file" name="followup_file" accept=".png,.jpg,.jpeg,.pdf">
+                        <div class="invalid-feedback" id="followup-file-error"></div>
                     </div>
                 </div>
                 <div class="modal-footer border-top">
@@ -129,11 +148,24 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr) {
+                console.log(xhr);
                 if (xhr.status === 422) {
                     const errors = xhr.responseJSON.errors;
                     Object.keys(errors).forEach(field => {
-                        $(`#misconduct_${field}`).addClass('is-invalid');
-                        $(`#misconduct-${field}-error`).text(errors[field][0]);
+                        let fieldId, errorId;
+                        
+                        if (field.startsWith('followup_')) {
+                            // Handle follow-up fields
+                            fieldId = `#${field}`;
+                            errorId = `#${field.replace('_', '-')}-error`;
+                        } else {
+                            // Handle misconduct fields
+                            fieldId = `#misconduct_${field.replace('.', '_')}`;
+                            errorId = `#misconduct-${field.replace('.', '-')}-error`;
+                        }
+                        
+                        $(fieldId).addClass('is-invalid');
+                        $(errorId).text(errors[field][0]);
                     });
                 } else {
                     Swal.fire({
@@ -221,7 +253,7 @@ $(document).ready(function() {
                             if (remainingRows === 0) {
                                 $('#misconductsTable tbody').html(`
                                     <tr id="no-misconducts">
-                                        <td colspan="6" class="text-center">Tidak ada data pelanggaran</td>
+                                        <td colspan="7" class="text-center">Tidak ada data pelanggaran</td>
                                     </tr>
                                 `);
                             } else {
@@ -302,21 +334,42 @@ $(document).ready(function() {
 
         const canEdit = {{ auth()->user()->can('edit-student') ? 'true' : 'false' }};
         
+        let fileHtml = '';
+        if (misconduct.file) {
+            fileHtml = `<a href="/storage/${misconduct.file}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-paperclip me-1"></i>Lihat Lampiran</a>`;
+        }
+        
         let actionsHtml = '';
         if (canEdit) {
             actionsHtml = `
-                <button type="button" class="btn btn-warning btn-sm edit-misconduct"
-                    data-id="${misconduct.id}"
-                    data-name="${misconduct.name}"
-                    data-category="${misconduct.category}"
-                    data-date="${misconduct.date}"
-                    data-detail="${misconduct.detail}"
-                    data-file="${misconduct.file}">
-                    <i class="bi bi-pencil-square"></i>
-                </button>
-                <button type="button" class="btn btn-danger btn-sm delete-misconduct" data-id="${misconduct.id}">
-                    <i class="bi bi-trash"></i>
-                </button>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light border" type="button" id="dropdownMenuButton${misconduct.id}" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton${misconduct.id}">
+                        <li>
+                            <a class="dropdown-item" href="/student-misconducts/${misconduct.id}">
+                                <i class="bi bi-eye me-2"></i> Detail
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item edit-misconduct" href="javascript:void(0);"
+                                data-id="${misconduct.id}"
+                                data-name="${misconduct.name}"
+                                data-category="${misconduct.category}"
+                                data-date="${misconduct.date}"
+                                data-detail="${misconduct.detail}"
+                                data-file="${misconduct.file}">
+                                <i class="bi bi-pencil-square me-2"></i> Edit
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-danger delete-misconduct" href="javascript:void(0);" data-id="${misconduct.id}">
+                                <i class="bi bi-trash me-2"></i> Hapus
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             `;
         }
 
@@ -326,6 +379,7 @@ $(document).ready(function() {
                 <td>${misconduct.name}</td>
                 <td>${misconduct.category}</td>
                 <td>${date}</td>
+                <td>${fileHtml}</td>
                 <td>${misconduct.detail}</td>
                 <td>${actionsHtml}</td>
             </tr>
@@ -336,6 +390,12 @@ $(document).ready(function() {
     function clearMisconductErrors() {
         $('.is-invalid').removeClass('is-invalid');
         $('.invalid-feedback').text('');
+        
+        // Also clear follow-up specific errors
+        $('#followup_notes').removeClass('is-invalid');
+        $('#followup-notes-error').text('');
+        $('#followup_file').removeClass('is-invalid');
+        $('#followup-file-error').text('');
     }
 });
 </script>

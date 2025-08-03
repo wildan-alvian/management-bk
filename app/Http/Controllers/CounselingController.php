@@ -266,8 +266,7 @@ class CounselingController extends Controller
         }
     }
 
-    public function cancel(Request $request, Counseling $counseling)
-    {
+    public function cancel(Request $request, Counseling $counseling) {
         // Check if user is Guidance Counselor
         if (!auth()->user()->hasRole('Guidance Counselor')) {
             return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk membatalkan konseling.');
@@ -313,6 +312,89 @@ class CounselingController extends Controller
             return redirect()
                 ->route('counseling.show', $counseling)
                 ->with('error', 'Terjadi kesalahan saat membatalkan data konseling.');
+        }
+    }
+
+    public function reschedule(Request $request, Counseling $counseling) {
+        // Check if user is authorized to reschedule this counseling
+        if (!auth()->user()->hasAnyRole(['Student', 'Student Parents']) || 
+            $counseling->submitted_by_id !== auth()->id()) {
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mereschedule konseling ini.');
+        }
+
+        // Check if counseling status allows rescheduling
+        if (!in_array($counseling->status, ['approved', 'new']) || $counseling->status === 'canceled') {
+            return redirect()->back()->with('error', 'Status konseling tidak memungkinkan untuk direschedule.');
+        }
+
+        // Validate request
+        $request->validate([
+            'scheduled_at' => 'required|date|after:now',
+            'reschedule_reason' => 'nullable|string|max:500',
+        ], [
+            'scheduled_at.required' => 'Jadwal baru harus diisi.',
+            'scheduled_at.date' => 'Format jadwal tidak valid.',
+            'scheduled_at.after' => 'Jadwal baru harus setelah waktu sekarang.',
+            'reschedule_reason.max' => 'Alasan reschedule maksimal 500 karakter.',
+        ]);
+
+        try {
+            $oldScheduledAt = $counseling->scheduled_at;
+            
+            $counseling->update([
+                'status' => 'new',
+                'scheduled_at' => $request->scheduled_at,
+                'old_date' => $oldScheduledAt ?: null,
+                'reschedule_note' => $request->reschedule_reason
+            ]);
+
+            $user = User::findOrFail($counseling->submitted_by_id);
+
+            $oldScheduledFormatted = $oldScheduledAt ? Carbon::parse($oldScheduledAt)->format('d M Y H:i') : 'Belum dijadwalkan';
+            $newScheduledFormatted = Carbon::parse($request->scheduled_at)->format('d M Y H:i');
+            
+            $content = ($oldScheduledAt && $oldScheduledAt != 'Belum dijadwalkan') 
+                ? "$user->name mengajukan penjadwalan ulang Konseling {$counseling->title} dari {$oldScheduledFormatted} menjadi {$newScheduledFormatted}"
+                : "$user->name mengajukan jadwal baru untuk Konseling {$counseling->title} pada {$newScheduledFormatted}";
+            
+            // Create notification for guidance counselors
+            Notification::create([
+                'type' => 'Guidance Counselor',
+                'content' => $content,
+                'status' => false,
+            ]);
+
+            $details = [
+                'name' => $user->name,
+                'title' => $counseling->title,
+                'old_scheduled_at' => $oldScheduledFormatted,
+                'new_scheduled_at' => $newScheduledFormatted,
+                'reschedule_reason' => $request->reschedule_reason,
+                'url' => env('APP_URL') . '/counseling/' . $counseling->id
+            ];
+
+            // Send email to all guidance counselors
+            $emailSubject = ($oldScheduledAt && $oldScheduledAt != 'Belum dijadwalkan') 
+                ? 'Ada pengajuan penjadwalan ulang konseling'
+                : 'Ada pengajuan jadwal baru konseling';
+                
+            $guidanceCounselors = User::role('Guidance Counselor')->get();
+            foreach ($guidanceCounselors as $guidanceCounselor) {
+                Mail::to($guidanceCounselor->email)->send(
+                    new TestMail($emailSubject, 'email.counseling.reschedule', $details)
+                );
+            }
+
+            $successMessage = ($oldScheduledAt && $oldScheduledAt != 'Belum dijadwalkan') 
+                ? 'Pengajuan penjadwalan ulang konseling berhasil dikirim. Tim konseling akan meninjau permintaan Anda.'
+                : 'Pengajuan jadwal baru konseling berhasil dikirim. Tim konseling akan meninjau permintaan Anda.';
+                
+            return redirect()->route('counseling.index')
+                ->with('success', $successMessage);
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('counseling.index')
+                ->with('error', 'Terjadi kesalahan saat mengajukan penjadwalan ulang konseling: ' . $e->getMessage());
         }
     }
 }

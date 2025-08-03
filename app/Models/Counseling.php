@@ -13,16 +13,19 @@ class Counseling extends Model
 
     protected $fillable = [
         'scheduled_at',
+        'old_date',
         'submitted_by',
         'submitted_by_id',
         'counseling_type',
         'title',
         'status',
         'notes',
+        'reschedule_note',
         'description'
     ];
     protected $casts = [
         'scheduled_at' => 'datetime',
+        'old_date' => 'datetime',
     ];
 
     public function submittedByUser()

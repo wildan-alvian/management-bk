@@ -45,6 +45,9 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Tanggal & Waktu Konseling</label>
                                 <input type="text" class="form-control" value="{{ $counseling->scheduled_at->format('d F Y H:i') }}" disabled>
+                                @if($counseling->old_date)
+                                <small class="text-muted">Rescheduled dari: {{ $counseling->old_date->format('d F Y H:i') }}</small>
+                                @endif
                             </div>
                         </div>
                         <div class="mb-3">
@@ -56,6 +59,13 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Catatan</label>
                             <textarea class="form-control" rows="4" disabled>{{ $counseling->notes }}</textarea>
+                        </div>
+                        @endif
+
+                        @if($counseling->reschedule_note)
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Alasan Reschedule</label>
+                            <textarea class="form-control" rows="3" disabled>{{ $counseling->reschedule_note }}</textarea>
                         </div>
                         @endif
 
@@ -101,9 +111,12 @@
                     <h5 class="mb-0 fw-bold fs-5">
                        </i> Tindak Lanjut Konseling
                     </h5>
+
+                    @hasanyrole('Admin|Super Admin|Guidance Counselor')
                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambah">
                         <i class="bi bi-plus-lg me-1"></i> Tambah Tindak Lanjut
                     </button>
+                    @endhasanyrole
                 </div>
             
                <div class="table-responsive" style="min-height: fit-content">
@@ -113,7 +126,9 @@
                                 <th style="width: 50px;">No</th>
                                 <th>Deskripsi</th>
                                 <th style="width: 160px;">Tanggal</th>
+                                @hasanyrole('Admin|Super Admin|Guidance Counselor')
                                 <th style="width: 150px;">Aksi</th>
+                                @endhasanyrole
                             </tr>
                         </thead>
                         <tbody>
@@ -123,12 +138,14 @@
                                 <td class="text-start text-secondary">{{ $tindaklanjut->description }}</td>
                                 <td>{{ \Carbon\Carbon::parse($tindaklanjut->tanggal ?? $tindaklanjut->created_at)->format('d F Y') }}</td>
                                 <td>
+                                    @hasanyrole('Admin|Super Admin|Guidance Counselor')
                                     <button class="btn btn-warning btn-sm me-1" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $tindaklanjut->id }}" title="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalHapus{{ $tindaklanjut->id }}" title="Hapus">
                                         <i class="bi bi-trash"></i>
                                     </button>
+                                    @endhasanyrole
                                 </td>
                             </tr>
                             <tr>

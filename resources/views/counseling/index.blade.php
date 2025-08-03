@@ -78,7 +78,9 @@
             @forelse ($counselings as $index => $counseling)
                 <tr>
                     <td>{{ $counselings->firstItem() + $index }}</td>
-                    <td>{{ $counseling->scheduled_at ? \Carbon\Carbon::parse($counseling->scheduled_at)->format('d M Y H:i') : '-' }}</td>
+                    <td>
+                        {{ $counseling->scheduled_at ? \Carbon\Carbon::parse($counseling->scheduled_at)->format('d M Y H:i') : '-' }}
+                    </td>
                     <td>{{ $counseling->submitted_by ?? '-' }}</td>
                     <td>{{ ucfirst(str_replace('_', ' ', $counseling->counseling_type)) }}</td>
                     <td>{{ $counseling->title }}</td>
@@ -99,6 +101,12 @@
                                 <a class="dropdown-item" href="{{ route('counseling.show', $counseling->id) }}">
                                     <i class="bi bi-eye me-2"></i>Detail
                                 </a> 
+                                @if(Auth::user()->hasRole(['Student', 'Student Parents']) && $counseling->submitted_by_id == Auth::id() && in_array($counseling->status, ['approved', 'new']) && $counseling->status !== 'canceled')
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#rescheduleModal{{ $counseling->id }}">
+                                        <i class="bi bi-calendar-event me-2"></i>{{ $counseling->scheduled_at ? 'Reschedule' : 'Set Jadwal' }}
+                                    </a>
+                                @endif
                                 @if(Auth::user()->hasRole(['Guidance Counselor']) && $counseling->status !== 'canceled')
                                     <div class="dropdown-divider"></div>  
                                     <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $counseling->id }}">
@@ -119,6 +127,10 @@
                         </div>
 
                         
+                        @if(Auth::user()->hasRole(['Student', 'Student Parents']) && $counseling->submitted_by_id == Auth::id() && in_array($counseling->status, ['approved', 'new']) && $counseling->status !== 'canceled')
+                            @include('counseling.partials._reschedule_modal', ['counseling' => $counseling])
+                        @endif
+
                         @if(Auth::user()->hasRole(['Guidance Counselor']))
                             @include('counseling.partials._cancel_modal', ['counseling' => $counseling])
                         @endif

@@ -6,6 +6,7 @@
     <h4 class="fw-bold mb-0">
         <i class="bi bi-person-lines-fill me-2"></i>Detail Data Siswa
     </h4>
+    
     <div class="d-flex gap-2">
         @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
             <a href="{{ route('students.exportPdf', $student->id) }}" class="btn btn-outline-danger">
@@ -234,9 +235,7 @@
                                 <th style="width: 15%;">Tanggal</th>
                                 <th style="width: 20%;">Lampiran</th>
                                 <th style="width: 30%;">Keterangan</th>
-                                @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
                                 <th style="width: 10%;">Aksi</th>
-                                @endif
                                 </tr>
                         </thead>
                         <tbody>
@@ -257,7 +256,6 @@
                             
                                 {{-- INI SELALU MEMUNCULKAN KOLOM <td> AGAR TIDAK LOMPAT BARIS --}}
                                 <td>
-                                    @can('edit-student')
                                     <div class="dropdown">
                                         <button class="btn btn-sm btn-light border" type="button" id="dropdownMenuButton{{ $misconduct->id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="bi bi-three-dots-vertical"></i>
@@ -268,6 +266,7 @@
                                                     <i class="bi bi-eye me-2"></i> Detail
                                                 </a>
                                             </li>
+                                            @can('edit-student')
                                             <li>
                                                 <a class="dropdown-item edit-misconduct" href="javascript:void(0);"
                                                     data-id="{{ $misconduct->id }}"

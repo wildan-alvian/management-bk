@@ -72,8 +72,7 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
     Route::resource('students', StudentController::class)->except(['index', 'show']);
     Route::resource('student-parents', StudentParentController::class)->except(['index', 'show']);
     Route::resource('student-achievements', StudentAchievementController::class);
-    Route::resource('student-misconducts', StudentMisconductController::class);
-    Route::get('/student-misconducts/{id}', [StudentMisconductController::class, 'show'])->name('student-misconducts.show');
+    Route::resource('student-misconducts', StudentMisconductController::class)->except(['show']);
     Route::get('/students/{student}/export-pdf', [StudentController::class, 'exportPdf'])->name('students.exportPdf');
     Route::post('/students/import', [StudentController::class, 'import'])->name('students.import');
     Route::post('/student-parents/import', [StudentParentController::class, 'import'])->name('student-parents.import');
@@ -86,6 +85,7 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
 
 // Student viewing routes with broader access
 Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor|Student|Student Parents'])->group(function () {
+    Route::get('/student-misconducts/{id}', [StudentMisconductController::class, 'show'])->name('student-misconducts.show');
     Route::get('/student-parents', [StudentParentController::class, 'index'])->name('student-parents.index');
     Route::get('/student-parents/{id}', [StudentParentController::class, 'show'])->name('student-parents.show');
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');

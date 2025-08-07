@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Counseling;
-use App\Models\TindakLanjut;
+use App\Models\Tindaklanjut;
 use App\Models\User;
 use App\Models\Notification;
 use App\Mail\TestMail;
@@ -160,7 +160,7 @@ class CounselingController extends Controller
     public function show($id)
     {
         $counseling = Counseling::findOrFail($id);
-        $tindaklanjuts = TindakLanjut::where('counseling_id', $id)->get();
+        $tindaklanjuts = Tindaklanjut::where('counseling_id', $id)->get();
     
         return view('counseling.show', compact('counseling', 'tindaklanjuts'));
     }    

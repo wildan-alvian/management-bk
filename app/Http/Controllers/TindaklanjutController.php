@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TindakLanjut;
+use App\Models\Tindaklanjut;
 use App\Models\Counseling;
 use Illuminate\Http\Request;
 
-class TindakLanjutController extends Controller
+class TindaklanjutController extends Controller
 {
     public function store(Request $request)
     {
@@ -32,17 +32,17 @@ class TindakLanjutController extends Controller
             'tanggal' => 'required|date',
         ]);
 
-        $tindakLanjut = TindakLanjut::findOrFail($id);
-        $tindakLanjut->description = $request->description;
-        $tindakLanjut->tanggal = $request->tanggal;
-        $tindakLanjut->save();
+        $tindaklanjut = tindaklanjut::findOrFail($id);
+        $tindaklanjut->description = $request->description;
+        $tindaklanjut->tanggal = $request->tanggal;
+        $tindaklanjut->save();
 
         return redirect()->back()->with('success', 'Tindak lanjut berhasil diperbarui');
     }
 
-    public function destroy(tindaklanjut $tindakLanjut)
+    public function destroy(tindaklanjut $tindaklanjut)
     {
-        $tindakLanjut->delete();
+        $tindaklanjut->delete();
         return redirect()->back()->with('success', 'Tindak lanjut berhasil dihapus.');
     }
 }

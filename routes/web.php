@@ -13,6 +13,7 @@ use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TindakLanjutController;
+use App\Http\Controllers\PresensiController;
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -81,6 +82,9 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor'])->group(
     Route::post('/counseling/{id}/tindaklanjut', [tindaklanjutController::class, 'store'])->name('tindaklanjut.store');
     Route::put('/tindaklanjut/{tindaklanjut}', [tindaklanjutController::class, 'update'])->name('tindaklanjut.update');
     Route::delete('/tindaklanjut/{tindaklanjut}', [tindaklanjutController::class, 'destroy'])->name('tindaklanjut.destroy');
+    Route::get('/misconducts/{id}/export-pdf', [StudentMisconductController::class, 'exportPdf'])
+    ->name('misconducts.exportPdf');
+    Route::get('/presensi/export', [PresensiController::class, 'export'])->name('presensi.export');
 });
 
 // Student viewing routes with broader access
@@ -91,6 +95,7 @@ Route::middleware(['auth', 'role:Super Admin|Admin|Guidance Counselor|Student|St
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
     Route::get('/counseling/{counseling}', [CounselingController::class, 'show'])->name('counseling.show');
+    Route::resource('presensi', PresensiController::class);
 });
 
 Route::get('/counseling', [CounselingController::class, 'index'])

@@ -613,6 +613,10 @@
                 <i class="bi bi-file-earmark-text"></i>
                 <span>Data Konseling</span>
             </a>
+            <a href="{{ route('presensi.index') }}" class="nav-link {{ request()->routeIs('presensi.index') ? 'active' : '' }}">
+                <i class="bi bi-journal-check"></i>
+                <span>Absensi</span>
+            </a>
             @endif
         </nav>
 

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StudentMisconductController extends Controller
 {
@@ -211,6 +212,18 @@ class StudentMisconductController extends Controller
 {
     $misconduct = StudentMisconduct::with('followUp')->findOrFail($id);
     return view('student.misconduct-show', compact('misconduct'));
+}
+
+public function exportPdf($id)
+{
+    $misconduct = StudentMisconduct::with('followUp')->findOrFail($id);
+
+    $pdf = Pdf::loadView('student.export_pdf', compact('misconduct'))
+              ->setPaper('a4', 'portrait');
+
+    $fileName = 'Pelanggaran_Siswa_' . $misconduct->id . '.pdf';
+
+    return $pdf->download($fileName);
 }
 
 }

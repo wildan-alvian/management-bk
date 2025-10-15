@@ -11,47 +11,55 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class PresensiController extends Controller
 {
-public function index(Request $request)
-{
-    $user = auth()->user(); // ini wajib, supaya $user tidak undefined
-    $query = Presensi::with('user')->latest();
+    public function index(Request $request)
+    {
+        $user = auth()->user(); // ini wajib, supaya $user tidak undefined
+        $query = Presensi::with(['user.student'])->latest(); // ← pastikan student di-load
 
-    // Jika role student → hanya presensi dirinya
-    if ($user->hasRole('Student')) {
-        $query->where('user_id', $user->id);
-    }
+        // Jika role student → hanya presensi dirinya
+        if ($user->hasRole('Student')) {
+            $query->where('user_id', $user->id);
+        }
 
-    // Jika role student parent → hanya presensi anak-anaknya
-if ($user->hasRole('Student Parents')) {
-    $studentParent = $user->studentParent; // relasi 1-1 ke tabel student_parents
-    if ($studentParent) {
-        $parentId = $studentParent->id;
+        // Jika role student parent → hanya presensi anak-anaknya
+        if ($user->hasRole('Student Parents')) {
+            $studentParent = $user->studentParent; // relasi 1-1 ke tabel student_parents
+            if ($studentParent) {
+                $parentId = $studentParent->id;
 
-        $query->whereHas('user.student', function ($q) use ($parentId) {
-            // tadinya hanya where, sekarang pakai whereIn agar bisa lebih dari 1 anak
-            $q->whereIn('student_parent_id', [$parentId]);
-        });
-    }
-}
+                $query->whereHas('user.student', function ($q) use ($parentId) {
+                    $q->whereIn('student_parent_id', [$parentId]);
+                });
+            }
+        }
 
-    // Filter pencarian
-    if ($request->filled('search')) {
+        if ($request->filled('search')) {
         $search = $request->search;
         $query->where(function ($q) use ($search) {
             $q->whereHas('user', function ($sub) use ($search) {
-                $sub->where('name', 'like', "%{$search}%");
+                $sub->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('student', function($s) use ($search) {
+                        $s->where('nisn', 'like', "%{$search}%")
+                        ->orWhere('class', 'like', "%{$search}%"); // <-- kolom class
+                    });
             })
             ->orWhere('status', 'like', "%{$search}%");
         });
     }
+// Filter kelas
+    if ($request->filled('kelas')) {
+        $kelas = $request->kelas;
+        $query->whereHas('user.student', function ($q) use ($kelas) {
+            $q->where('class', $kelas);
+        });
+    }
 
-    $presensi = $query->paginate(10);
+    $presensi = $query->paginate(10)->withQueryString(); // supaya query string search & kelas tetap ada di pagination
 
     return view('presensi.index', compact('presensi'));
 }
 
-
-   public function store(Request $request)
+    public function store(Request $request)
 {
     $data = $request->validate([
         'status' => 'required|string',
@@ -84,18 +92,31 @@ if ($user->hasRole('Student Parents')) {
         $data['foto'] = $filename;
     }
 
-    Presensi::create($data);
+    // Simpan presensi
+     $presensi = Presensi::create($data);
+
+    // Jika terlambat → otomatis simpan pelanggaran
+    if ($presensi->status === 'terlambat') {
+        \App\Models\StudentMisconduct::create([
+            'student_id' => Auth::user()->student->id,
+            'name'       => 'Terlambat Masuk Sekolah',
+            'category'   => 'ringan',
+            'date'       => now()->toDateString(),
+            'detail'     => 'Siswa terlambat hadir pada jam ' . now()->format('H:i'),
+            'file'       => $lampiranPath ?? null, // ambil langsung dari upload
+        ]);
+    }
+
 
     return redirect()->route('presensi.index')->with('success', 'Presensi berhasil ditambahkan');
 }
-
 
     // ===============================
     // Edit Data Presensi
     // ===============================
     public function edit($id)
     {
-        $presensi = Presensi::findOrFail($id);
+        $presensi = Presensi::with('user.student')->findOrFail($id); // ← pastikan student di-load
         return view('presensi.edit', compact('presensi'));
     }
 
@@ -115,7 +136,6 @@ if ($user->hasRole('Student Parents')) {
 
         // Update lampiran kalau ada file baru
         if ($request->hasFile('lampiran')) {
-            // hapus file lama kalau ada
             if ($presensi->lampiran && Storage::disk('public')->exists($presensi->lampiran)) {
                 Storage::disk('public')->delete($presensi->lampiran);
             }
@@ -161,28 +181,28 @@ if ($user->hasRole('Student Parents')) {
     }
 
     public function show($id)
-{
-    $presensi = Presensi::with('user')->findOrFail($id);
-    return view('presensi.show', compact('presensi'));
-}
-
-public function export(Request $request)
-{
-    $query = Presensi::with('user')->latest();
-
-    // Filter pencarian sama dengan index
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->whereHas('user', function ($sub) use ($search) {
-                $sub->where('name', 'like', "%{$search}%");
-            })
-            ->orWhere('status', 'like', "%{$search}%");
-        });
+    {
+        $presensi = Presensi::with('user.student')->findOrFail($id); // ← pastikan student di-load
+        return view('presensi.show', compact('presensi'));
     }
 
-    $presensi = $query->get();
+    public function export(Request $request)
+    {
+        $query = Presensi::with('user.student')->latest(); // ← pastikan student di-load
 
-    return Excel::download(new PresensiExport($presensi), 'presensi.xlsx');
-}
+        // Filter pencarian sama dengan index
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%");
+                })
+                ->orWhere('status', 'like', "%{$search}%");
+            });
+        }
+
+        $presensi = $query->get();
+
+        return Excel::download(new PresensiExport($presensi), 'presensi.xlsx');
+    }
 }

@@ -30,7 +30,7 @@
     </form>
     <div class="dropdown">
       <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="bi bi-funnel me-1"></i>
+        <i class="bi bi-filter me-1"></i>
       </button>
       <ul class="dropdown-menu" aria-labelledby="filterDropdown">
         <li><h6 class="dropdown-header">Status</h6></li>
@@ -38,10 +38,12 @@
         <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'approved'])) }}">Approved</a></li>
         <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'rejected'])) }}">Rejected</a></li>
         <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['status' => 'canceled'])) }}">Canceled</a></li>
+        @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
         <li><hr class="dropdown-divider"></li>
         <li><h6 class="dropdown-header">Tipe Konseling</h6></li>
         <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['counseling_type' => 'siswa'])) }}">Siswa</a></li>
         <li><a class="dropdown-item" href="{{ route('counseling.index', array_merge(request()->except('page'), ['counseling_type' => 'wali_murid'])) }}">Wali Murid</a></li>
+         @endif
       </ul>
     </div>
     @if(request('status') || request('counseling_type'))

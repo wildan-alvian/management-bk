@@ -15,7 +15,7 @@
         @can('create-student')
         <div class="dropdown">
             <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-funnel-fill me-1"></i>
+                <i class="bi bi-filter me-1"></i>
             </button>
             <ul class="dropdown-menu" aria-labelledby="filterDropdown">
                 <li><a class="dropdown-item {{ request('class_filter') == '7' ? 'active' : '' }}" href="?class_filter=7">Kelas 7</a></li>

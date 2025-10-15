@@ -25,44 +25,54 @@
                 <video id="videoEdit{{ $p->id }}" width="100%" autoplay></video>
                 <canvas id="canvasEdit{{ $p->id }}" class="d-none"></canvas>
                 <input type="hidden" name="foto" id="fotoInputEdit{{ $p->id }}" value="{{ $p->foto ?? '' }}">
+
+                <!-- Preview -->
+                <div class="mt-2 d-none" id="previewSectionEdit{{ $p->id }}">
+                    <label>Preview Foto</label><br>
+                    <img id="fotoPreviewEdit{{ $p->id }}" class="img-fluid rounded border" alt="Hasil Foto">
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-warning btn-sm ulangiBtnEdit" data-id="{{ $p->id }}">Ulangi Foto</button>
+                    </div>
+                </div>
+
+                <!-- Foto lama -->
                 @if($p->foto)
                     <div class="mt-2">
                         <small class="text-muted">Foto saat ini:</small><br>
                         <img src="{{ asset('storage/' . $p->foto) }}" alt="Foto" width="100px">
                     </div>
                 @endif
+
                 <button type="button" class="btn btn-success mt-2 captureBtnEdit" data-id="{{ $p->id }}">Ambil Foto</button>
             </div>
 
-         <!-- Section Izin / Dispensasi -->
-        <div class="mb-3 d-none descLampiranSectionEdit" id="descLampiranSectionEdit{{ $p->id }}">
-            <label>Deskripsi</label>
-            <textarea class="form-control" name="deskripsi">{{ $p->deskripsi }}</textarea>
-            
-            <label class="mt-2">Lampiran (PDF / Gambar)</label>
-            <input type="file" name="lampiran" class="form-control" accept=".pdf,image/png,image/jpeg,image/jpg">
+            <!-- Section Izin / Dispensasi -->
+            <div class="mb-3 d-none descLampiranSectionEdit" id="descLampiranSectionEdit{{ $p->id }}">
+                <label>Deskripsi</label>
+                <textarea class="form-control" name="deskripsi">{{ $p->deskripsi }}</textarea>
+                
+                <label class="mt-2">Lampiran (PDF / Gambar)</label>
+                <input type="file" name="lampiran" class="form-control" accept=".pdf,image/png,image/jpeg,image/jpg">
 
-           @if($p->lampiran)
-            <div class="mt-1">
-                <small class="text-muted">File saat ini: </small>
-                @php
-                    $ext = strtolower(pathinfo($p->lampiran, PATHINFO_EXTENSION));
-                @endphp
+                @if($p->lampiran)
+                    <div class="mt-1">
+                        <small class="text-muted">File saat ini: </small>
+                        @php
+                            $ext = strtolower(pathinfo($p->lampiran, PATHINFO_EXTENSION));
+                        @endphp
 
-                @if(in_array($ext, ['jpg','jpeg','png']))
-                    <a href="{{ asset('storage/' . $p->lampiran) }}" target="_blank">
-                        <img src="{{ asset('storage/' . $p->lampiran) }}" alt="Lampiran" width="100">
-                    </a>
-                @elseif($ext === 'pdf')
-                    <a href="{{ asset('storage/' . $p->lampiran) }}" target="_blank">{{ basename($p->lampiran) }}</a>
-                @else
-                    <span>{{ basename($p->lampiran) }}</span>
+                        @if(in_array($ext, ['jpg','jpeg','png']))
+                            <a href="{{ asset('storage/' . $p->lampiran) }}" target="_blank">
+                                <img src="{{ asset('storage/' . $p->lampiran) }}" alt="Lampiran" width="100">
+                            </a>
+                        @elseif($ext === 'pdf')
+                            <a href="{{ asset('storage/' . $p->lampiran) }}" target="_blank">{{ basename($p->lampiran) }}</a>
+                        @else
+                            <span>{{ basename($p->lampiran) }}</span>
+                        @endif
+                    </div>
                 @endif
             </div>
-            @endif
-
-
-
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">Update</button>
@@ -73,11 +83,9 @@
   </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
-    // Fungsi untuk toggle sections berdasarkan status
+    // Toggle section berdasarkan status
     function toggleEditSections(id) {
         const select = document.querySelector(`.statusSelectEdit[data-id='${id}']`);
         const status = select.value;
@@ -96,52 +104,61 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Inisialisasi toggle saat modal dibuka
     document.querySelectorAll('.statusSelectEdit').forEach(select => {
         const id = select.dataset.id;
         toggleEditSections(id);
-
-        select.addEventListener('change', () => {
-            toggleEditSections(id);
-        });
+        select.addEventListener('change', () => toggleEditSections(id));
     });
 
-    // Kamera dan capture foto
+    // Kamera & Capture foto
     document.querySelectorAll('.captureBtnEdit').forEach(button => {
         const id = button.dataset.id;
         const video = document.getElementById(`videoEdit${id}`);
         const canvas = document.getElementById(`canvasEdit${id}`);
         const fotoInput = document.getElementById(`fotoInputEdit${id}`);
+        const previewSection = document.getElementById(`previewSectionEdit${id}`);
+        const fotoPreview = document.getElementById(`fotoPreviewEdit${id}`);
 
-        // Request kamera hanya ketika tombol capture diklik
-        button.addEventListener('click', () => {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert("Kamera tidak didukung di browser ini!");
-                return;
-            }
+        let stream = null;
 
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
+        // Mulai kamera saat modal dibuka
+        $(`#editPresensiModal${id}`).on('shown.bs.modal', function () {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(s => {
+                    stream = s;
                     video.srcObject = stream;
                     video.play();
+                }).catch(() => alert("Kamera tidak bisa diakses!"));
+            }
+        });
 
-                    // Ambil foto saat tombol capture ditekan
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        // Hentikan kamera saat modal ditutup
+        $(`#editPresensiModal${id}`).on('hidden.bs.modal', function () {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
 
-                    // Simpan foto ke input hidden
-                    fotoInput.value = canvas.toDataURL('image/png');
+        // Capture foto
+        button.addEventListener('click', () => {
+            if (!stream) return;
 
-                    // Stop stream agar kamera mati
-                    stream.getTracks().forEach(track => track.stop());
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("Gagal mengakses kamera!");
-                });
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataURL = canvas.toDataURL('image/png');
+            fotoInput.value = dataURL;
+
+            fotoPreview.src = dataURL;
+            previewSection.classList.remove('d-none');
+        });
+
+        // Ulangi foto
+        document.querySelector(`.ulangiBtnEdit[data-id='${id}']`).addEventListener('click', () => {
+            fotoInput.value = "";
+            previewSection.classList.add('d-none');
         });
     });
-
 });
 </script>

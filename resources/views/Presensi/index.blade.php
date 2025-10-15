@@ -14,9 +14,51 @@
         </a>
          @endif
 
+       <!-- Dropdown Filter Kelas sebagai Icon -->
+<div class="d-flex align-items-center gap-2">
+
+    <!-- Dropdown Filter Kelas -->
+     @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+    <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-filter me-1"></i>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item {{ request('kelas') == '7' ? 'active' : '' }}" 
+                   href="{{ route('presensi.index', array_merge(request()->all(), ['kelas' => '7'])) }}">
+                   Kelas 7
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item {{ request('kelas') == '8' ? 'active' : '' }}" 
+                   href="{{ route('presensi.index', array_merge(request()->all(), ['kelas' => '8'])) }}">
+                   Kelas 8
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item {{ request('kelas') == '9' ? 'active' : '' }}" 
+                   href="{{ route('presensi.index', array_merge(request()->all(), ['kelas' => '9'])) }}">
+                   Kelas 9
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tombol Reset Filter di luar dropdown -->
+    @if(request('kelas') || request('search'))
+    <a href="{{ route('presensi.index') }}" class="btn btn-outline-secondary" title="Reset Filter">
+        <i class="bi bi-x-circle-fill"></i>
+    </a>
+    @endif
+ @endif
+</div>
+
+
+
     <form method="GET" action="{{ route('presensi.index') }}" class="d-flex" id="filterForm">
         <input type="text" name="search" value="{{ request('search') }}" 
-               class="form-control me-2" placeholder="Cari nama atau status...">
+               class="form-control me-2" placeholder="Cari nama, NISN, kelas, atau status...">
         <button type="submit" class="btn btn-outline-secondary me-2">
             <i class="bi bi-search"></i>
         </button>
@@ -48,18 +90,19 @@
     </div>
 @endif
 
-
 <div class="table-responsive">
     <table class="table table-hover align-middle">
         <thead class="table-light">
         <tr>
-            <th class="fw bold text-center" style="width: 5%;"></i>No</th>
-            <th class="fw bold" style="width: 15%;"><i class="bi bi-person-badge me-2"></i>Nama</th>
-            <th class="fw bold" style="width: 20%;"><i class="bi bi-clock-history me-2"></i>Tanggal/Waktu</th>
-            <th class="fw bold" style="width: 15%;"><i class="bi bi-check2-circle me-2"></i>Status</th>
-            <th class="fw bold" style="width: 20%;"><i class="bi bi-paperclip me-2"></i>Lampiran/Foto</th>
+            <th class="fw-bold text-center" style="width: 5%;">No</th>
+            <th class="fw-bold"><i class="bi bi-card-text me-2"></i>NISN</th>
+            <th class="fw-bold"><i class="bi bi-person-badge me-2"></i>Nama</th>
+            <th class="fw-bold"><i class="bi bi-building me-2"></i>Kelas</th>
+            <th class="fw-bold"><i class="bi bi-clock-history me-2"></i>Tanggal/Waktu</th>
+            <th class="fw-bold"><i class="bi bi-check2-circle me-2"></i>Status</th>
+            <th class="fw-bold"><i class="bi bi-paperclip me-2"></i>Lampiran/Foto</th>
         @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
-            <th class="fw bold text-center" style="width: 10%;"><i class="bi bi-gear-fill me-2"></i> Aksi</th>
+            <th class="fw bold text-center"><i class="bi bi-gear-fill"></i> Aksi</th>
         @endif
         </tr>
     </thead>
@@ -67,18 +110,56 @@
         @forelse($presensi as $index => $p)
         <tr>
             <td>{{ $presensi->firstItem() + $index }}</td>
+            <td>{{ $p->user->student->nisn ?? '-' }}</td>
             <td>{{ $p->user->name }}</td>
+            <td>{{ $p->user->student->class ?? '-' }}</td>
             <td>{{ $p->tanggal_waktu }}</td>
-            <td>{{ ucfirst($p->status) }}</td>
             <td>
-                @if($p->lampiran)
-                    <a href="{{ asset('storage/' . $p->lampiran) }}" target="_blank">Lihat Lampiran</a>
-                @elseif($p->foto)
-                    <img src="{{ asset('storage/' . $p->foto) }}" alt="Foto Presensi" width="100">
-                @else
-                    -
-                @endif
+                @php
+                    $status = strtolower($p->status);
+                    $badgeClass = match($status) {
+                        'hadir' => 'success',
+                        'terlambat' => 'danger',
+                        'izin' => 'warning',
+                        'dispensasi' => 'info',
+                        default => 'secondary',
+                    };
+                @endphp
+                <span class="badge bg-{{ $badgeClass }} px-3 py-2">
+                    {{ ucfirst($p->status) }}
+                </span>
             </td>
+            <td>
+    @if($p->lampiran)
+        @php
+            $ext = strtolower(pathinfo($p->lampiran, PATHINFO_EXTENSION));
+        @endphp
+        @if(in_array($ext, ['jpg','jpeg','png','gif']))
+            <img 
+                src="{{ asset('storage/' . $p->lampiran) }}" 
+                alt="Lampiran Foto" 
+                width="100" 
+                class="img-thumbnail clickable-img" 
+                data-bs-toggle="modal" 
+                data-bs-target="#imageModal" 
+                data-img="{{ asset('storage/' . $p->lampiran) }}">
+        @else
+            <a href="{{ asset('storage/' . $p->lampiran) }}" target="_blank">Lihat Lampiran</a>
+        @endif
+    @elseif($p->foto)
+        <img 
+            src="{{ asset('storage/' . $p->foto) }}" 
+            alt="Foto Presensi" 
+            width="100" 
+            class="img-thumbnail clickable-img" 
+            data-bs-toggle="modal" 
+            data-bs-target="#imageModal" 
+            data-img="{{ asset('storage/' . $p->foto) }}">
+    @else
+        -
+    @endif
+        </td>
+
               @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
             <td class="text-center">
             <div class="dropdown">
@@ -105,23 +186,22 @@
             </div>
         </td>
 
-
         <!-- Include partial modal -->
         @include('presensi.partials.edit', ['p' => $p])
         @include('presensi.partials.delete', ['p' => $p])
         @endif
         @empty
         <tr>
-            <td colspan="6" class="text-center">Belum ada data presensi</td>
+            <td colspan="8" class="text-center">Belum ada data presensi</td>
         </tr>
         @endforelse
     </tbody>
 </table>
 
-<!-- Pagination -->
-<div class="d-flex justify-content-center">
+<div class="d-flex justify-content-end">
     {{ $presensi->links() }}
 </div>
+
 
 <!-- Modal Tambah Presensi -->
 <div class="modal fade" id="addPresensiModal" tabindex="-1" aria-labelledby="addPresensiModalLabel" aria-hidden="true">
@@ -150,15 +230,26 @@
                 <video id="video" width="100%" autoplay></video>
                 <canvas id="canvas" class="d-none"></canvas>
                 <input type="hidden" name="foto" id="fotoInput">
-                <button type="button" class="btn btn-success mt-2" id="captureBtn">Ambil Foto</button>
+
+                <div class="mt-2">
+                    <button type="button" class="btn btn-success" id="captureBtn">Ambil Foto</button>
+                </div>
+
+                <!-- Preview hasil jepretan -->
+                <div class="mt-3 d-none" id="previewSection">
+                    <label>Preview Foto</label><br>
+                    <img id="fotoPreview" class="img-fluid rounded border" alt="Hasil Foto">
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-warning btn-sm" id="ulangiBtn">Ulangi Foto</button>
+                    </div>
+                </div>
             </div>
 
-         <!-- Section Izin / Dispensasi -->
+            <!-- Section Izin / Dispensasi -->
             <div class="mb-3 d-none" id="descLampiranSection">
                 <label>Deskripsi</label>
                 <textarea class="form-control" name="deskripsi"></textarea>
                 <label class="mt-2">Lampiran</label>
-                <!-- Tambahkan accept agar hanya file tertentu (opsional) -->
                 <input type="file" name="lampiran" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
             </div>
         </div>
@@ -172,7 +263,27 @@
 </div>
 @endsection
 
+<!-- Modal Preview Gambar -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-transparent border-0 shadow-none">
+      <div class="modal-body text-center position-relative">
+        <img id="previewImage" src="" alt="Preview Foto" class="img-fluid rounded shadow">
+        <button type="button" class="btn btn-light position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 @push('scripts')
+<style>
+  /* Supaya preview kamera tidak mirror */
+  #video {
+    transform: scaleX(-1);
+  }
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const addPresensiModal = document.getElementById('addPresensiModal');
@@ -182,30 +293,25 @@ document.addEventListener('DOMContentLoaded', function() {
     let cameraSection = document.getElementById('cameraSection');
     let descLampiranSection = document.getElementById('descLampiranSection');
     let statusSelect = document.getElementById('statusSelect');
+    let previewSection = document.getElementById('previewSection');
+    let fotoPreview = document.getElementById('fotoPreview');
+    let ulangiBtn = document.getElementById('ulangiBtn');
     let stream = null;
 
-    // Saat modal ditampilkan
     addPresensiModal.addEventListener('shown.bs.modal', function () {
-        cameraSection.classList.add('d-none');
-        descLampiranSection.classList.add('d-none');
-        fotoInput.value = '';
-        stopCamera();
+        resetForm();
     });
 
-    // Saat modal ditutup
     addPresensiModal.addEventListener('hidden.bs.modal', function () {
-        stopCamera();
-        fotoInput.value = '';
-        statusSelect.value = '';
-        cameraSection.classList.add('d-none');
-        descLampiranSection.classList.add('d-none');
+        resetForm();
     });
 
-    // Ganti status
     statusSelect.addEventListener('change', function() {
-        console.log("Status dipilih:", this.value); // debug
         cameraSection.classList.add('d-none');
         descLampiranSection.classList.add('d-none');
+        previewSection.classList.add('d-none');
+        fotoPreview.src = '';
+        fotoInput.value = '';
         stopCamera();
 
         if (this.value === 'hadir') {
@@ -216,13 +322,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Capture foto
+    // Capture foto (hasilnya tidak mirror)
     document.getElementById('captureBtn').addEventListener('click', function() {
+        if (!stream) return;
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-        fotoInput.value = canvas.toDataURL('image/png');
-        alert('Foto berhasil diambil!');
+        let ctx = canvas.getContext('2d');
+        ctx.save();
+        ctx.translate(canvas.width, 0); // geser ke kanan
+        ctx.scale(-1, 1); // balik horizontal
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        let dataURL = canvas.toDataURL('image/png');
+        fotoInput.value = dataURL;
+        fotoPreview.src = dataURL;
+        previewSection.classList.remove('d-none');
+    });
+
+    ulangiBtn.addEventListener('click', function() {
+        fotoInput.value = '';
+        fotoPreview.src = '';
+        previewSection.classList.add('d-none');
     });
 
     function startCamera() {
@@ -243,6 +363,35 @@ document.addEventListener('DOMContentLoaded', function() {
             stream = null;
         }
     }
+
+    function resetForm() {
+        stopCamera();
+        fotoInput.value = '';
+        statusSelect.value = '';
+        cameraSection.classList.add('d-none');
+        descLampiranSection.classList.add('d-none');
+        previewSection.classList.add('d-none');
+        fotoPreview.src = '';
+    }
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const imageModal = document.getElementById('imageModal');
+    const previewImage = document.getElementById('previewImage');
+
+    // Saat modal akan ditampilkan, ubah src gambar berdasarkan atribut data-img
+    imageModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; // elemen yang diklik
+        const imgSrc = button.getAttribute('data-img');
+        previewImage.src = imgSrc;
+    });
+
+    // Hapus src saat modal ditutup agar tidak terbebani memori
+    imageModal.addEventListener('hidden.bs.modal', function () {
+        previewImage.src = '';
+    });
+});
+</script>
+
 @endpush

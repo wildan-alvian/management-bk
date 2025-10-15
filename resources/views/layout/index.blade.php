@@ -23,6 +23,7 @@
             --text-secondary: #4a5568;
             --bg-light: #f8f9fa;
             --bg-white: #ffffff;
+            --sidebar-bg: #f0f4f1;
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
@@ -142,7 +143,7 @@
         /* Sidebar Styles */
         .sidebar {
             width: 280px;
-            background: var(--bg-white);
+            background-color: #F5F5F0; 
             box-shadow: var(--shadow-md);
             padding: 1.5rem;
             transition: var(--transition-base);
@@ -635,7 +636,7 @@
                     </li> -->
                     <li>
                         <a class="dropdown-item" href="{{ route('password.change') }}">
-                            <i class="bi bi-key me-2"></i> Gnati Kata Sandi
+                            <i class="bi bi-key me-2"></i> Ganti Kata Sandi
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>

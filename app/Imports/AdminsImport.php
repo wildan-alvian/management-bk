@@ -11,13 +11,18 @@ class AdminsImport implements ToModel
 {
     public function model(array $row)
     {
-        if ($row[0] === 'NIP') {
+        // Lewati baris header (biasanya kolom pertama berisi teks "NIP")
+        if ($row[0] === 'NIP' || empty($row[2])) {
             return null;
         }
 
+        // Cegah duplikasi email
         if (User::where('email', $row[2])->exists()) {
             return null;
         }
+
+        // Gunakan nomor telepon sebagai password default
+        $defaultPassword = !empty($row[3]) ? $row[3] : '123456'; // fallback jika no. telepon kosong
 
         $user = new User([
             'id_number' => $row[0],
@@ -25,12 +30,16 @@ class AdminsImport implements ToModel
             'email' => $row[2],
             'phone' => $row[3],
             'address' => $row[4],
-            'password' => Hash::make('password123'), 
+            'password' => Hash::make($defaultPassword),
             'role' => 'Admin',
         ]);
 
         $user->save();
-        $user->assignRole('Admin');
+
+        // Pastikan role "Admin" sudah ada sebelum assign
+        if (Role::where('name', 'Admin')->exists()) {
+            $user->assignRole('Admin');
+        }
 
         return $user;
     }

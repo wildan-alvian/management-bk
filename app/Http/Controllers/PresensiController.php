@@ -21,7 +21,7 @@ class PresensiController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        // Jika role student parent → hanya presensi anak-anaknya
+        // Jika role student parent → hanya presensi anak-anaknyaaa
         if ($user->hasRole('Student Parents')) {
             $studentParent = $user->studentParent; // relasi 1-1 ke tabel student_parents
             if ($studentParent) {
@@ -101,24 +101,37 @@ class PresensiController extends Controller
 
     if ($student) {
         $misconductFilePath = null;
+        $publicDisk = Storage::disk('public');
 
-        // Salin lampiran presensi ke folder misconducts pada disk public
-        if (!empty($presensi->lampiran)) {
-            $publicDisk = Storage::disk('public');
-            $sourceRelativePath = ltrim($presensi->lampiran, '/'); // contoh: presensi/abc.pdf
+        // Tentukan file mana yang akan disalin (prioritas: foto > lampiran)
+        $sourceFile = null;
+        if (!empty($presensi->foto)) {
+            $sourceFile = $presensi->foto;
+        } elseif (!empty($presensi->lampiran)) {
+            $sourceFile = $presensi->lampiran;
+        }
 
-            if ($publicDisk->exists($sourceRelativePath)) {
-                // Pastikan direktori tujuan ada
-                if (!$publicDisk->exists('misconducts')) {
-                    $publicDisk->makeDirectory('misconducts');
-                }
+        // Salin file ke folder misconducts jika ada
+        if ($sourceFile && $publicDisk->exists($sourceFile)) {
+            // Pastikan direktori tujuan ada
+            if (!$publicDisk->exists('misconducts')) {
+                $publicDisk->makeDirectory('misconducts');
+            }
 
-                $extension = pathinfo($sourceRelativePath, PATHINFO_EXTENSION) ?: 'dat';
-                $destinationRelativePath = 'misconducts/' . uniqid('auto_') . '.' . $extension;
+            // Ambil extension dari file sumber
+            $extension = pathinfo($sourceFile, PATHINFO_EXTENSION);
+            if (empty($extension)) {
+                $extension = 'png'; // default untuk foto base64
+            }
 
-                $publicDisk->copy($sourceRelativePath, $destinationRelativePath);
+            // Buat nama file tujuan yang unik
+            $destinationRelativePath = 'misconducts/' . uniqid('auto_') . '.' . $extension;
 
-                // Simpan path relatif (tanpa prefix public/) sesuai pola penyimpanan
+            // Copy file dari sumber ke tujuan
+            $copySuccess = $publicDisk->copy($sourceFile, $destinationRelativePath);
+
+            // Simpan path relatif jika berhasil
+            if ($copySuccess) {
                 $misconductFilePath = $destinationRelativePath;
             }
         }

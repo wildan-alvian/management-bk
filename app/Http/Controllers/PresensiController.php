@@ -102,21 +102,26 @@ class PresensiController extends Controller
     if ($student) {
         $misconductFilePath = null;
 
-       
-       if (!empty($presensi->lampiran)) {
-    
-    $sourcePath = 'public/' . ltrim($presensi->lampiran, '/');
-    if (Storage::exists($sourcePath)) {
-        $extension = pathinfo($sourcePath, PATHINFO_EXTENSION);
-        $newFileName = 'public/misconducts/' . uniqid('auto_') . '.' . $extension;
+        // Salin lampiran presensi ke folder misconducts pada disk public
+        if (!empty($presensi->lampiran)) {
+            $publicDisk = Storage::disk('public');
+            $sourceRelativePath = ltrim($presensi->lampiran, '/'); // contoh: presensi/abc.pdf
 
-     
-        Storage::copy($sourcePath, $newFileName);
+            if ($publicDisk->exists($sourceRelativePath)) {
+                // Pastikan direktori tujuan ada
+                if (!$publicDisk->exists('misconducts')) {
+                    $publicDisk->makeDirectory('misconducts');
+                }
 
-    
-        $misconductFilePath = str_replace('public/', '', $newFileName);
-    }
-}
+                $extension = pathinfo($sourceRelativePath, PATHINFO_EXTENSION) ?: 'dat';
+                $destinationRelativePath = 'misconducts/' . uniqid('auto_') . '.' . $extension;
+
+                $publicDisk->copy($sourceRelativePath, $destinationRelativePath);
+
+                // Simpan path relatif (tanpa prefix public/) sesuai pola penyimpanan
+                $misconductFilePath = $destinationRelativePath;
+            }
+        }
 
         // Buat pelanggaran baru
         \App\Models\StudentMisconduct::create([

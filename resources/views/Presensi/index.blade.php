@@ -227,7 +227,7 @@
             <!-- Section Kamera -->
             <div class="mb-3 d-none" id="cameraSection">
                 <label>Foto Kehadiran</label>
-                <video id="video" width="100%" autoplay></video>
+                <video id="video" width="100%" autoplay playsinline muted></video>
                 <canvas id="canvas" class="d-none"></canvas>
                 <input type="hidden" name="foto" id="fotoInput">
 
@@ -347,13 +347,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function startCamera() {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
+            // Constraint yang lebih kompatibel dengan iOS
+            const constraints = {
+                video: {
+                    facingMode: 'user',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            };
+            
+            navigator.mediaDevices.getUserMedia(constraints)
             .then(s => {
                 stream = s;
                 video.srcObject = stream;
-                video.play();
+                
+                // Set atribut untuk iOS compatibility
+                video.setAttribute('playsinline', 'true');
+                video.setAttribute('autoplay', 'true');
+                video.setAttribute('muted', 'true');
+                
+                // Pastikan play() dipanggil dan handle promise
+                video.play().catch(err => {
+                    console.error('Error playing video:', err);
+                    alert('Gagal memutar video kamera: ' + err.message);
+                });
             })
-            .catch(err => alert('Gagal mengakses kamera: ' + err));
+            .catch(err => {
+                console.error('Error accessing camera:', err.name, err.message);
+                let errorMsg = 'Gagal mengakses kamera: ';
+                
+                if (err.name === 'NotAllowedError') {
+                    errorMsg += 'Izin kamera ditolak. Silakan aktifkan izin kamera di pengaturan browser.';
+                } else if (err.name === 'NotFoundError') {
+                    errorMsg += 'Kamera tidak ditemukan pada perangkat ini.';
+                } else if (err.name === 'NotReadableError') {
+                    errorMsg += 'Kamera sedang digunakan oleh aplikasi lain.';
+                } else if (err.name === 'NotSupportedError') {
+                    errorMsg += 'Browser tidak mendukung akses kamera atau koneksi tidak aman (gunakan HTTPS).';
+                } else {
+                    errorMsg += err.message;
+                }
+                
+                alert(errorMsg);
+            });
+        } else {
+            alert('Browser Anda tidak mendukung akses kamera. Silakan gunakan browser yang lebih modern.');
         }
     }
 
@@ -361,6 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
             stream = null;
+            video.srcObject = null;
         }
     }
 

@@ -71,7 +71,7 @@ class PresensiController extends Controller
     $data['user_id'] = Auth::id();
     $data['tanggal_waktu'] = now();
 
-    // Cek jika status hadir, tetapi lewat dari jam 07:00
+    // Cek status terlambat
     if ($data['status'] === 'hadir') {
         $jamBatas = \Carbon\Carbon::createFromTime(7, 0, 0);
         if (now()->greaterThan($jamBatas)) {
@@ -79,12 +79,12 @@ class PresensiController extends Controller
         }
     }
 
-    // Upload lampiran
+    // Upload lampiran (file)
     if ($request->hasFile('lampiran')) {
         $data['lampiran'] = $request->file('lampiran')->store('presensi', 'public');
     }
 
-    // Upload foto base64
+    // Upload foto (base64)
     if (!empty($request->foto)) {
         $image = preg_replace('/^data:image\/\w+;base64,/', '', $request->foto);
         $filename = 'presensi/' . uniqid() . '.png';
@@ -92,24 +92,49 @@ class PresensiController extends Controller
         $data['foto'] = $filename;
     }
 
-    // Simpan presensi
-     $presensi = Presensi::create($data);
+    
+    $presensi = Presensi::create($data);
 
-    // Jika terlambat → otomatis simpan pelanggaran
+ 
     if ($presensi->status === 'terlambat') {
+    $student = Auth::user()->student;
+
+    if ($student) {
+        $misconductFilePath = null;
+
+       
+       if (!empty($presensi->lampiran)) {
+    
+    $sourcePath = 'public/' . ltrim($presensi->lampiran, '/');
+    if (Storage::exists($sourcePath)) {
+        $extension = pathinfo($sourcePath, PATHINFO_EXTENSION);
+        $newFileName = 'public/misconducts/' . uniqid('auto_') . '.' . $extension;
+
+     
+        Storage::copy($sourcePath, $newFileName);
+
+    
+        $misconductFilePath = str_replace('public/', '', $newFileName);
+    }
+}
+
+        // Buat pelanggaran baru
         \App\Models\StudentMisconduct::create([
-            'student_id' => Auth::user()->student->id,
+            'student_id' => $student->id,
             'name'       => 'Terlambat Masuk Sekolah',
             'category'   => 'ringan',
             'date'       => now()->toDateString(),
-            'detail'     => 'Siswa terlambat hadir pada jam ' . now()->format('H:i'),
-            'file'       => $lampiranPath ?? null, // ambil langsung dari upload
+            'detail'     => 'Siswa terlambat hadir pada jam ' . now()->format('H:i'), 
+            'file'       => $misconductFilePath, 
         ]);
     }
+}
+
 
 
     return redirect()->route('presensi.index')->with('success', 'Presensi berhasil ditambahkan');
 }
+
 
     // ===============================
     // Edit Data Presensi

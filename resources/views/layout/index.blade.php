@@ -692,20 +692,21 @@
             const sidebar = document.querySelector('.sidebar');
             const toggleButton = document.getElementById('toggleSidebar');
 
-            
-            toggleButton.addEventListener('click', function () {
-                sidebar.classList.toggle('show');
-            });
+            // Only attach handlers if elements exist to avoid runtime errors that stop other JS (like Bootstrap dropdown)
+            if (sidebar && toggleButton) {
+                toggleButton.addEventListener('click', function () {
+                    sidebar.classList.toggle('show');
+                });
 
-            
-            document.addEventListener('click', function (e) {
-                const isClickInsideSidebar = sidebar.contains(e.target);
-                const isClickOnToggle = toggleButton.contains(e.target);
+                document.addEventListener('click', function (e) {
+                    const isClickInsideSidebar = sidebar.contains(e.target);
+                    const isClickOnToggle = toggleButton.contains(e.target);
 
-                if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('show')) {
-                    sidebar.classList.remove('show');
-                }
-            });
+                    if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            }
         });
     </script>
 

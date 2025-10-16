@@ -21,8 +21,9 @@ class Counseling extends Model
         'status',
         'notes',
         'reschedule_note',
-        'description'
+        'description',
     ];
+
     protected $casts = [
         'scheduled_at' => 'datetime',
         'old_date' => 'datetime',
@@ -33,9 +34,8 @@ class Counseling extends Model
         return $this->belongsTo(User::class, 'submitted_by_id');
     }
 
-        public function TindakLanjuts()
+    public function tindaklanjuts()
     {
-        return $this->hasMany(TindakLanjut::class);
+        return $this->hasMany(Tindaklanjut::class);
     }
-
 }

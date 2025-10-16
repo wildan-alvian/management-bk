@@ -132,7 +132,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse(optional($counseling)->tindaklanjuts ?? [] as $key => $tindaklanjut)
+                            @php
+                                // Prefer controller-provided $tindaklanjuts (fresh from DB), fallback to relation
+                                $listTindak = $tindaklanjuts ?? optional($counseling)->tindaklanjuts ?? collect();
+                            @endphp
+                            @forelse($listTindak as $key => $tindaklanjut)
                             <tr>
                                 <td class="fw-semibold">{{ $key + 1 }}</td>
                                 <td class="text-start text-secondary">{{ $tindaklanjut->description }}</td>

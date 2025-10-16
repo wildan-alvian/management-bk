@@ -40,6 +40,11 @@ class StudentMisconduct extends Model
         return $this->hasOne(Lanjutan::class, 'misconduct_id');
     }
 
+    public function presensi()
+{
+    return $this->belongsTo(Presensi::class);
+}
+
 
 }
 

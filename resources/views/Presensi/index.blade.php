@@ -204,7 +204,7 @@
 
 
 <!-- Modal Tambah Presensi -->
-<div class="modal fade" id="addPresensiModal" tabindex="-1" aria-labelledby="addPresensiModalLabel" aria-hidden="true">
+<div class="modal fade" id="addPresensiModal" tabindex="-1" aria-labelledby="addPresensiModalLabel">
   <div class="modal-dialog">
     <form action="{{ route('presensi.store') }}" method="POST" enctype="multipart/form-data" id="presensiForm">
       @csrf
@@ -215,7 +215,7 @@
         </div>
         <div class="modal-body">
             <div class="mb-3">
-                <label>Status</label>
+                <label for="statusSelect">Status</label>
                 <select class="form-select" name="status" id="statusSelect" required>
                     <option value="">Pilih Status</option>
                     <option value="hadir">Hadir</option>
@@ -227,6 +227,9 @@
             <!-- Section Kamera -->
             <div class="mb-3 d-none" id="cameraSection">
                 <label>Foto Kehadiran</label>
+                <div class="alert alert-info" id="cameraInfo">
+                    <small>Pastikan Anda telah mengizinkan akses kamera pada browser.</small>
+                </div>
                 <video id="video" width="100%" autoplay playsinline muted></video>
                 <canvas id="canvas" class="d-none"></canvas>
                 <input type="hidden" name="foto" id="fotoInput">
@@ -247,10 +250,10 @@
 
             <!-- Section Izin / Dispensasi -->
             <div class="mb-3 d-none" id="descLampiranSection">
-                <label>Deskripsi</label>
-                <textarea class="form-control" name="deskripsi"></textarea>
-                <label class="mt-2">Lampiran</label>
-                <input type="file" name="lampiran" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                <label for="deskripsiInput">Deskripsi</label>
+                <textarea class="form-control" name="deskripsi" id="deskripsiInput"></textarea>
+                <label class="mt-2" for="lampiranInput">Lampiran</label>
+                <input type="file" name="lampiran" id="lampiranInput" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
             </div>
         </div>
         <div class="modal-footer">
@@ -264,7 +267,7 @@
 @endsection
 
 <!-- Modal Preview Gambar -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content bg-transparent border-0 shadow-none">
       <div class="modal-body text-center position-relative">
@@ -296,16 +299,22 @@ document.addEventListener('DOMContentLoaded', function() {
     let previewSection = document.getElementById('previewSection');
     let fotoPreview = document.getElementById('fotoPreview');
     let ulangiBtn = document.getElementById('ulangiBtn');
+    let captureBtn = document.getElementById('captureBtn');
+    let cameraInfo = document.getElementById('cameraInfo');
     let stream = null;
+    let cameraStarted = false;
 
+    // Event ketika modal dibuka
     addPresensiModal.addEventListener('shown.bs.modal', function () {
         resetForm();
     });
 
+    // Event ketika modal ditutup
     addPresensiModal.addEventListener('hidden.bs.modal', function () {
         resetForm();
     });
 
+    // Event ketika status berubah
     statusSelect.addEventListener('change', function() {
         cameraSection.classList.add('d-none');
         descLampiranSection.classList.add('d-none');
@@ -313,93 +322,144 @@ document.addEventListener('DOMContentLoaded', function() {
         fotoPreview.src = '';
         fotoInput.value = '';
         stopCamera();
+        cameraStarted = false;
 
         if (this.value === 'hadir') {
             cameraSection.classList.remove('d-none');
-            startCamera();
+            // Delay start camera untuk menghindari konflik dengan modal
+            setTimeout(() => {
+                startCamera();
+            }, 300);
         } else if (this.value === 'izin' || this.value === 'dispensasi') {
             descLampiranSection.classList.remove('d-none');
         }
     });
 
     // Capture foto (hasilnya tidak mirror)
-    document.getElementById('captureBtn').addEventListener('click', function() {
-        if (!stream) return;
+    captureBtn.addEventListener('click', function() {
+        if (!stream || !video.videoWidth) {
+            alert('Kamera belum siap. Tunggu beberapa saat.');
+            return;
+        }
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         let ctx = canvas.getContext('2d');
         ctx.save();
-        ctx.translate(canvas.width, 0); // geser ke kanan
-        ctx.scale(-1, 1); // balik horizontal
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         ctx.restore();
         let dataURL = canvas.toDataURL('image/png');
         fotoInput.value = dataURL;
         fotoPreview.src = dataURL;
         previewSection.classList.remove('d-none');
+        
+        // Stop camera setelah foto diambil untuk menghemat resource
+        stopCamera();
     });
 
     ulangiBtn.addEventListener('click', function() {
         fotoInput.value = '';
         fotoPreview.src = '';
         previewSection.classList.add('d-none');
+        // Restart camera
+        if (!cameraStarted) {
+            startCamera();
+        }
     });
 
     function startCamera() {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            // Constraint yang lebih kompatibel dengan iOS
+        if (cameraStarted) {
+            return;
+        }
+
+        // Cek apakah browser mendukung getUserMedia
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            cameraInfo.innerHTML = '<small class="text-danger"><strong>Error:</strong> Browser Anda tidak mendukung akses kamera atau koneksi tidak aman (gunakan HTTPS).</small>';
+            captureBtn.disabled = true;
+            return;
+        }
+
+        cameraInfo.innerHTML = '<small>Mengaktifkan kamera...</small>';
+        captureBtn.disabled = true;
+
+        // Cek dulu apakah ada kamera yang tersedia
+        navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            
+            if (videoDevices.length === 0) {
+                throw new Error('Tidak ada kamera yang ditemukan di perangkat ini');
+            }
+
+            // Constraint yang lebih kompatibel
             const constraints = {
                 video: {
                     facingMode: 'user',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
+                    width: { ideal: 640 },
+                    height: { ideal: 480 }
+                },
+                audio: false
             };
             
-            navigator.mediaDevices.getUserMedia(constraints)
-            .then(s => {
-                stream = s;
-                video.srcObject = stream;
-                
-                // Set atribut untuk iOS compatibility
-                video.setAttribute('playsinline', 'true');
-                video.setAttribute('autoplay', 'true');
-                video.setAttribute('muted', 'true');
-                
-                // Pastikan play() dipanggil dan handle promise
-                video.play().catch(err => {
-                    console.error('Error playing video:', err);
-                    alert('Gagal memutar video kamera: ' + err.message);
-                });
-            })
-            .catch(err => {
-                console.error('Error accessing camera:', err.name, err.message);
-                let errorMsg = 'Gagal mengakses kamera: ';
-                
-                if (err.name === 'NotAllowedError') {
-                    errorMsg += 'Izin kamera ditolak. Silakan aktifkan izin kamera di pengaturan browser.';
-                } else if (err.name === 'NotFoundError') {
-                    errorMsg += 'Kamera tidak ditemukan pada perangkat ini.';
-                } else if (err.name === 'NotReadableError') {
-                    errorMsg += 'Kamera sedang digunakan oleh aplikasi lain.';
-                } else if (err.name === 'NotSupportedError') {
-                    errorMsg += 'Browser tidak mendukung akses kamera atau koneksi tidak aman (gunakan HTTPS).';
-                } else {
-                    errorMsg += err.message;
-                }
-                
-                alert(errorMsg);
-            });
-        } else {
-            alert('Browser Anda tidak mendukung akses kamera. Silakan gunakan browser yang lebih modern.');
-        }
+            return navigator.mediaDevices.getUserMedia(constraints);
+        })
+        .then(s => {
+            stream = s;
+            video.srcObject = stream;
+            cameraStarted = true;
+            
+            // Set atribut untuk iOS compatibility
+            video.setAttribute('playsinline', 'true');
+            video.setAttribute('autoplay', 'true');
+            video.setAttribute('muted', 'true');
+            
+            // Tunggu video siap sebelum enable button
+            video.onloadedmetadata = function() {
+                video.play()
+                    .then(() => {
+                        cameraInfo.innerHTML = '<small class="text-success">Kamera aktif. Silakan ambil foto.</small>';
+                        captureBtn.disabled = false;
+                    })
+                    .catch(err => {
+                        console.error('Error playing video:', err);
+                        cameraInfo.innerHTML = '<small class="text-danger"><strong>Error:</strong> Gagal memutar video kamera: ' + err.message + '</small>';
+                        stopCamera();
+                    });
+            };
+        })
+        .catch(err => {
+            console.error('Error accessing camera:', err.name, err.message);
+            let errorMsg = '<strong>Error:</strong> ';
+            
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                errorMsg += 'Izin kamera ditolak. Silakan aktifkan izin kamera di pengaturan browser Anda.';
+            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                errorMsg += 'Kamera tidak ditemukan pada perangkat ini. Pastikan perangkat memiliki kamera dan tidak digunakan aplikasi lain.';
+            } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                errorMsg += 'Kamera sedang digunakan oleh aplikasi lain. Tutup aplikasi lain yang menggunakan kamera.';
+            } else if (err.name === 'NotSupportedError') {
+                errorMsg += 'Browser tidak mendukung akses kamera atau koneksi tidak aman (gunakan HTTPS).';
+            } else if (err.name === 'OverconstrainedError' || err.name === 'ConstraintNotSatisfiedError') {
+                errorMsg += 'Kamera tidak mendukung resolusi yang diminta.';
+            } else {
+                errorMsg += err.message || 'Tidak dapat mengakses kamera. Pastikan menggunakan HTTPS dan izin kamera diaktifkan.';
+            }
+            
+            cameraInfo.innerHTML = '<small class="text-danger">' + errorMsg + '</small>';
+            captureBtn.disabled = true;
+            cameraStarted = false;
+        });
     }
 
     function stopCamera() {
         if (stream) {
-            stream.getTracks().forEach(track => track.stop());
+            stream.getTracks().forEach(track => {
+                track.stop();
+            });
             stream = null;
             video.srcObject = null;
+            cameraStarted = false;
         }
     }
 
@@ -411,7 +471,14 @@ document.addEventListener('DOMContentLoaded', function() {
         descLampiranSection.classList.add('d-none');
         previewSection.classList.add('d-none');
         fotoPreview.src = '';
+        cameraInfo.innerHTML = '<small>Pastikan Anda telah mengizinkan akses kamera pada browser.</small>';
+        captureBtn.disabled = false;
     }
+
+    // Pastikan kamera stop saat page unload
+    window.addEventListener('beforeunload', function() {
+        stopCamera();
+    });
 });
 </script>
 <script>
@@ -421,7 +488,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Saat modal akan ditampilkan, ubah src gambar berdasarkan atribut data-img
     imageModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget; // elemen yang diklik
+        const button = event.relatedTarget;
         const imgSrc = button.getAttribute('data-img');
         previewImage.src = imgSrc;
     });

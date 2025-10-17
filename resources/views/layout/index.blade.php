@@ -191,7 +191,7 @@
         .content {
             flex: 1;
             margin-left: 280px;
-            padding: 2rem;
+            padding: 1rem;
             transition: var(--transition-base);
             overflow: auto;
         }

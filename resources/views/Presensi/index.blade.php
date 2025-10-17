@@ -93,192 +93,194 @@
 <div class="table-responsive">
     <table class="table table-hover align-middle">
         <thead class="table-light">
-        <tr>
-            <th class="fw-bold text-center" style="width: 5%;">No</th>
-            <th class="fw-bold"><i class="bi bi-card-text me-2"></i>NISN</th>
-            <th class="fw-bold"><i class="bi bi-person-badge me-2"></i>Nama</th>
-            <th class="fw-bold"><i class="bi bi-building me-2"></i>Kelas</th>
-            <th class="fw-bold"><i class="bi bi-clock-history me-2"></i>Tanggal/Waktu</th>
-            <th class="fw-bold"><i class="bi bi-check2-circle me-2"></i>Status</th>
-            <th class="fw-bold"><i class="bi bi-paperclip me-2"></i>Lampiran/Foto</th>
-        @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
-            <th class="fw bold text-center"><i class="bi bi-gear-fill"></i> Aksi</th>
-        @endif
-        </tr>
-    </thead>
-    <tbody>
-        @forelse($presensi as $index => $p)
-        <tr>
-            <td>{{ $presensi->firstItem() + $index }}</td>
-            <td>{{ $p->user->student->nisn ?? '-' }}</td>
-            <td>{{ $p->user->name }}</td>
-            <td>{{ $p->user->student->class ?? '-' }}</td>
-            <td>{{ $p->tanggal_waktu }}</td>
-            <td>
-                @php
-                    $status = strtolower($p->status);
-                    $badgeClass = match($status) {
-                        'hadir' => 'success',
-                        'terlambat' => 'danger',
-                        'izin' => 'warning',
-                        'dispensasi' => 'info',
-                        default => 'secondary',
-                    };
-                @endphp
-                <span class="badge bg-{{ $badgeClass }} px-3 py-2">
-                    {{ ucfirst($p->status) }}
-                </span>
-            </td>
-            <td>
-    @if($p->lampiran)
-        @php
-            $ext = strtolower(pathinfo($p->lampiran, PATHINFO_EXTENSION));
-        @endphp
-        @if(in_array($ext, ['jpg','jpeg','png','gif']))
+            <tr>
+                <th class="fw-bold text-center" style="width: 5%;">No</th>
+                <th class="fw-bold"><i class="bi bi-card-text me-2"></i>NISN</th>
+                <th class="fw-bold"><i class="bi bi-person-badge me-2"></i>Nama</th>
+                <th class="fw-bold"><i class="bi bi-building me-2"></i>Kelas</th>
+                <th class="fw-bold"><i class="bi bi-clock-history me-2"></i>Tanggal/Waktu</th>
+                <th class="fw-bold"><i class="bi bi-check2-circle me-2"></i>Status</th>
+                <th class="fw-bold"><i class="bi bi-paperclip me-2"></i>Lampiran/Foto</th>
+            @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+                <th class="fw bold text-center"><i class="bi bi-gear-fill"></i> Aksi</th>
+            @endif
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($presensi as $index => $p)
+            <tr>
+                <td>{{ $presensi->firstItem() + $index }}</td>
+                <td>{{ $p->user->student->nisn ?? '-' }}</td>
+                <td>{{ $p->user->name }}</td>
+                <td>{{ $p->user->student->class ?? '-' }}</td>
+                <td>{{ $p->tanggal_waktu }}</td>
+                <td>
+                    @php
+                        $status = strtolower($p->status);
+                        $badgeClass = match($status) {
+                            'hadir' => 'success',
+                            'terlambat' => 'danger',
+                            'izin' => 'warning',
+                            'dispensasi' => 'info',
+                            default => 'secondary',
+                        };
+                    @endphp
+                    <span class="badge bg-{{ $badgeClass }} px-3 py-2">
+                        {{ ucfirst($p->status) }}
+                    </span>
+                </td>
+                <td>
+        @if($p->lampiran)
+            @php
+                $ext = strtolower(pathinfo($p->lampiran, PATHINFO_EXTENSION));
+            @endphp
+            @if(in_array($ext, ['jpg','jpeg','png','gif']))
+                <img 
+                    src="{{ asset('storage/' . $p->lampiran) }}" 
+                    alt="Lampiran Foto" 
+                    width="100" 
+                    class="img-thumbnail clickable-img" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#imageModal" 
+                    data-img="{{ asset('storage/' . $p->lampiran) }}">
+            @else
+                <a href="{{ asset('storage/' . $p->lampiran) }}" target="_blank">Lihat Lampiran</a>
+            @endif
+        @elseif($p->foto)
             <img 
-                src="{{ asset('storage/' . $p->lampiran) }}" 
-                alt="Lampiran Foto" 
+                src="{{ asset('storage/' . $p->foto) }}" 
+                alt="Foto Presensi" 
                 width="100" 
                 class="img-thumbnail clickable-img" 
                 data-bs-toggle="modal" 
                 data-bs-target="#imageModal" 
-                data-img="{{ asset('storage/' . $p->lampiran) }}">
+                data-img="{{ asset('storage/' . $p->foto) }}">
         @else
-            <a href="{{ asset('storage/' . $p->lampiran) }}" target="_blank">Lihat Lampiran</a>
+            -
         @endif
-    @elseif($p->foto)
-        <img 
-            src="{{ asset('storage/' . $p->foto) }}" 
-            alt="Foto Presensi" 
-            width="100" 
-            class="img-thumbnail clickable-img" 
-            data-bs-toggle="modal" 
-            data-bs-target="#imageModal" 
-            data-img="{{ asset('storage/' . $p->foto) }}">
-    @else
-        -
-    @endif
-        </td>
+            </td>
 
-              @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
-            <td class="text-center">
-            <div class="dropdown">
-                <button class="btn btn-sm btn-light" type="button" id="dropdownMenuButton{{ $p->id }}" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-three-dots-vertical"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ $p->id }}">
-                     <li>
-                        <a href="{{ route('presensi.show', $p->id) }}" class="dropdown-item">
-                            <i class="bi bi-eye-fill me-2"></i>Detail
-                        </a>
-                    </li>
-                    <li>
-                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editPresensiModal{{ $p->id }}">
-                            <i class="bi bi-pencil-square me-2"></i>Edit
-                        </button>
-                    </li>
-                    <li>
-                        <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deletePresensiModal{{ $p->id }}">
-                            <i class="bi bi-trash3-fill me-2"></i>Hapus
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </td>
+                @if(Auth::user()->hasAnyRole(['Super Admin', 'Admin', 'Guidance Counselor']))
+                <td class="text-center">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light" type="button" id="dropdownMenuButton{{ $p->id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ $p->id }}">
+                        <li>
+                            <a href="{{ route('presensi.show', $p->id) }}" class="dropdown-item">
+                                <i class="bi bi-eye-fill me-2"></i>Detail
+                            </a>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editPresensiModal{{ $p->id }}">
+                                <i class="bi bi-pencil-square me-2"></i>Edit
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deletePresensiModal{{ $p->id }}">
+                                <i class="bi bi-trash3-fill me-2"></i>Hapus
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </td>
 
-        <!-- Include partial modal -->
-        @include('presensi.partials.edit', ['p' => $p])
-        @include('presensi.partials.delete', ['p' => $p])
-        @endif
-        @empty
-        <tr>
-            <td colspan="8" class="text-center">Belum ada data presensi</td>
-        </tr>
-        @endforelse
-    </tbody>
-</table>
+            <!-- Include partial modal -->
+            @include('presensi.partials.edit', ['p' => $p])
+            @include('presensi.partials.delete', ['p' => $p])
+            @endif
+            @empty
+            <tr>
+                <td colspan="8" class="text-center">Belum ada data presensi</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
 
-<div class="d-flex justify-content-end">
-    {{ $presensi->links() }}
+    <div class="d-flex justify-content-end">
+        {{ $presensi->links() }}
+    </div>
 </div>
 
 
 <!-- Modal Tambah Presensi -->
 <div class="modal fade" id="addPresensiModal" tabindex="-1" aria-labelledby="addPresensiModalLabel">
-  <div class="modal-dialog">
-    <form action="{{ route('presensi.store') }}" method="POST" enctype="multipart/form-data" id="presensiForm">
-      @csrf
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addPresensiModalLabel">Tambah Presensi</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div class="mb-3">
-                <label for="statusSelect">Status</label>
-                <select class="form-select" name="status" id="statusSelect" required>
-                    <option value="">Pilih Status</option>
-                    <option value="hadir">Hadir</option>
-                    <option value="izin">Izin</option>
-                    <option value="dispensasi">Dispensasi</option>
-                </select>
+    <div class="modal-dialog modal-dialog-centered">
+        
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="addPresensiModalLabel">Tambah Presensi</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
-            <!-- Section Kamera -->
-            <div class="mb-3 d-none" id="cameraSection">
-                <label>Foto Kehadiran</label>
-                <div class="alert alert-info" id="cameraInfo">
-                    <small>Pastikan Anda telah mengizinkan akses kamera pada browser.</small>
-                </div>
-                <video id="video" width="100%" autoplay playsinline muted></video>
-                <canvas id="canvas" class="d-none"></canvas>
-                <input type="hidden" name="foto" id="fotoInput">
-
-                <div class="mt-2">
-                    <button type="button" class="btn btn-success" id="captureBtn">Ambil Foto</button>
+            <div class="modal-body">
+                <form action="{{ route('presensi.store') }}" method="POST" enctype="multipart/form-data" id="presensiForm">
+                @csrf
+                <div class="mb-3">
+                    <label for="statusSelect">Status</label>
+                    <select class="form-select" name="status" id="statusSelect" required>
+                        <option value="">Pilih Status</option>
+                        <option value="hadir">Hadir</option>
+                        <option value="izin">Izin</option>
+                        <option value="dispensasi">Dispensasi</option>
+                    </select>
                 </div>
 
-                <!-- Preview hasil jepretan -->
-                <div class="mt-3 d-none" id="previewSection">
-                    <label>Preview Foto</label><br>
-                    <img id="fotoPreview" class="img-fluid rounded border" alt="Hasil Foto">
+                <!-- Section Kamera -->
+                <div class="mb-3 d-none" id="cameraSection">
+                    <label>Foto Kehadiran</label>
+                    <div class="alert alert-info" id="cameraInfo">
+                        <small>Pastikan Anda telah mengizinkan akses kamera pada browser.</small>
+                    </div>
+                    <video id="video" width="100%" autoplay playsinline muted></video>
+                    <canvas id="canvas" class="d-none"></canvas>
+                    <input type="hidden" name="foto" id="fotoInput">
+
                     <div class="mt-2">
-                        <button type="button" class="btn btn-warning btn-sm" id="ulangiBtn">Ulangi Foto</button>
+                        <button type="button" class="btn btn-success" id="captureBtn">Ambil Foto</button>
+                    </div>
+
+                    <!-- Preview hasil jepretan -->
+                    <div class="mt-3 d-none" id="previewSection">
+                        <label>Preview Foto</label><br>
+                        <img id="fotoPreview" class="img-fluid rounded border" alt="Hasil Foto">
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-warning btn-sm" id="ulangiBtn">Ulangi Foto</button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Section Izin / Dispensasi -->
-            <div class="mb-3 d-none" id="descLampiranSection">
-                <label for="deskripsiInput">Deskripsi</label>
-                <textarea class="form-control" name="deskripsi" id="deskripsiInput"></textarea>
-                <label class="mt-2" for="lampiranInput">Lampiran</label>
-                <input type="file" name="lampiran" id="lampiranInput" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                <!-- Section Izin / Dispensasi -->
+                <div class="mb-3 d-none" id="descLampiranSection">
+                    <label for="deskripsiInput">Deskripsi</label>
+                    <textarea class="form-control" name="deskripsi" id="deskripsiInput"></textarea>
+                    <label class="mt-2" for="lampiranInput">Lampiran</label>
+                    <input type="file" name="lampiran" id="lampiranInput" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                </div>
+                </form>
             </div>
         </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Simpan</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        </div>
-      </div>
-    </form>
-  </div>
+    </div>
 </div>
-@endsection
 
 <!-- Modal Preview Gambar -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content bg-transparent border-0 shadow-none">
-      <div class="modal-body text-center position-relative">
-        <img id="previewImage" src="" alt="Preview Foto" class="img-fluid rounded shadow">
-        <button type="button" class="btn btn-light position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0 shadow-none">
+        <div class="modal-body text-center position-relative">
+            <img id="previewImage" src="" alt="Preview Foto" class="img-fluid rounded shadow">
+            <button type="button" class="btn btn-light position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        </div>
     </div>
-  </div>
 </div>
+@endsection
 
 @push('scripts')
 <style>
